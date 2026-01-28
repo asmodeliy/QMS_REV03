@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <main class="container wide rpmt-root">
+    
+    <div class="dashboard-header-section rpmt-header">
+      <div class="dashboard-header-content">
+        <div>
+          <h1 class="dashboard-title">RPMT</h1>
+          <p class="dashboard-subtitle">RAMSCHIP PROJECT MANAGEMENT TOOL</p>
+        </div>
+      </div>
+    </div>
+
+    
+    <section class="cards" id="projectCards">
+      {% for row in summary %}
+      {% set variant = (row.project.id % 8) + 1 %}
+      <article class="card colored variant-{{ variant }}" 
+               data-process="{{ row.project.process or '' }}" 
+               data-dept="{{ (row.project.code or '') }}" 
+               data-has-delayed="{{ 1 if (project_metrics.get(row.project.id) and project_metrics[row.project.id].overdue_count > 0) or row.counts.get('지연중',0) > 0 else 0 }}">
+        <div class="card-head">
+          <a class="card-title" href="/rpmt/projects/{{ row.project.id }}" title="{{ row.project.code }}">
+            {{ row.project.code }}
+          </a>
+          {# per-card KPI status badges removed per design request #}
+        </div>
+
+        <div class="percent">
+          <div class="percent-num">{{ (row.percent*100)|round(0) }}%</div>
+          <div class="bar"><div class="bar-fill" style="width:{{ (row.percent*100)|round(0) }}%"></div></div>
+        </div>
+
+        <div class="meta-split">
+          <div class="tags-col">
+            {% if row.project.process %}<span class="pill">{{ row.project.process }}</span>{% endif %}
+            {% if row.project.metal_option %}<span class="pill">{{ row.project.metal_option }}</span>{% endif %}
+            {% if row.project.pdk_ver %}<span class="pill">{{ row.project.pdk_ver }}</span>{% endif %}
+            {% if row.project.ip_code %}<span class="pill">{{ row.project.ip_code }}</span>{% endif %}
+            {% set tag_count = (row.project.process and 1 or 0)
+                              + (row.project.metal_option and 1 or 0)
+                              + (row.project.pdk_ver and 1 or 0)
+                              + (row.project.ip_code and 1 or 0) %}
+            {% for _ in range(4 - tag_count) %}<span class="pill ghost"> </span>{% endfor %}
+          </div>
+
+          <div class="kpis-col">
+            <button class="kpi sm ok   kpi-btn" data-pid="{{ row.project.id }}" data-kind="done"><span class="lbl">{{ t('task.complete', locale) }}</span><span class="num">{{ row.counts.get('완료', 0) or row.counts.get('Complete', 0) }}</span></button>
+            <button class="kpi sm prog kpi-btn" data-pid="{{ row.project.id }}" data-kind="progress"><span class="lbl">{{ t('dashboard.in_progress', locale) }}</span><span class="num">{{ row.counts.get('진행중', 0) or row.counts.get('In-progress', 0) }}</span></button>
+            <button class="kpi sm late kpi-btn" data-pid="{{ row.project.id }}" data-kind="late"><span class="lbl">{{ t('task.overdue', locale) }}</span><span class="num">{{ row.counts.get('지연중', 0) or row.counts.get('Overdue', 0) }}</span></button>
+            <button class="kpi sm      kpi-btn" data-pid="{{ row.project.id }}" data-kind="not_started"><span class="lbl">{{ t('dashboard.not_started', locale) }}</span><span class="num">{{ row.counts.get('준비중', 0) or row.counts.get('Not Started', 0) }}</span></button>
+            <button class="kpi sm na   kpi-btn" data-pid="{{ row.project.id }}" data-kind="na"><span class="lbl">{{ t('dashboard.na', locale) }}</span><span class="num">{{ row.counts.get('해당 없음', 0) or row.counts.get('N/A', 0) }}</span></button>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+
+    
+    <div class="week-head">
+      <div class="week-filters" id="statusFilters">
+        <button class="btn toggle active" data-v="all">{{ t('weekly.all', locale) }}</button>
+        <button class="btn toggle" data-v="In-progress">{{ t('dashboard.in_progress', locale) }}</button>
+        <button class="btn toggle" data-v="Complete">{{ t('task.complete', locale) }}</button>
+        <button class="btn toggle" data-v="Not Started">{{ t('dashboard.not_started', locale) }}</button>
+        <button class="btn toggle" data-v="N/A">{{ t('dashboard.na', locale) }}</button>
+      </div>
+      <div class="week-filters-right">
+        <div class="gf-row">
+          <label class="gf-label">{{ t('dashboard.process', locale) if t('dashboard.process', locale) != 'dashboard.process' else 'Process' }}</label>
+          <select id="gfProcess" class="sel gf-select">
+            <option value="">{{ t('common.all', locale) if t('common.all', locale) != 'common.all' else 'All' }}</option>
+            {% for proc in projects|map(attribute='process')|reject('equalto','')|unique|list %}
+              <option value="{{ proc }}">{{ proc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="gf-row">
+          <label class="gf-label">Dept</label>
+          <input id="gfDept" class="inp gf-input" placeholder="검색"/>
+        </div>
+        <label class="gf-checkbox">
+          <input type="checkbox" id="gfDelayedOnly" />
+          <span>{{ t('dashboard.only_delayed', locale) if t('dashboard.only_delayed', locale) != 'dashboard.only_delayed' else 'Delayed' }}</span>
+        </label>
+        <button type="button" class="btn small ghost" id="gfReset">{{ t('dashboard.reset_filters', locale) if t('dashboard.reset_filters', locale) != 'dashboard.reset_filters' else 'Reset' }}</button>
+      </div>
+    </div>
+
+    <section class="focus3">
+      {% set labels = {
+        'prev': t('weekly.previous_week', locale),
+        'cur': t('weekly.this_week', locale),
+        'next': t('weekly.next_week', locale)
+      } %}
+      {% for key, label in labels.items() %}
+        {% set wk = weekly_triplet[key] if weekly_triplet is defined else triplet[key] %}  
+        <article class="big-week">
+          {% if wk %}
+            <div class="meta">
+              <div>{{ wk.year }}-{{ "%02d"|format(wk.month) }} · W{{ wk.week.iso_week }} · {{ label }}</div>
+              <div>{{ wk.week.monday.strftime('%m.%d') }}–{{ wk.week.sunday.strftime('%m.%d') }}</div>
+            </div>
+            <div class="week-list">
+              {% set items = wk.week['items'] %}
+              {% if items|length == 0 %}
+                <div class="chip">{{ t('weekly.no_deadline', locale) }}</div>
+              {% else %}
+                {% for it in items %}
+                  {% set v = (it.project.id % 8) + 1 %}
+                  <div class="week-item colored variant-{{ v }}" data-status="{{ it.task.status.value if it.task.status else 'N/A' }}" data-task-id="{{ it.task.id }}" {% if it.signal == '지연중' or it.signal == 'Overdue' %}data-delayed="true"{% endif %}>
+                    <div><strong><a href="/rpmt/projects/{{ it.project.id }}">{{ it.project.code }}</a></strong> · {{ it.task.cat1 }}</div>
+                    <div class="muted" style="font-size:12px">{{ it.task.cat2 }}</div>
+                    <div class="meta-line">
+                      {% if it.code == 'overdue' %}
+                        <span class="chip danger pulse">{{ t('task.overdue', locale) }}</span>
+                      {% elif it.code == 'due_soon' %}
+                        <span class="chip warn">{{ t('task.due_soon', locale) }}</span>
+                      {% else %}
+                        <span class="chip">{{ t('dashboard.in_progress', locale) }}</span>
+                      {% endif %}
+                      <span class="pill">{{ it.task.due_date }}</span>
+                      <span class="pill week-status-pill">{{ it.task.status.value if it.task.status else 'N/A' }}</span>
+                      <span class="chip route" title="Department route">
+                        {{ it.task.dept_from or '—' }} → {{ it.task.dept_to or '—' }}
+                      </span>
+                      <button class="wk2-quick-status" type="button" aria-label="Quick status change">⋯</button>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="meta"><div>{{ label }}</div><div>&nbsp;</div></div>
+            <div class="week-list"><div class="chip">{{ t('message.no_data', locale) }}</div></div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+
+  
+  {% if delayed and delayed|length > 0 %}
+  {# Template-only modal card. Live modal is created and appended to document.body by the script below. #}
+  <template id="rpmt_delay_template">
+    <div class="modal-card rpmt-delay-card">
+      <div class="modal-head">
+        <strong>{{ t('dashboard.delayed', locale) }} ({{ delayed|length }})</strong>
+        <button class="icon-btn danger" data-rpmt-close type="button" title="{{ t('common.close', locale) }}">✕</button>
+      </div>
+      <div class="modal-body">
+        <ul class="delay-list">
+          {% for p, t_item, d in delayed %}
+          <li class="delay-item {% if d|int > 0 %}overdue{% endif %} variant-{{ (p.id % 8) + 1 }}">
+            <div class="tit">
+              <a href="/rpmt/projects/{{ p.id }}" class="prj">{{ p.code }}</a>
+              <span class="sep">·</span>
+              <span class="cat">{{ t_item.cat1 or t('message.no_data', locale) }}</span>
+              {% if t_item.cat2 %}<span class="muted"> — {{ t_item.cat2 }}</span>{% endif %}
+            </div>
+            <div class="meta">
+              <span class="chip danger">{{ t('task.overdue', locale) }}</span>
+              {% if d %}<span class="pill">{{ t('task.overdue', locale) }} {{ d }}</span>{% endif %}
+              {% if t_item.due_date %}<span class="pill">{{ t('task.due_date', locale) }} {{ t_item.due_date }}</span>{% endif %}
+              <span class="pill">{{ t_item.status.value if t_item.status else 'N/A' }}</span>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="modal-foot">
+        <button class="btn primary" data-rpmt-confirm type="button">{{ t('common.confirm', locale) }}</button>
+      </div>
+    </div>
+  </template>
+  <script>
+  (function initRpmtIsolatedModal(){
+    try{
+      const tpl = document.getElementById('rpmt_delay_template');
+      if(!tpl) return;
+      const card = tpl.content.firstElementChild.cloneNode(true);
+
+      const overlay = document.createElement('div');
+      overlay.id = 'rpmt_fixed_delay_overlay';
+      const modalWrap = document.createElement('div');
+      modalWrap.id = 'rpmt_fixed_delay_modal';
+      modalWrap.appendChild(card);
+      document.body.appendChild(overlay);
+      document.body.appendChild(modalWrap);
+
+      function openModal(){ overlay.style.display='block'; modalWrap.style.display='flex'; }
+      function closeModal(){ overlay.style.display='none'; modalWrap.style.display='none'; }
+
+      overlay.addEventListener('click', closeModal);
+      const closeBtn = card.querySelector('[data-rpmt-close]');
+      const okBtn = card.querySelector('[data-rpmt-confirm]');
+      if(closeBtn) closeBtn.addEventListener('click', e=>{ e.stopPropagation(); closeModal(); });
+      if(okBtn) okBtn.addEventListener('click', e=>{ e.stopPropagation(); closeModal(); });
+
+      window.__rpmt_openDelayModal = openModal;
+      window.__rpmt_closeDelayModal = closeModal;
+
+      // Auto-open shortly after load
+      setTimeout(openModal, 120);
+    }catch(e){ console.error('rpmt isolated modal init', e); }
+  })();
+  </script>
+  {% endif %}
+
+  <template id="rpmt_kpi_template">
+    <div class="modal-card rpmt-delay-card">
+      <div class="modal-head">
+        <strong>KPI</strong>
+        <button class="icon-btn danger" data-rpmt-close type="button" title="{{ t('common.close', locale) }}">✕</button>
+      </div>
+      <div class="modal-body">
+        <ul class="delay-list"></ul>
+      </div>
+      <div class="modal-foot">
+        <button class="btn primary" data-rpmt-confirm type="button">{{ t('common.confirm', locale) }}</button>
+      </div>
+    </div>
+  </template>
+
+
+  <script>
+    const locale = "{{ locale }}";
+    const KIND_LABEL = {
+      ko: { done:'완료', progress:'진행중', late:'지연중', not_started:'준비중', na:'해당 없음' },
+      en: { done:'Complete', progress:'In Progress', late:'Overdue', not_started:'Not Started', na:'N/A' }
+    };
+
+    function setLanguage(lang) {
+      window.location.href = `/api/set-language/${lang}`;
+    }
+
+    // ===== Global Filters for project cards =====
+    (function(){
+      const $cards = document.getElementById('projectCards');
+      if(!$cards) return;
+      const $proc = document.getElementById('gfProcess');
+      const $dept = document.getElementById('gfDept');
+      const $delayed = document.getElementById('gfDelayedOnly');
+      const $reset = document.getElementById('gfReset');
+
+      function apply(){
+        const proc = ($proc?.value || '').toLowerCase();
+        const dept = ($dept?.value || '').toLowerCase();
+        const delayedOnly = !!($delayed && $delayed.checked);
+
+        $cards.querySelectorAll('.card').forEach(card=>{
+          const p = (card.getAttribute('data-process') || '').toLowerCase();
+          const d = (card.getAttribute('data-dept') || '').toLowerCase();
+          const hasDelayed = card.getAttribute('data-has-delayed') === '1';
+
+          let ok = true;
+          if(proc && !p.includes(proc)) ok = false;
+          if(dept && !d.includes(dept)) ok = false;
+          if(delayedOnly && !hasDelayed) ok = false;
+
+          card.style.display = ok ? '' : 'none';
+        });
+      }
+
+      [$proc, $dept, $delayed].forEach(el=>{
+        if(!el) return;
+        const evt = (el === $dept) ? 'input' : 'change';
+        el.addEventListener(evt, apply);
+      });
+
+      if($reset){
+        $reset.addEventListener('click', ()=>{
+          if($proc) $proc.value = '';
+          if($dept) $dept.value = '';
+          if($delayed) $delayed.checked = false;
+          apply();
+        });
+      }
+    })();
+
+    (function(){
+      const bell = document.getElementById('openDelayBtn');
+      const m = document.getElementById('delayModal');
+      if(!bell || !m) return;
+      bell.addEventListener('click', ()=> m.classList.add('open'));
+    })();
+
+    // ===== Weekly Filter =====
+    (function(){
+      const bar = document.getElementById('statusFilters');
+      if(!bar) return;
+      let current = 'all';
+      const apply = () => {
+        document.querySelectorAll('.week-item').forEach(it => {
+          const st = it.getAttribute('data-status') || 'N/A';
+          it.style.display = (current === 'all' || st === current) ? '' : 'none';
+        });
+        document.querySelectorAll('.big-week').forEach(card=>{
+          const any = Array.from(card.querySelectorAll('.week-item')).some(n => n.style.display !== 'none');
+          const ghost = card.querySelector('.__empty');
+          if(!any){
+            if(!ghost){
+              const n = document.createElement('div');
+              n.className='__empty chip'; n.textContent='{{ t("message.no_data", locale) }}'; n.style.marginTop='6px';
+              card.querySelector('.week-list').appendChild(n);
+            }
+          }else if(ghost){ ghost.remove(); }
+        });
+      };
+      bar.addEventListener('click', e=>{
+        const b = e.target.closest('button[data-v]'); if(!b) return;
+        current = b.dataset.v;
+        bar.querySelectorAll('.btn.toggle').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        apply();
+      });
+      // expose apply for other scripts
+      window.__dashWeekApply = apply;
+    })();
+
+    // ===== Quick status change in dashboard weekly strip =====
+    (function(){
+      const menu = document.createElement('div');
+      menu.className = 'wk2-status-menu';
+      const LABEL = {
+        ko: { 'Complete':'완료', 'In-progress':'진행중', 'Not Started':'준비중', 'N/A':'해당 없음' },
+        en: { 'Complete':'Complete', 'In-progress':'In-progress', 'Not Started':'Not Started', 'N/A':'N/A' }
+      };
+      const L = LABEL[locale] || LABEL.en;
+      menu.innerHTML = `
+        <button data-value="Complete">${L['Complete']}</button>
+        <button data-value="In-progress">${L['In-progress']}</button>
+        <button data-value="Not Started">${L['Not Started']}</button>
+        <button data-value="N/A">${L['N/A']}</button>
+      `;
+      document.body.appendChild(menu);
+
+      let target = null;
+
+      document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.wk2-quick-status');
+        if (btn) {
+          e.stopPropagation();
+          const host = btn.closest('.week-item');
+          target = host;
+          const rect = btn.getBoundingClientRect();
+          menu.style.left = rect.left + window.scrollX + 'px';
+          menu.style.top = rect.bottom + window.scrollY + 4 + 'px';
+          menu.classList.add('open');
+          return;
+        }
+
+        if (e.target.closest('.wk2-status-menu')) {
+          const val = e.target.getAttribute('data-value');
+          if (!val || !target) return;
+          const taskId = target.getAttribute('data-task-id');
+          try {
+            const res = await fetch(`/api/tasks/${taskId}/status`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: val })
+            });
+            if (res.ok) {
+              target.setAttribute('data-status', val);
+              const pill = target.querySelector('.week-status-pill');
+              if (pill) pill.textContent = L[val] || val;
+              if (typeof window.__dashWeekApply === 'function') {
+                window.__dashWeekApply();
+              }
+            }
+          } catch (err) {
+            console.error(err);
+          }
+          menu.classList.remove('open');
+          target = null;
+          return;
+        }
+
+        if (menu.classList.contains('open')) {
+          menu.classList.remove('open');
+          target = null;
+        }
+      });
+    })();
+
+    // ===== Delay Auto Modal =====
+    (function(){
+      const modal = document.getElementById('delayModal');
+      if(!modal) return;
+      
+      const overlay = document.getElementById('delayOverlay');
+      const closeBtn = document.getElementById('delayCloseBtn');
+      const okBtn = document.getElementById('delayOkBtn');
+      
+      function closeModal() {
+        modal.style.display = 'none';
+      }
+      
+      function openModal() {
+        modal.style.display = 'flex';
+      }
+      
+      // Close button click
+      if(closeBtn) {
+        closeBtn.onclick = closeModal;
+      }
+      
+      // OK button click
+      if(okBtn) {
+        okBtn.onclick = closeModal;
+      }
+      
+      // Overlay click
+      if(overlay) {
+        overlay.onclick = closeModal;
+      }
+      
+      // Escape key
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && modal.style.display === 'flex') {
+          closeModal();
+        }
+      });
+      
+      // Auto-open
+      setTimeout(openModal, 100);
+    })();
+
+    // ===== KPI buttons -> isolated modal =====
+    (function(){
+      try{
+        const tpl = document.getElementById('rpmt_kpi_template');
+        if(!tpl) return;
+
+        let overlay, modalWrap, card;
+
+        function ensure(){
+          if(modalWrap) return;
+          card = tpl.content.firstElementChild.cloneNode(true);
+          overlay = document.createElement('div'); overlay.id = 'rpmt_kpi_overlay';
+          modalWrap = document.createElement('div'); modalWrap.id = 'rpmt_kpi_modal';
+          modalWrap.appendChild(card);
+          document.body.appendChild(overlay);
+          document.body.appendChild(modalWrap);
+
+          overlay.addEventListener('click', closeModal);
+          card.querySelector('[data-rpmt-close]')?.addEventListener('click', e=>{ e.stopPropagation(); closeModal(); });
+          card.querySelector('[data-rpmt-confirm]')?.addEventListener('click', e=>{ e.stopPropagation(); closeModal(); });
+        }
+
+        function openModal(){ if(!modalWrap) ensure(); overlay.style.display='block'; modalWrap.style.display='flex'; }
+        function closeModal(){ if(overlay) overlay.style.display='none'; if(modalWrap) modalWrap.style.display='none'; }
+
+        document.addEventListener('click', async (e)=>{
+          const btn = e.target.closest('.kpi-btn');
+          if(!btn) return;
+          e.preventDefault();
+          const pid = btn.dataset.pid;
+          const kind = btn.dataset.kind;
+          try{
+            const res = await fetch(`/rpmt/projects/${pid}/kpi.json?kind=${encodeURIComponent(kind)}`);
+            if(!res.ok) return alert(`Load error: ${res.status}`);
+            const data = await res.json();
+            ensure();
+            const title = card.querySelector('.modal-head strong');
+            const list = card.querySelector('.delay-list');
+            title.textContent = `${KIND_LABEL[locale]?.[kind] || kind} (${data.project.code}) – ${data.count}건`;
+            list.innerHTML = '';
+            for(const it of data.items){
+              const li = document.createElement('li');
+              li.className = 'delay-item';
+              // set variant class so we can apply project theme colors
+              try{
+                const v = (data.project.id % 8) + 1;
+                li.classList.add(`variant-${v}`);
+              }catch(e){}
+              // mark overdue
+              if(it.late_days !== null && it.late_days !== undefined && Number(it.late_days) > 0){
+                li.classList.add('overdue');
+              }
+              li.innerHTML = `
+                <div class="tit">
+                  <a href="/rpmt/projects/${data.project.id}" class="prj">${data.project.code}</a>
+                  <span class="sep">·</span>
+                  <span class="cat">${it.cat1 || '-'}</span>
+                  ${it.cat2 ? `<span class="muted"> — ${it.cat2}</span>` : ''}
+                </div>
+                <div class="meta">
+                  <span class="pill">From: ${it.dept_from || '-'}</span>
+                  <span class="pill">To: ${it.dept_to || '-'}</span>
+                  <span class="pill">Due: ${it.due_date || '-'}</span>
+                  ${it.late_days !== null && it.late_days !== undefined ? `<span class="pill">Late: ${it.late_days}d</span>` : ''}
+                </div>
+              `;
+              list.appendChild(li);
+            }
+            openModal();
+          }catch(err){ console.error('kpi modal load', err); alert('Load error'); }
+        });
+
+        window.__rpmt_openKpiModal = openModal;
+        window.__rpmt_closeKpiModal = closeModal;
+      }catch(e){ console.error('rpmt kpi modal init', e); }
+    })();
+
+  </script>
+{% endblock %}
+</body>
+</html>

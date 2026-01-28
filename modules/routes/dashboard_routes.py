@@ -1,0 +1,329 @@
+from datetime import date ,timedelta 
+from collections import defaultdict 
+from typing import Dict ,List ,Tuple ,Optional 
+
+from fastapi import APIRouter ,Request ,Depends 
+from fastapi .responses import HTMLResponse ,RedirectResponse 
+from sqlalchemy import select 
+from sqlalchemy .orm import Session 
+
+from models import Project ,Task ,StatusEnum 
+from services import compute_derived 
+from core .db import get_db 
+from func .services .metrics import get_all_project_metrics 
+from core .i18n import get_locale 
+
+router =APIRouter ()
+
+templates =None 
+
+def set_templates (tmpl ):
+    global templates 
+    templates =tmpl 
+
+def ensure_authenticated (request :Request )->Optional [RedirectResponse ]:
+    if not request .session .get ("is_authenticated"):
+        return RedirectResponse (url ="/main",status_code =303 )
+    return None 
+
+def _iso_week_span (d :date ):
+    iso_year ,iso_week ,_ =d .isocalendar ()
+    monday =d -timedelta (days =d .weekday ())
+    sunday =monday +timedelta (days =6 )
+    return iso_year ,iso_week ,monday ,sunday 
+
+def build_weekly_data (db :Session ,*,weeks_back :int =12 ,weeks_ahead :int =20 ,
+q :Optional [str ]=None ,status :Optional [str ]=None ):
+    today =date .today ()
+    cur_y ,cur_w ,cur_mon ,cur_sun =_iso_week_span (today )
+
+    start_mon =cur_mon -timedelta (weeks =weeks_back )
+    end_sun =cur_sun +timedelta (weeks =weeks_ahead )
+
+    timeline :Dict [Tuple [int ,int ],Dict ]=defaultdict (lambda :{"year":0 ,"month":0 ,"weeks":[]})
+    wcur =start_mon 
+    while wcur <=end_sun :
+        wy ,ww ,wmon ,wsun =_iso_week_span (wcur )
+        mkey =(wmon .year ,wmon .month )
+        if timeline [mkey ]["year"]==0 :
+            timeline [mkey ]["year"]=wmon .year ;timeline [mkey ]["month"]=wmon .month 
+        timeline [mkey ]["weeks"].append ({"iso_year":wy ,"iso_week":ww ,"monday":wmon ,"sunday":wsun ,"items":[]})
+        wcur +=timedelta (weeks =1 )
+
+    q_norm =(q or "").strip ().lower ()
+
+    def pass_filter (p :Project ,t :Task )->bool :
+        if status and status in StatusEnum ._value2member_map_ :
+            if not t .status or t .status .value !=status :return False 
+        if q_norm :
+            if q_norm not in (" ".join ([p .code or "",t .cat1 or "",t .cat2 or "",t .reason or ""]).lower ()):
+                return False 
+        return True 
+
+    projects =db .execute (select (Project )).scalars ().all ()
+    nobucket :List [Tuple [Project ,Task ]]=[]
+    for p in projects :
+        for t in p .tasks :
+            if t .archived or False :
+                continue 
+            if not t .due_date :
+                if pass_filter (p ,t ):nobucket .append ((p ,t ))
+                continue 
+            if not (start_mon <=t .due_date <=end_sun ):continue 
+            if not pass_filter (p ,t ):continue 
+            ty ,tw ,tmon ,tsun =_iso_week_span (t .due_date )
+            mkey =(tmon .year ,tmon .month )
+            for wk in timeline [mkey ]["weeks"]:
+                if wk ["iso_year"]==ty and wk ["iso_week"]==tw :
+                    remain ,_ ,signal =compute_derived (t .due_date ,t .status .value if t .status else "Not Started")
+                    wk ["items"].append ({"project":p ,"task":t ,"remain":remain or "","signal":signal or ""})
+                    break 
+
+    month_blocks =[timeline [k ]for k in sorted (timeline .keys (),key =lambda x :(x [0 ],x [1 ]))]
+    for mb in month_blocks :
+        mb ["weeks"].sort (key =lambda w :w ["monday"])
+        for w in mb ["weeks"]:
+            w ["items"].sort (key =lambda it :(it ["task"].due_date or date .max ,(it ["task"].ord or 10 **9 ),it ["task"].id ))
+
+    all_projects =db .execute (select (Project ).order_by (Project .id .asc ())).scalars ().all ()
+    proj_order =[(p .id ,p .code )for p in all_projects ]
+
+    for mb in month_blocks :
+        week_keys =[(w ["iso_year"],w ["iso_week"])for w in mb ["weeks"]]
+        mb ["matrix"]={k :{}for k in week_keys }
+        appear_proj_ids =set ()
+        for w in mb ["weeks"]:
+            wy ,ww =w ["iso_year"],w ["iso_week"]
+            for it in w ["items"]:
+                pid =it ["project"].id 
+                appear_proj_ids .add (pid )
+                mb ["matrix"][(wy ,ww )].setdefault (pid ,[]).append (it )
+        mb ["projects"]=[(pid ,code )for (pid ,code )in proj_order if pid in appear_proj_ids ]
+
+    def _find_week (d :date ):
+        iy ,iw ,imon ,isun =_iso_week_span (d )
+        for mb in month_blocks :
+            for w in mb ["weeks"]:
+                if w ["iso_year"]==iy and w ["iso_week"]==iw :
+                    return {"year":mb ["year"],"month":mb ["month"],"week":w }
+        return None 
+
+    prev_w =_find_week (cur_mon -timedelta (weeks =1 ))
+    cur_w =_find_week (cur_mon )
+    next_w =_find_week (cur_mon +timedelta (weeks =1 ))
+
+    triplet ={"prev":prev_w ,"cur":cur_w ,"next":next_w }
+
+    return {
+    "month_blocks":month_blocks ,
+    "cur_year":cur_y ,"cur_week":cur_w ,
+    "cur_monday":cur_mon ,"cur_sunday":cur_sun ,
+    "weeks_back":weeks_back ,"weeks_ahead":weeks_ahead ,
+    "q":q or "","status":status or "",
+    "nobucket":nobucket ,
+    "triplet":triplet 
+    }
+
+@router.get("",response_class =HTMLResponse )
+def rpmt_redirect (request :Request ):
+    return RedirectResponse (url ="/rpmt/dashboard",status_code =303 )
+
+@router.get("/dashboard",response_class =HTMLResponse )
+def dashboard (request :Request ,db :Session =Depends (get_db )):
+    from app import templates 
+
+    auth_check =ensure_authenticated (request )
+    if auth_check :
+        return auth_check 
+
+    locale =get_locale (request )
+    projects =db .execute (
+    select (Project ).where (Project .active ==True ).order_by (Project .id .desc ())
+    ).scalars ().all ()
+
+    bulk_metrics =get_all_project_metrics (db )
+
+    project_metrics ={}
+    for p in projects :
+        pm =bulk_metrics .get (p .id )
+        if pm is None :
+            project_metrics [p .id ]={
+            "total":0 ,
+            "completed":0 ,
+            "completion_rate":0.0 ,
+            "overdue_count":0 ,
+            "on_track":0 ,
+            "health":"⚪",
+            }
+        else :
+            project_metrics [p .id ]=pm 
+
+    summary ,urgent ,delayed ,nodue =[],[],[],[]
+
+    for p in projects :
+        counts ={"진행중":0 ,"지연중":0 ,"완료":0 ,"준비중":0 ,"해당 없음":0 }
+        total =done =0 
+        for t in p .tasks :
+            if t .archived or False :
+                continue 
+            total +=1 
+            if t .status ==StatusEnum .COMPLETE :
+                done +=1 
+            remain ,delay_txt ,signal =compute_derived (t .due_date ,(t .status .value if t .status else "Not Started"))
+            if signal =="마감일 입력 필요":
+                nodue .append ((p ,t ))
+            elif "임박"in signal :
+                urgent .append ((p ,t ,signal ))
+            elif "지연중"in signal :
+                counts ["지연중"]+=1 
+                delayed .append ((p ,t ,delay_txt ))
+            ko ={"Complete":"완료","In-progress":"진행중","Not Started":"준비중","N/A":"해당 없음"}[t .status .value ]
+            counts [ko ]=counts .get (ko ,0 )+1 
+        percent =(done /total )if total else 0 
+        summary .append ({"project":p ,"counts":counts ,"percent":percent })
+
+    weekly_ctx =build_weekly_data (db ,weeks_back =8 ,weeks_ahead =12 )
+    return templates .TemplateResponse ("modules/rpmt/dashboard.html",{
+    "request":request ,
+    "projects":projects ,
+    "project_metrics":project_metrics ,
+    "summary":summary ,
+    "urgent":urgent [:20 ],
+    "delayed":delayed [:20 ],
+    "nodue":nodue [:20 ],
+    "StatusEnum":StatusEnum ,
+    "locale":locale ,
+    **{f"weekly_{k }":v for k ,v in weekly_ctx .items ()},
+    })
+
+
+@router.get("/weekly/calendar",response_class =HTMLResponse )
+def weekly_calendar (request :Request ,db :Session =Depends (get_db )):
+    auth_check =ensure_authenticated (request )
+    if auth_check :
+        return auth_check 
+
+    locale =get_locale (request )
+
+    q_year =request .query_params .get ("year")
+    q_month =request .query_params .get ("month")
+    today =date .today ()
+    base_year =int (q_year )if q_year and q_year .isdigit ()else today .year 
+    base_month =int (q_month )if q_month and q_month .isdigit ()else today .month 
+
+    first_of_month =date (base_year ,base_month ,1 )
+    if first_of_month .month <12 :
+        next_month_first =first_of_month .replace (month =first_of_month .month +1 ,day =1 )
+    else :
+        next_month_first =first_of_month .replace (year =first_of_month .year +1 ,month =1 ,day =1 )
+    last_of_month =next_month_first -timedelta (days =1 )
+
+    if base_month ==1 :
+        prev_year ,prev_month =base_year -1 ,12 
+    else :
+        prev_year ,prev_month =base_year ,base_month -1 
+
+    if base_month ==12 :
+        next_year ,next_month =base_year +1 ,1 
+    else :
+        next_year ,next_month =base_year ,base_month +1 
+
+    q =(
+    select (Project ,Task )
+    .join (Task ,Task .project_id ==Project .id )
+    .where (Task .due_date >=first_of_month ,Task .due_date <=last_of_month )
+    .order_by (Task .due_date .asc (),Project .id .asc (),Task .id .asc ())
+    )
+    rows =db .execute (q ).all ()
+
+    calendar_map :Dict [date ,List [Dict ]]=defaultdict (list )
+    for p ,t in rows :
+        info ={
+        "project":p ,
+        "task":t ,
+        "status":t .status .value if t .status else "N/A",
+        }
+        if t .due_date :
+            calendar_map [t .due_date ].append (info )
+
+    return templates .TemplateResponse (
+    "modules/rpmt/weekly_calendar.html",
+    {
+    "request":request ,
+    "locale":locale ,
+    "today":today ,
+    "first_of_month":first_of_month ,
+    "last_of_month":last_of_month ,
+    "cur_year":base_year ,
+    "cur_month":base_month ,
+    "prev_year":prev_year ,
+    "prev_month":prev_month ,
+    "next_year":next_year ,
+    "next_month":next_month ,
+    "calendar_map":calendar_map ,
+    },
+    )
+
+
+@router.get("/me/focus",response_class =HTMLResponse )
+def my_focus (request :Request ,db :Session =Depends (get_db )):
+    auth_check =ensure_authenticated (request )
+    if auth_check :
+        return auth_check 
+    locale =get_locale (request )
+
+    today =date .today ()
+    horizon =today +timedelta (days =7 )
+
+    q =(
+    select (Project ,Task )
+    .join (Task ,Task .project_id ==Project .id )
+    )
+    rows =db .execute (q ).all ()
+
+    today_items =[]
+    upcoming_items =[]
+    overdue_items =[]
+
+    for p ,t in rows :
+        remain ,delay ,signal =compute_derived (t .due_date ,t .status .value if t .status else "Not Started")
+        info ={"project":p ,"task":t ,"remain":remain or "","delay":delay or "","signal":signal or ""}
+        if t .due_date is None :
+            continue 
+        if t .due_date ==today :
+            today_items .append (info )
+        elif today <t .due_date <=horizon :
+            upcoming_items .append (info )
+        if "지연"in signal or "Overdue"in signal :
+            overdue_items .append (info )
+
+    def _key (it ):
+        t =it ["task"]
+        return (t .due_date or date .max ,(t .ord or 10 **9 ),t .id )
+
+    today_items .sort (key =_key )
+    upcoming_items .sort (key =_key )
+    overdue_items .sort (key =_key )
+
+    return templates .TemplateResponse (
+    "modules/rpmt/my_focus.html",
+    {
+    "request":request ,
+    "locale":locale ,
+    "today":today ,
+    "horizon":horizon ,
+    "today_items":today_items ,
+    "upcoming_items":upcoming_items ,
+    "overdue_items":overdue_items ,
+    },
+    )
+
+
+
+@router.get("/help",response_class =HTMLResponse )
+def help_page (request :Request ):
+    auth_check =ensure_authenticated (request )
+    if auth_check :
+        return auth_check 
+    locale =get_locale (request )
+    return templates .TemplateResponse ("modules/rpmt/help.html",{"request":request ,"locale":locale })

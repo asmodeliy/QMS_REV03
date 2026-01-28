@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container wide rpmt-root">
+  <div class="page-head">
+    <div class="page-head-left">
+      <h1 class="title">Risk & Delay Report</h1>
+      <p class="muted">최근 {{ weeks }}주 동안의 마감 현황을 부서 기준으로 요약합니다.</p>
+    </div>
+    <div class="page-head-right">
+      <form method="get" action="/reports/risk" class="gf-row inline" style="gap:8px;align-items:center">
+        <label class="gf-label" for="weeks">기간</label>
+        <select id="weeks" name="weeks" class="sel" style="width:90px">
+          {% for w in [2,4,8,12] %}
+            <option value="{{ w }}" {% if w == weeks %}selected{% endif %}>{{ w }}주</option>
+          {% endfor %}
+        </select>
+        <span class="muted" style="font-size:12px">{{ start_date }} ~ {{ end_date }}</span>
+        <button class="btn small ghost" type="submit">적용</button>
+      </form>
+    </div>
+  </div>
+
+  <section class="cards kpi-row">
+    <article class="card stat">
+      <div class="card-head">
+        <div>
+          <div class="pill">전체 태스크</div>
+          <div class="stat-sub">기간 내 마감이 설정된 태스크 수</div>
+        </div>
+      </div>
+      <div class="stat-main">{{ total_tasks }}</div>
+    </article>
+    <article class="card stat">
+      <div class="card-head">
+        <div>
+          <div class="pill danger">지연/미완료</div>
+          <div class="stat-sub">마감일을 지났거나 미완료 상태인 태스크</div>
+        </div>
+      </div>
+      <div class="stat-main">{{ total_overdue }}</div>
+    </article>
+  </section>
+
+  <section class="admin-panel" style="margin-top:24px">
+    <div class="panel-head">
+      <h2>By Department</h2>
+      <p class="muted">지연 건수가 많은 부서(dept_to) 순으로 정렬됩니다.</p>
+    </div>
+
+    
+    <div class="dept-bars" style="margin-bottom:20px">
+      {% set max_delayed = 0 %}
+      {% for dept, info in by_dept %}
+        {% set d = info.detail %}
+        {% set delayed = d.get('__OVERDUE__', 0) %}
+        {% if delayed > max_delayed %}{% set max_delayed = delayed %}{% endif %}
+      {% endfor %}
+
+      {% for dept, info in by_dept[:8] %}
+      {% set d = info.detail %}
+      {% set delayed = d.get('__OVERDUE__', 0) %}
+      {% set total = info.total %}
+      {% set width = (delayed / max_delayed * 100) if max_delayed > 0 else 0 %}
+      <div class="dept-row">
+        <div class="dept-label">{{ dept }}</div>
+        <div class="dept-bar-track">
+          <div class="dept-bar-fill" style="width:{{ width|round(1) }}%"></div>
+        </div>
+        <div class="dept-metric">{{ delayed }} / {{ total }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="table-wrapper">
+      <table class="tbl tbl-risk">
+        <thead>
+          <tr>
+            <th>Dept</th>
+            <th>Total</th>
+            <th>Delayed</th>
+            <th>In-progress</th>
+            <th>Not Started</th>
+            <th>Complete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dept, info in by_dept %}
+          {% set d = info.detail %}
+          <tr>
+            <td>{{ dept }}</td>
+            <td>{{ info.total }}</td>
+            <td class="bad">{{ d.get('__OVERDUE__', 0) }}</td>
+            <td>{{ d.get('진행중', 0) + d.get('In-progress', 0) }}</td>
+            <td>{{ d.get('준비중', 0) + d.get('Not Started', 0) }}</td>
+            <td class="ok">{{ d.get('완료', 0) + d.get('Complete', 0) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+{% endblock %}

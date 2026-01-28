@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container admin-wrap rpmt-root">
+  
+  <div class="admin-top">
+    <div class="brand"><a href="/rpmt/admin?v={{ visit }}">{{ t('common.previous', locale) }}</a></div>
+    <nav class="toolbar">
+      <h2 style="margin:0; color:var(--text); font-size:inherit; font-weight:600">{{ t('admin.archived_projects', locale) }}</h2>
+    </nav>
+  </div>
+
+  <section class="admin-panel" style="margin:20px 0">
+    {% if projects|length == 0 %}
+    <div class="admin-card soft muted" style="text-align:center; padding:40px; color:var(--muted);">
+      <p>{{ t('admin.no_archived_projects', locale) }}</p>
+    </div>
+    {% else %}
+    <div class="admin-card">
+      <table class="admin-task-table">
+        <thead>
+          <tr>
+            <th>{{ t('project.code', locale) }}</th>
+            <th>{{ t('project.process', locale) }}</th>
+            <th>{{ t('project.metal_option', locale) }}</th>
+            <th>{{ t('project.ip_code', locale) }}</th>
+            <th>{{ t('project.pdk_version', locale) }}</th>
+            <th style="width:120px">{{ t('common.action', locale) }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for prj in projects %}
+          <tr>
+            <td><strong>{{ prj.code }}</strong></td>
+            <td>{{ prj.process or '-' }}</td>
+            <td>{{ prj.metal_option or '-' }}</td>
+            <td>{{ prj.ip_code or '-' }}</td>
+            <td>{{ prj.pdk_ver or '-' }}</td>
+            <td>
+              <form method="post"
+                    action="/rpmt/admin/projects/{{ prj.id }}/restore?v={{ visit }}"
+                    style="display:inline">
+                <button class="btn small" type="submit" title="{{ t('admin.restore', locale) }}">↩️ {{ t('admin.restore', locale) }}</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </section>
+</main>
+
+{% endblock %}

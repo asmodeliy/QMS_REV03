@@ -1,0 +1,619 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container svit-detail svit-root">
+  <div class="detail-header">
+    
+    <div class="breadcrumb-nav">
+      <span class="breadcrumb-item">RAMSCHIP QMS</span>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/svit/" class="breadcrumb-item">SVIT</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-item active">{{ issue.tracking_no }}</span>
+    </div>
+    
+    <div class="header-info">
+      <h1 class="tracking-title">{{ issue.tracking_no }}</h1>
+      <div class="header-meta">
+        <span class="status-badge status-{{ issue.status.lower().replace('-', '_') }}">{{ issue.status }}</span>
+        <span class="date-created">{{ t("svit.created_at") }}: {{ issue.created_at.strftime('%Y-%m-%d %H:%M') if issue.created_at else 'N/A' }}</span>
+        <span class="creator-info">{{ t("svit.creator") }} <strong>{{ issue.creator or 'Unknown' }}</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-content">
+    <div class="detail-main">
+      {# Use single DB field `issue.issue_phenomenon` (combined description/phenomenon) #}
+      {% set combined = issue.issue_phenomenon or issue.issue_description or issue.phenomenon %}
+      <section class="detail-section">
+        <h3 class="section-title">📝 {{ t("svit.issue_phenomenon") }}</h3>
+        <div class="description-box" id="phenDisplay">
+          <p>{{ combined or '—' }}</p>
+        </div>
+        <textarea id="phenEdit" class="editable-textarea hidden">{{ combined or '' }}</textarea>
+        <div id="phenEditAttachments" class="phen-attachments hidden"></div>
+      </section>
+
+      <section class="detail-section">
+        <h3 class="section-title">🔎 Expected Root Cause</h3>
+        <div class="description-box" id="expectedRootDisplay">
+          <p>{{ issue.expected_root_cause or '—' }}</p>
+        </div>
+        <textarea id="expectedRootEdit" class="editable-textarea hidden">{{ issue.expected_root_cause or '' }}</textarea>
+      </section>
+
+      <section class="detail-section">
+        <h3 class="section-title">🛠️ Counter Measure</h3>
+        <div class="description-box" id="countermeasureDisplay">
+          <p>{{ issue.countermeasure or '—' }}</p>
+        </div>
+        <textarea id="countermeasureEdit" class="editable-textarea hidden">{{ issue.countermeasure or '' }}</textarea>
+      </section>
+
+
+      <section class="detail-section">
+        <h3 class="section-title">🎯 {{ t("svit.condition_parameters") }}</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>{{ t("svit.shuttle_id") }}</label>
+            <span class="info-value">{{ issue.shuttle_id or '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>{{ t("svit.node") }}</label>
+            <span class="info-value">{{ issue.node or '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>{{ t("svit.ip_ic") }}</label>
+            <span class="info-value">{{ issue.ip_ic or '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>{{ t("svit.family") }}</label>
+            <span class="info-value">{{ issue.family or '—' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h3 class="section-title">⚡ {{ t("svit.condition_parameters") }}</h3>
+        <div class="condition-params">
+          <div class="param-group">
+            <div class="param-item" id="powerSection">
+              <label>{{ t("svit.power_config") }}</label>
+              <div id="powerDisplay" class="power-config-display">
+                {{ issue.input_v or 'AVDD: — DVDD: — VDD: —' }}
+              </div>
+              <div id="powerEdit" class="power-config-edit hidden">
+                <div class="power-row">
+                  <span class="power-label">{{ t("svit.avdd") }}:</span>
+                  <input type="text" id="avddEdit" placeholder="0.8" value=""/>
+                </div>
+                <div class="power-row">
+                  <span class="power-label">{{ t("svit.dvdd") }}:</span>
+                  <input type="text" id="dvddEdit" placeholder="1.2" value=""/>
+                </div>
+                <div class="power-row">
+                  <span class="power-label">{{ t("svit.vdd") }}:</span>
+                  <input type="text" id="vddEdit" placeholder="0.8" value=""/>
+                </div>
+              </div>
+            </div>
+            <div class="param-item">
+              <label>{{ t("svit.temperature") }}</label>
+              <span id="tempDisplay" class="param-value">{{ issue.temp or '—' }}</span>
+              <input id="tempEdit" type="number" step="0.1" class="hidden" value="{{ issue.temp or '' }}"/>
+            </div>
+            <div class="param-item">
+              <label>{{ t("svit.frequency") }}</label>
+              <span id="freqDisplay" class="param-value">{{ issue.frequency or '—' }}</span>
+              <input id="freqEdit" type="text" class="hidden" value="{{ issue.frequency or '' }}"/>
+            </div>
+            <div class="param-item">
+              <label>{{ t("svit.pattern") }}</label>
+              <span id="patternDisplay" class="param-value">{{ issue.pattern or '—' }}</span>
+              <input id="patternEdit" type="text" class="hidden" value="{{ issue.pattern or '' }}"/>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h3 class="section-title">📅 {{ t("svit.created_at") }}</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>{{ t("svit.created_at") }}</label>
+            <span class="info-value">{{ issue.date.strftime('%Y-%m-%d') if issue.date else '—' }}</span>
+          </div>
+        </div>
+        <div class="log-section">
+          <label>{{ t("svit.attachment") }}</label>
+          <div class="log-attachment">
+            {% if issue.log_attach %}
+              {% set files = issue.log_attach.split(',') if ',' in issue.log_attach else [issue.log_attach] %}
+              <div class="log-list">
+                {% for f in files %}
+                  {% set ff = f.strip().replace('\\','/') %}
+                  {% if ff %}
+                    {% set fname = ff.split('/')[-1].lower() %}
+                    {% if fname.endswith('.png') or fname.endswith('.jpg') or fname.endswith('.jpeg') or fname.endswith('.gif') or fname.endswith('.webp') %}
+                      <a href="/{{ ff.lstrip('/') }}" target="_blank" class="log-file-item log-image" data-path="{{ ff }}">
+                        <img src="/{{ ff.lstrip('/') }}" class="attach-thumb" alt="{{ fname }}" />
+                      </a>
+                    {% else %}
+                      <div class="log-file-item">
+                        <span class="file-icon">📎</span>
+                        <a href="/{{ ff.lstrip('/') }}" target="_blank" class="link-file">{{ ff.split('/')[-1] }}</a>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="no-file">—</span>
+            {% endif %}
+          </div>
+          <button type="button" class="btn-upload" onclick="document.getElementById('fileInput').click()">📤 {{ t("svit.upload_file") }}</button>
+          <input type="file" id="fileInput" class="hidden-input" multiple accept="image/*,application/pdf,video/*" capture="environment" onchange="uploadFile({{ issue.id }})"/>
+          <input type="hidden" id="issue-id" value="{{ issue.id if issue else '' }}" />
+        </div>
+      </section>
+
+      {% if issue.update_note or issue.resolved_note %}
+      <section class="detail-section">
+        <h3 class="section-title">📋 Notes</h3>
+        {% if issue.update_note %}
+        <div class="note-box">
+          <h4>Update Note</h4>
+          <p>{{ issue.update_note }}</p>
+        </div>
+        {% endif %}
+        {% if issue.resolved_note %}
+        <div class="note-box resolved-note">
+          <h4>Resolution Note</h4>
+          <p>{{ issue.resolved_note }}</p>
+        </div>
+        {% endif %}
+      </section>
+      {% endif %}
+
+      {% if issue.assignee or issue.reviewer %}
+      <section class="detail-section">
+        <h3 class="section-title">👥 Assignment</h3>
+        <div class="info-grid">
+          {% if issue.assignee %}
+          <div class="info-item">
+            <label>Assigned To</label>
+            <span class="info-value">{{ issue.assignee }}</span>
+          </div>
+          {% endif %}
+          {% if issue.reviewer %}
+          <div class="info-item">
+            <label>Reviewer</label>
+            <span class="info-value">{{ issue.reviewer }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+      {% endif %}
+    </div>
+
+    <aside class="detail-sidebar">
+      <div class="sidebar-card">
+        <h4>Issue Status</h4>
+        <div class="status-selector">
+          <select id="statusSelect" class="selector-input form-input" onchange="updateStatus({{ issue.id }}, this.value)">
+            <option value="NEW" {% if issue.status == 'NEW' %}selected{% endif %}>{{ t('svit.status_new') }}</option>
+            <option value="IN_PROGRESS" {% if issue.status == 'IN_PROGRESS' %}selected{% endif %}>{{ t('svit.status_in_progress') }}</option>
+            <option value="RESOLVED" {% if issue.status == 'RESOLVED' %}selected{% endif %}>{{ t('svit.status_resolved') }}</option>
+          </select>
+        </div>
+
+        <div class="sidebar-actions">
+          <button id="editBtn" class="btn btn-secondary" onclick="toggleEditMode()">✏️ {{ t('svit.edit_issue') }}</button>
+          <button id="cancelBtn" class="btn btn-secondary hidden" onclick="toggleEditMode()">✕ {{ t('svit.cancel_edit') }}</button>
+          <button id="saveBtn" class="btn btn-primary hidden" onclick="saveAllChanges({{ issue.id }})">💾 {{ t('svit.save_changes') }}</button>
+          <button class="btn btn-danger" onclick="deleteIssue({{ issue.id }})">🗑️ {{ t('svit.delete_issue') }}</button>
+        </div>
+      </div>
+
+      <div class="sidebar-card metadata">
+        <h4>Metadata</h4>
+        <div class="metadata-item">
+          <span>Created:</span>
+          <span>{{ issue.created_at.strftime('%Y-%m-%d') if issue.created_at else 'N/A' }}</span>
+        </div>
+        <div class="metadata-item">
+          <span>Updated:</span>
+          <span>{{ issue.updated_at.strftime('%Y-%m-%d') if issue.updated_at else 'N/A' }}</span>
+        </div>
+        {% if issue.resolved_at %}
+        <div class="metadata-item">
+          <span>Resolved:</span>
+          <span>{{ issue.resolved_at.strftime('%Y-%m-%d') if issue.resolved_at else 'N/A' }}</span>
+        </div>
+        {% endif %}
+        <div class="metadata-item">
+          <span>Status:</span>
+          <span>{% if issue.resolved %}✓ Resolved{% else %}✗ Open{% endif %}</span>
+        </div>
+        <div class="metadata-item">
+          <span>Creator:</span>
+          <span>{{ issue.creator or 'Unknown' }}</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+let isEditMode = false;
+
+// Clipboard paste-to-upload handler (inlined into main script block)
+document.addEventListener('paste', async function(e){
+  if(!e.clipboardData) return;
+  const items = e.clipboardData.items;
+  if(!items) return;
+  for(const item of items){
+    if(!item.type) continue;
+    if(item.type.indexOf('image') !== -1){
+      const file = item.getAsFile();
+      if(!file) continue;
+      if(!file.name) file.name = `clipboard_${Date.now()}.png`;
+      const fd = new FormData();
+      fd.append('log_attach', file, file.name);
+      // determine issue id from hidden input or url fallback
+      const issueId = document.getElementById('issue-id')?.value || (location.pathname.match(/\/(?:issue|phenomenon)\/(\d+)/)||[])[1] || '';
+      try{
+        const res = await fetch(`/svit/issue/update/${issueId}`, {method:'POST', body: fd});
+        if(!res.ok){ console.error('paste upload failed', res.status); alert('파일 업로드 실패'); return; }
+        // after upload, reload so server-provided paths render
+        // show a quick local preview then reload
+        const reader = new FileReader();
+        reader.onload = function(){
+          const desc = document.getElementById('phenDisplay');
+          if(desc){
+            const wrap = document.createElement('div');
+            wrap.className = 'inline-attach';
+            wrap.innerHTML = `<div class="attach-wrap"><div class="resizable"><img src="${reader.result}" alt="${file.name}"/></div></div>`;
+            desc.appendChild(wrap);
+          }
+          setTimeout(()=> location.reload(), 800);
+        };
+        reader.readAsDataURL(file);
+      }catch(err){
+        console.error('paste upload error', err);
+        alert('업로드 중 오류가 발생했습니다.');
+      }
+    }
+  }
+});
+
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+
+  const editBtn = document.getElementById('editBtn') || document.querySelector('.btn.btn-secondary');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const saveBtn = document.getElementById('saveBtn');
+
+  const phenDisplay = document.getElementById('phenDisplay');
+  const phenEdit = document.getElementById('phenEdit');
+
+  const powerDisplay = document.getElementById('powerDisplay');
+  const powerEdit = document.getElementById('powerEdit');
+  const tempDisplay = document.getElementById('tempDisplay');
+  const tempEdit = document.getElementById('tempEdit');
+  const freqDisplay = document.getElementById('freqDisplay');
+  const freqEdit = document.getElementById('freqEdit');
+  const patternDisplay = document.getElementById('patternDisplay');
+  const patternEdit = document.getElementById('patternEdit');
+
+  if (isEditMode) {
+    if (editBtn) editBtn.classList.add('hidden');
+    if (cancelBtn) cancelBtn.classList.remove('hidden');
+    if (saveBtn) saveBtn.classList.remove('hidden');
+
+    const powerText = powerDisplay ? (powerDisplay.textContent || '') : '';
+    const avddMatch = powerText.match(/AVDD:\s*([^D]*?)(?=\sDVDD|$)/);
+    const dvddMatch = powerText.match(/DVDD:\s*([^V]*?)(?=\sVDD|$)/);
+    const vddMatch = powerText.match(/VDD:\s*(.+?)$/);
+
+    const avddEl = document.getElementById('avddEdit');
+    const dvddEl = document.getElementById('dvddEdit');
+    const vddEl = document.getElementById('vddEdit');
+    if (avddEl) avddEl.value = avddMatch ? avddMatch[1].trim() : '';
+    if (dvddEl) dvddEl.value = dvddMatch ? dvddMatch[1].trim() : '';
+    if (vddEl) vddEl.value = vddMatch ? vddMatch[1].trim() : '';
+
+    if (phenDisplay) phenDisplay.classList.add('hidden');
+    if (phenEdit) phenEdit.classList.remove('hidden');
+
+    const expectedDisplay = document.getElementById('expectedRootDisplay');
+    const expectedEdit = document.getElementById('expectedRootEdit');
+    if(expectedDisplay) expectedDisplay.classList.add('hidden');
+    if(expectedEdit) expectedEdit.classList.remove('hidden');
+    if(expectedEdit && expectedDisplay) expectedEdit.value = (expectedDisplay.textContent || '').trim() === '—' ? '' : expectedDisplay.textContent.trim();
+
+    const counterDisplay = document.getElementById('countermeasureDisplay');
+    const counterEdit = document.getElementById('countermeasureEdit');
+    if(counterDisplay) counterDisplay.classList.add('hidden');
+    if(counterEdit) counterEdit.classList.remove('hidden');
+    if(counterEdit && counterDisplay) counterEdit.value = (counterDisplay.textContent || '').trim() === '—' ? '' : counterDisplay.textContent.trim();
+
+    // enable edit-mode styling (shows delete buttons)
+    document.querySelector('.svit-root')?.classList.add('svit-edit-mode');
+    // populate attachments area for edit
+    const editAttach = document.getElementById('phenEditAttachments');
+    if(editAttach){
+      editAttach.classList.remove('hidden');
+      // clone inline attachments into edit area
+      editAttach.innerHTML = '';
+      document.querySelectorAll('.inline-attach').forEach(node => {
+        const clone = node.cloneNode(true);
+        // ensure delete button works in clone
+        const del = clone.querySelector('.delete-btn');
+        if(del){
+          const path = node.querySelector('img')?.src || node.querySelector('a')?.getAttribute('href') || '';
+          del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path.replace(/^\//,''), clone); });
+        }
+        editAttach.appendChild(clone);
+      });
+    }
+
+    if (powerDisplay) powerDisplay.classList.add('hidden');
+    if (powerEdit) powerEdit.classList.remove('hidden');
+    if (tempDisplay) tempDisplay.classList.add('hidden');
+    if (tempEdit) tempEdit.classList.remove('hidden');
+    if (freqDisplay) freqDisplay.classList.add('hidden');
+    if (freqEdit) freqEdit.classList.remove('hidden');
+    if (patternDisplay) patternDisplay.classList.add('hidden');
+    if (patternEdit) patternEdit.classList.remove('hidden');
+  } else {
+    if (editBtn) editBtn.classList.remove('hidden');
+    if (cancelBtn) cancelBtn.classList.add('hidden');
+    if (saveBtn) saveBtn.classList.add('hidden');
+
+    if (phenDisplay) phenDisplay.classList.remove('hidden');
+    if (phenEdit) phenEdit.classList.add('hidden');
+
+    const expectedDisplay = document.getElementById('expectedRootDisplay');
+    const expectedEdit = document.getElementById('expectedRootEdit');
+    if(expectedDisplay) expectedDisplay.classList.remove('hidden');
+    if(expectedEdit) expectedEdit.classList.add('hidden');
+
+    const counterDisplay = document.getElementById('countermeasureDisplay');
+    const counterEdit = document.getElementById('countermeasureEdit');
+    if(counterDisplay) counterDisplay.classList.remove('hidden');
+    if(counterEdit) counterEdit.classList.add('hidden');
+
+    // disable edit-mode styling
+    document.querySelector('.svit-root')?.classList.remove('svit-edit-mode');
+    const editAttach = document.getElementById('phenEditAttachments');
+    if(editAttach){ editAttach.classList.add('hidden'); editAttach.innerHTML = ''; }
+
+    if (powerDisplay) powerDisplay.classList.remove('hidden');
+    if (powerEdit) powerEdit.classList.add('hidden');
+    if (tempDisplay) tempDisplay.classList.remove('hidden');
+    if (tempEdit) tempEdit.classList.add('hidden');
+    if (freqDisplay) freqDisplay.classList.remove('hidden');
+    if (freqEdit) freqEdit.classList.add('hidden');
+    if (patternDisplay) patternDisplay.classList.remove('hidden');
+    if (patternEdit) patternEdit.classList.add('hidden');
+  }
+}
+
+function saveAllChanges(issueId) {
+  const formData = new FormData();
+  
+  formData.append('issue_phenomenon', document.getElementById('phenEdit').value);
+  
+  const avdd = document.getElementById('avddEdit').value;
+  const dvdd = document.getElementById('dvddEdit').value;
+  const vdd = document.getElementById('vddEdit').value;
+  const powerConfig = `AVDD: ${avdd || '—'} DVDD: ${dvdd || '—'} VDD: ${vdd || '—'}`;
+  formData.append('input_v', powerConfig);
+  
+  formData.append('temp', document.getElementById('tempEdit').value);
+  formData.append('frequency', document.getElementById('freqEdit').value);
+  formData.append('pattern', document.getElementById('patternEdit').value);
+  formData.append('status', document.getElementById('statusSelect')?.value || 'New');
+  formData.append('severity', document.getElementById('severitySelect')?.value || 'Medium');
+  formData.append('expected_root_cause', document.getElementById('expectedRootEdit')?.value || '');
+  formData.append('countermeasure', document.getElementById('countermeasureEdit')?.value || '');
+  
+  fetch(`/svit/issue/update/${issueId}`, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      const phenText = document.getElementById('phenEdit').value;
+      const tempVal = document.getElementById('tempEdit').value;
+      const freqVal = document.getElementById('freqEdit').value;
+      const patternVal = document.getElementById('patternEdit').value;
+      
+      document.getElementById('phenDisplay').innerHTML = `<p>${phenText || '—'}</p>`;
+      document.getElementById('powerDisplay').textContent = powerConfig;
+      document.getElementById('tempDisplay').textContent = tempVal || '—';
+      document.getElementById('freqDisplay').textContent = freqVal || '—';
+      document.getElementById('patternDisplay').textContent = patternVal || '—';
+      // update expected root cause and countermeasure displays
+      document.getElementById('expectedRootDisplay').innerHTML = `<p>${document.getElementById('expectedRootEdit').value || '—'}</p>`;
+      document.getElementById('countermeasureDisplay').innerHTML = `<p>${document.getElementById('countermeasureEdit').value || '—'}</p>`;
+      
+      isEditMode = true;
+      toggleEditMode();
+      
+      alert('Changes saved successfully!');
+    } else {
+      alert('Failed to save changes');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error saving changes');
+  });
+}
+
+function updateStatus(issueId, status) {
+  const formData = new FormData();
+  formData.append('status', status);
+  formData.append('severity', document.getElementById('severitySelect')?.value || 'Medium');
+  
+  fetch(`/svit/issue/update/${issueId}`, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      alert('Failed to update status');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error updating status');
+  });
+}
+
+function updateSeverity(issueId, severity) {
+  const formData = new FormData();
+  formData.append('severity', severity);
+  formData.append('status', document.getElementById('statusSelect')?.value || 'New');
+  
+  fetch(`/svit/issue/update/${issueId}`, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      alert('Failed to update severity');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error updating severity');
+  });
+}
+
+function deleteIssue(issueId) {
+  if (confirm('Are you sure you want to delete this issue? This action cannot be undone.')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/svit/issue/delete/${issueId}`;
+    
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+function uploadFile(issueId) {
+  const fileInput = document.getElementById('fileInput');
+  if (fileInput.files.length === 0) return;
+
+  const formData = new FormData();
+  for (let i = 0; i < fileInput.files.length; i++) {
+    formData.append('log_attach', fileInput.files[i]);
+  }
+  formData.append('status', document.getElementById('statusSelect')?.value || 'New');
+  formData.append('severity', document.getElementById('severitySelect')?.value || 'Medium');
+
+  fetch(`/svit/issue/update/${issueId}`, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      alert('Failed to upload file');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error uploading file');
+  });
+}
+</script>
+
+<script>
+// Render server-side attachments inline in the description area and attach delete handlers
+function syncInlineAttachments(){
+  try{
+    const desc = document.getElementById('phenDisplay');
+    if(!desc) return;
+    const logList = document.querySelectorAll('.log-list .log-image');
+    logList.forEach(a => {
+      try{
+        const href = a.getAttribute('href');
+        const path = a.getAttribute('data-path') || (href? href.replace(/^\//,'') : '');
+        // avoid duplicating
+        if(desc.querySelector(`img[src="${href}"]`)) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'inline-attach';
+        const inner = document.createElement('div'); inner.className='attach-wrap';
+        const resz = document.createElement('div'); resz.className='resizable';
+        const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
+        resz.appendChild(img);
+        inner.appendChild(resz);
+        // delete button
+        const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+        del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path, wrap); });
+        inner.appendChild(del);
+        wrap.appendChild(inner);
+        desc.appendChild(wrap);
+      }catch(e){/*ignore per-item*/}
+    });
+    // attach delete to non-image files in log-list
+    document.querySelectorAll('.log-list .log-file-item .link-file').forEach(link=>{
+      const parent = link.closest('.log-file-item');
+      if(parent && !parent.querySelector('.delete-btn')){
+        const fn = parent.querySelector('.link-file')?.getAttribute('href')?.replace(/^\//,'') || '';
+        const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+        del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, fn, parent); });
+        parent.appendChild(del);
+      }
+    });
+  }catch(e){console.error('syncInlineAttachments', e)}
+}
+
+async function deleteAttachment(issueId, filePath, el){
+  if(!confirm('이 파일을 삭제하시겠습니까?')) return;
+  
+  // 경로 정규화
+  let cleanPath = filePath
+    .replace(/^\//,'')           // Leading slash 제거
+    .replace(/\\/g, '/')         // Backslash를 forward slash로
+    .trim();
+  
+  console.log('Deleting file:', cleanPath, 'Issue:', issueId); // Debug
+  
+  const fd = new FormData();
+  fd.append('path', cleanPath);
+  
+  try{
+    const res = await fetch(`/svit/issue/${issueId}/file-delete`, {
+      method: 'POST',
+      body: fd
+    });
+    
+    console.log('Delete response status:', res.status); // Debug
+    
+    if(res.ok){
+      const data = await res.json();
+      console.log('Delete success:', data); // Debug
+      el.remove();
+      alert('파일이 삭제되었습니다.');
+    } else {
+      const errText = await res.text();
+      console.error('Delete failed:', res.status, errText); // Debug
+      alert('삭제에 실패했습니다: ' + res.status);
+    }
+  }catch(err){
+    console.error('deleteAttachment error:', err);
+    alert('서버 오류: ' + err.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', syncInlineAttachments);
+</script>
+
+{% endblock %}

@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <main class="container admin-wrap rpmt-root">
+    
+    <div class="admin-top">
+      <div class="brand"><a href="/">{{ t('common.previous') }}</a></div>
+      <nav class="toolbar">
+        <button class="btn" type="button" id="btn-system" title="{{ t('admin.system_status') }}"> {{ t('admin.system') }}</button>
+        <button class="btn" id="btn-backup" title="{{ t('admin.backup_database') }}"> {{ t('admin.backup') }}</button>
+        <button class="btn" id="btn-restore" title="{{ t('admin.restore_database') }}"> {{ t('admin.restore') }}</button>
+        <button class="btn" id="btn-vacuum" title="{{ t('admin.optimize_database') }}">{{ t('admin.vacuum') }}</button>
+      </nav>
+    </div>
+
+    <div class="admin-layout">
+      
+      <aside class="sidebar">
+      <div class="side-head">
+        <div class="title-sm"> {{ t('project.projects') }} ({{ projects|length }})</div>
+        <div class="search">
+          <input class="inp" id="proj-search" placeholder="{{ t('common.search') }}" aria-label="{{ t('project.search_project') }}">
+        </div>
+      </div>
+
+      <a class="btn primary" href="/rpmt/admin/archive?v={{ visit }}" style="margin-bottom: 12px; width: 100%; text-align: center;">
+        {{ t('admin.view_archived_projects') }}
+      </a>
+
+      <div class="side-list" id="proj-list" role="list">
+        {% for prj in projects %}
+        <div class="side-item variant-{{ ((prj.id or loop.index0) % 8) + 1 }}"
+            data-code="{{ prj.code|e }}"
+            data-proc="{{ prj.process or ''|e }}"
+            onclick="openProjectInAdmin({{ prj.id }})"
+            role="listitem"
+            title="{{ prj.code }} {{ prj.process or '' }}">
+          <div class="row">
+            <span class="code clamp-1">{{ prj.code }}</span>
+            <div style="display:flex; gap:4px; flex-wrap:wrap">
+              {% if prj.process %}<span class="pill">{{ prj.process }}</span>{% endif %}
+              {% if prj.metal_option %}<span class="pill">{{ prj.metal_option }}</span>{% endif %}
+              {% if prj.ip_code %}<span class="pill">{{ prj.ip_code }}</span>{% endif %}
+              {% if prj.pdk_ver %}<span class="pill">{{ prj.pdk_ver }}</span>{% endif %}
+            </div>
+          </div>
+          <form method="post"
+                action="/rpmt/admin/projects/{{ prj.id }}/delete?v={{ visit }}"
+                onsubmit="return confirm('Delete this project?\nThis action cannot be undone.');"
+                style="display:contents">
+            <button class="btn small danger" type="submit" title="{{ t('common.delete') }}">✕</button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+
+      <hr class="soft">
+
+      <form class="create-form" method="post" action="/rpmt/admin/projects/create?v={{ visit }}">
+        <div class="title-sm">{{ t('admin.new_project') }}</div>
+        <input class="inp" name="code" placeholder="{{ t('project.code') }}" required maxlength="50">
+        <input class="inp" name="process" placeholder="{{ t('project.process') }} (optional)" maxlength="50">
+        <input class="inp" name="metal_option" placeholder="{{ t('project.metal_option') }} (optional)" maxlength="50">
+        <input class="inp" name="ip_code" placeholder="{{ t('project.ip_code') }} (optional)" maxlength="50">
+        <input class="inp" name="pdk_ver" placeholder="{{ t('project.pdk_version') }} (optional)" maxlength="50">
+        <label class="ck">
+          <input type="checkbox" name="template"> {{ t('project.use_template') }}
+        </label>
+        <button class="btn primary" type="submit">{{ t('project.create_project') }}</button>
+      </form>
+    </aside>
+
+    
+    <section id="detail" class="detail" role="main" aria-label="Project Details">
+      <div class="empty-hint">👈 {{ t('admin.select_project') }}</div>
+    </section>
+    </div>
+  </main>
+
+  <input type="file" id="restore-file" accept=".db,application/octet-stream" hidden aria-hidden="true">
+
+  <script>
+    const VISIT = "{{ visit }}";
+    const FOCUS = "{{ focus or '' }}";
+
+    async function openProjectInAdmin(pid){
+      const pane = document.getElementById('detail');
+      pane.innerHTML = '<div class="loading">⏳ Loading…</div>';
+      
+      try {
+        const res = await fetch(`/rpmt/admin/projects/${pid}/tasks?v=${encodeURIComponent(VISIT)}`);
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        pane.innerHTML = await res.text();
+      } catch(e) {
+        pane.innerHTML = `<div class="error">⚠️ Load Failed: ${e.message}</div>`;
+        return;
+      }
+
+      document.querySelectorAll('.side-item.active').forEach(n => n.classList.remove('active'));
+      const sel = [...document.querySelectorAll('.side-item')]
+        .find(n => n.getAttribute('onclick')?.includes(`(${pid})`));
+      if(sel) sel.classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if(FOCUS) openProjectInAdmin(FOCUS);
+    });
+
+    (function(){
+      const q = document.getElementById('proj-search');
+      const list = document.getElementById('proj-list');
+      if(!q || !list) return;
+      
+      q.addEventListener('input', () => {
+        const v = q.value.trim().toLowerCase();
+        [...list.children].forEach(it => {
+          const code = (it.dataset.code || '').toLowerCase();
+          const proc = (it.dataset.proc || '').toLowerCase();
+          it.style.display = (!v || code.includes(v) || proc.includes(v)) ? '' : 'none';
+        });
+      });
+    })();
+
+    document.getElementById('btn-backup').addEventListener('click', () => {
+      location.href = `/rpmt/admin/backup?v=${encodeURIComponent(VISIT)}`;
+    });
+
+    document.getElementById('btn-restore').addEventListener('click', () => {
+      document.getElementById('restore-file').click();
+    });
+    document.getElementById('restore-file').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+      
+      const ok = confirm('Restore the database?\nCurrent data will be replaced.');
+      if(!ok) return;
+
+      const fd = new FormData();
+      fd.append('file', file);
+      
+      try {
+        const res = await fetch(`/rpmt/admin/restore?v=${encodeURIComponent(VISIT)}`, {
+          method:'POST',
+          body:fd
+        });
+        if(res.redirected) {
+          location.href = res.url;
+        } else {
+          location.reload();
+        }
+      } catch(e) {
+        alert(`복원 실패: ${e.message}`);
+      }
+    });
+
+    // VACUUM
+    document.getElementById('btn-vacuum').addEventListener('click', async () => {
+      const ok = confirm('Optimize the database?\n(Perform VACUUM/ANALYZE)');
+      if(!ok) return;
+
+      try {
+        const r = await fetch(`/rpmt/admin/vacuum?v=${encodeURIComponent(VISIT)}`, {method:'POST'});
+        const msg = await r.text();
+        alert(msg || '✓ Optimization Complete');
+      } catch(e) {
+        alert(`Error: ${e.message}`);
+      }
+    });
+
+    // System status: render into detail pane
+    document.getElementById('btn-system').addEventListener('click', async () => {
+      const pane = document.getElementById('detail');
+      pane.innerHTML = '<div class="loading">⏳ Loading system status…</div>';
+
+      try {
+        const res = await fetch(`/rpmt/admin/system/status?v=${encodeURIComponent(VISIT)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const s = await res.json();
+
+        const mb = (s.uploads_bytes || 0) / (1024 * 1024);
+
+        pane.innerHTML = `
+          <div class="admin-panel">
+            <div class="panel-head">
+              <h2>System Status</h2>
+              <p class="muted">Database and storage overview</p>
+            </div>
+            <div class="sys-grid">
+              <div class="sys-card">
+                <div class="label">Projects</div>
+                <div class="value">${s.project_count}</div>
+              </div>
+              <div class="sys-card">
+                <div class="label">Tasks</div>
+                <div class="value">${s.task_count}</div>
+              </div>
+              <div class="sys-card">
+                <div class="label">Uploads</div>
+                <div class="value">${s.uploads_files} files</div>
+                <div class="hint">${mb.toFixed(1)} MB total</div>
+              </div>
+              <div class="sys-card wide">
+                <div class="label">DB Path</div>
+                <div class="value small">${s.db_path}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } catch(e) {
+        pane.innerHTML = `<div class="error">⚠️ Failed to load system status: ${e.message}</div>`;
+      }
+    });
+
+    /* PDK/DK Modal Functions - Global scope for dynamically loaded content */
+    function togglePDKDKModal(event){
+      if(event) event.preventDefault();
+      const modal = document.getElementById('pdk-dk-modal');
+      if(modal) {
+        modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+      }
+    }
+
+    function closePDKDKModal(){
+      const modal = document.getElementById('pdk-dk-modal');
+      if(modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    function toggleEdit(cell, inputId){
+      const span = cell.querySelector('span');
+      const input = document.getElementById(inputId);
+      
+      if(!span || !input) return;
+      
+      if(span.style.display !== 'none'){
+        span.style.display = 'none';
+        input.style.display = 'inline-block';
+        input.focus();
+      } else {
+        span.style.display = 'inline-block';
+        input.style.display = 'none';
+      }
+    }
+
+    // 필드 저장
+    async function saveField(entryId, fieldName, value){
+      try {
+        const data = {};
+        data[fieldName] = value;
+        
+        const res = await fetch(`/rpmt/admin/pdkdk/${entryId}`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        
+        if(!res.ok){
+          const errData = await res.json().catch(() => ({}));
+          console.error('Save error:', errData);
+          alert(`저장 실패: ${fieldName} - ${errData.error || 'Unknown error'}`);
+          return false;
+        }
+        
+        console.log(`✓ Saved ${fieldName}=${value} for entry ${entryId}`);
+        return true;
+      } catch(e){
+        console.error('Save failed:', e);
+        alert('저장 실패: ' + e.message);
+        return false;
+      }
+    }
+    
+    // Type 토글 및 저장
+    function toggleTypeEdit(cell, entryId){
+      const span = cell.querySelector('span');
+      const select = document.getElementById('type-' + entryId);
+      
+      if(!select) return;
+      
+      if(select.style.display === 'none'){
+        span.style.display = 'none';
+        select.style.display = 'inline-block';
+        select.focus();
+      } else {
+        span.style.display = 'inline-block';
+        select.style.display = 'none';
+      }
+    }
+    
+    // Type 필드 저장
+    async function saveTypeField(entryId, value){
+      const success = await saveField(entryId, 'type', value);
+      if(success){
+        const span = document.getElementById('display-type-' + entryId);
+        const select = document.getElementById('type-' + entryId);
+        
+        if(span && select){
+          const displayValue = value === 'PDK' ? 'PDK' : (value === 'DK' ? 'DK' : '-');
+          span.textContent = displayValue;
+          span.style.background = value === 'PDK' ? '#eff6ff' : (value === 'DK' ? '#fef3c7' : '#f5f5f5');
+          span.style.display = 'inline-block';
+          select.style.display = 'none';
+        }
+      }
+    }
+
+    // 전체 데이터 저장
+    async function savePDKDKData(){
+      const rows = document.querySelectorAll('[data-entry-id]');
+      const currentProjectId = window.currentProjectId;
+      
+      try {
+        const newRows = Array.from(rows).filter(row => {
+          const entryId = parseInt(row.dataset.entryId);
+          return entryId < 0;
+        });
+        
+        for(const newRow of newRows){
+          const tempId = newRow.getAttribute('data-entry-id');
+          
+          const typeInput = document.getElementById('type-' + tempId);
+          const categoryInput = document.getElementById('category-' + tempId);
+          
+          const type = typeInput ? typeInput.value.trim() : '';
+          const category = categoryInput ? categoryInput.value.trim() : '';
+          
+          if(!type || !category){
+            alert('Type과 Category를 모두 선택하세요');
+            return;
+          }
+          
+          const createRes = await fetch(`/api/pdkdk/save?project_id=${currentProjectId}&category=${encodeURIComponent(category)}&type=${encodeURIComponent(type)}`, {
+            method: 'POST'
+          });
+          
+          const createData = await createRes.json();
+          
+          if(!createRes.ok){
+            alert('새 항목 생성 실패: ' + (createData.error || 'Unknown error'));
+            return;
+          }
+        }
+        
+        const existingRows = Array.from(rows).filter(row => {
+          const entryId = parseInt(row.dataset.entryId);
+          return entryId > 0;
+        });
+        
+        for(const row of existingRows){
+          const entryId = parseInt(row.dataset.entryId);
+          const data = {};
+          
+          const fields = ['eng-ver-ko', 'b2b-date-ko', 'match-ko', 'check-date-ko', 'qa-check-ko',
+                          'eng-ver-tweek', 'b2b-date-tweek', 'match-tweek', 'check-date-tweek', 'reason'];
+          
+          for(const field of fields){
+            const input = document.getElementById(field + '-' + entryId);
+            if(input){
+              data[fieldNameMap[field]] = input.value;
+            }
+          }
+          
+          if(Object.keys(data).length > 0){
+            const updateRes = await fetch('/rpmt/admin/pdkdk/' + entryId, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(data)
+            });
+            
+            if(!updateRes.ok){
+              alert(`저장 실패: ${entryId}`);
+              return;
+            }
+          }
+        }
+        
+        alert('모든 데이터가 저장되었습니다');
+      } catch(e){
+        console.error('Save failed:', e);
+        alert('저장 실패: ' + e.message);
+      }
+    }
+    
+    const fieldNameMap = {
+      'eng-ver-ko': 'engineer_version_kickoff',
+      'b2b-date-ko': 'engineer_b2b_date_kickoff',
+      'match-ko': 'engineer_matching_kickoff',
+      'check-date-ko': 'engineer_check_date_kickoff',
+      'qa-check-ko': 'qa_matching_kickoff',
+      'eng-ver-tweek': 'engineer_version_tweek',
+      'b2b-date-tweek': 'engineer_b2b_date_tweek',
+      'match-tweek': 'engineer_matching_tweek',
+      'check-date-tweek': 'engineer_check_date_tweek',
+      'reason': 'qa_unmatched_reason_tweek'
+    };
+
+    const pdkCategories = ['DFM', 'DRC', 'EM', 'ESD', 'ETC', 'Fill', 'FLT', 'LVS', 'MODEL', 'PDKLib', 'PEX', 'PnR'];
+    const dkCategories = ['Standard Cell', 'Memory', 'CDM ESD', 'GPIO', 'HSIO', 'Power ESD', 'CDM B2B'];
+    
+    // 새 항목 추가
+    function addNewPDKDKRow(projectId){
+      const modal = document.getElementById('pdkdk-modal');
+      const modalProjectId = modal ? modal.getAttribute('data-project-id') : null;
+      const actualProjectId = projectId || (modalProjectId ? parseInt(modalProjectId) : null);
+      
+      if(!actualProjectId){
+        alert('프로젝트 ID를 찾을 수 없습니다');
+        console.error('Project ID not found. projectId param:', projectId, 'modalProjectId:', modalProjectId);
+        return;
+      }
+      
+      window.currentProjectId = actualProjectId;
+      
+      const table = document.getElementById('pdkdk-table');
+      if(!table){
+        alert('테이블을 찾을 수 없습니다');
+        return;
+      }
+      const tbody = table.querySelector('tbody');
+      if(!tbody){
+        alert('테이블 본문을 찾을 수 없습니다');
+        return;
+      }
+      
+      const tempId = -1 * (Date.now() % 1000000);
+      
+      const row = document.createElement('tr');
+      row.setAttribute('data-entry-id', tempId);
+      row.style.cssText = 'border: 1px solid #d1d5db; background: #fff3cd;';
+      
+      const allCategories = [...pdkCategories, ...dkCategories];
+      const datalistId = 'category-list-' + tempId;
+      const datalistHtml = '<datalist id="' + datalistId + '">' + 
+        allCategories.map(cat => '<option value="' + cat + '"></option>').join('') + 
+        '</datalist>';
+      
+      const cells = [
+        '<td style="padding: 8px; font-weight: 600; border: 1px solid #d1d5db; background: #fff3cd;"><select id="type-' + tempId + '" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"><option value="">선택...</option><option value="PDK">PDK</option><option value="DK">DK</option></select></td>',
+        '<td style="padding: 8px; border: 1px solid #d1d5db; background: #fff3cd;"><input type="text" id="category-' + tempId + '" list="' + datalistId + '" placeholder="카테고리 입력" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;" disabled/>' + datalistHtml + '</td>',
+        '<td onclick="toggleEdit(this, \'eng-ver-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-eng-ver-ko-' + tempId + '">-</span><input type="text" id="eng-ver-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'b2b-date-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-b2b-date-ko-' + tempId + '">-</span><input type="text" id="b2b-date-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'match-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-match-ko-' + tempId + '">-</span><input type="text" id="match-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'check-date-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-check-date-ko-' + tempId + '">-</span><input type="text" id="check-date-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'qa-check-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-qa-check-ko-' + tempId + '">-</span><input type="text" id="qa-check-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'eng-ver-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-eng-ver-tweek-' + tempId + '">-</span><input type="text" id="eng-ver-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'b2b-date-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-b2b-date-tweek-' + tempId + '">-</span><input type="text" id="b2b-date-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'match-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-match-tweek-' + tempId + '">-</span><input type="text" id="match-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'check-date-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-check-date-tweek-' + tempId + '">-</span><input type="text" id="check-date-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td onclick="toggleEdit(this, \'reason-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-reason-' + tempId + '">-</span><input type="text" id="reason-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
+        '<td style="padding: 8px; text-align: center; border: 1px solid #d1d5db;"><button type="button" onclick="deleteNewRow(this)" class="btn small danger">✕</button></td>'
+      ];
+      
+      row.innerHTML = cells.join('');
+      tbody.appendChild(row);
+      
+      // Type 드롭다운 변경 이벤트 처리
+      const typeSelect = document.getElementById('type-' + tempId);
+      const categoryInput = document.getElementById('category-' + tempId);
+      
+      typeSelect.addEventListener('change', (e) => {
+        const type = e.target.value;
+        categoryInput.disabled = false;
+        categoryInput.value = '';
+        categoryInput.placeholder = '카테고리 입력';
+      });
+    }
+    
+    // 추가된 빈 행 삭제
+    function deleteNewRow(btn){
+      btn.closest('tr').remove();
+    }
+
+    // 항목 삭제
+    async function deleteEntry(entryId){
+      if(!confirm('정말 삭제하시겠습니까?')){
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/rpmt/admin/pdkdk/${entryId}`, {
+          method: 'DELETE'
+        });
+        
+        if(res.ok){
+          alert('삭제되었습니다');
+          const row = document.querySelector(`[data-entry-id="${entryId}"]`);
+          if(row) row.remove();
+        } else {
+          alert('삭제 실패: HTTP ' + res.status);
+        }
+      } catch(e){
+        console.error('Delete failed:', e);
+        alert('삭제 실패: ' + e.message);
+      }
+    }
+
+   </script>
+{% endblock %}

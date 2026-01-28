@@ -1,0 +1,938 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container spec-center-root">
+  <div class="spec-dashboard-header-section spec-center-header">
+    <div class="spec-dashboard-header-content">
+      <div>
+        <h1 class="spec-dashboard-title">{{ t('spec_center.title') }}</h1>
+        <p class="spec-dashboard-subtitle">{{ t('spec_center.subtitle') }}</p>
+      </div>
+      {% if is_admin %}
+      <div class="spec-header-actions">
+        <button class="spec-btn spec-btn-primary" onclick="openCreateCategoryModal()">
+          <span>➕</span> {{ t('spec_center.new_category') }}
+        </button>
+        <button id="spec-delete-cat-btn" class="spec-btn spec-btn-danger" onclick="deleteCategory()" style="display:none;">
+          <span>🗑️</span> {{ t('spec_center.delete_category') }}
+        </button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="spec-content-wrapper">
+    <aside class="spec-sidebar">
+      <div class="spec-sidebar-header">
+        <h3>{{ t('spec_center.categories') }}</h3>
+        <input 
+          id="spec-search" 
+          type="text"
+          placeholder="🔍 {{ t('spec_center.search_specs') }}..." 
+          class="spec-search-input"
+        />
+      </div>
+      <div id="spec-tree" class="spec-tree-container"></div>
+    </aside>
+
+    <section class="spec-main">
+      <div class="spec-file-search-bar">
+        <input id="spec-file-search" type="text" class="spec-search-input" placeholder="🔎 Search files by name..." />
+      </div>
+
+      <div id="spec-file-search-results" class="spec-file-search-results" style="display:none;"></div>
+
+      <div id="spec-category-header" class="spec-category-header" style="display:none;">
+        <div class="spec-category-title-section">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span id="spec-category-icon" class="spec-category-icon">📁</span>
+            <h2 id="spec-category-name" class="spec-category-name">Select a category</h2>
+          </div>
+          {% if is_admin %}
+          <div class="spec-category-actions">
+            <button id="spec-upload-btn" class="spec-btn spec-btn-secondary" onclick="openUploadModal()" style="display:none;">
+              <span>📤</span> Upload File
+            </button>
+          </div>
+          {% endif %}
+        </div>
+        <p id="spec-category-description" class="spec-category-description"></p>
+      </div>
+
+      <div id="spec-empty-state" class="spec-empty-state">
+        <div class="spec-empty-state-icon">📂</div>
+        <h3>No category selected</h3>
+        <p>Select a category from the sidebar to view specifications</p>
+      </div>
+
+      <div id="spec-files-section" class="spec-files-section" style="display:none;">
+        <h2 class="spec-section-title">Files</h2>
+        <div id="spec-files-list" class="spec-files-list"></div>
+      </div>
+
+      <div id="spec-preview-section" class="spec-preview-section" style="display:none;">
+        <div class="spec-preview-header">
+          <h3>Preview</h3>
+          <button class="spec-close-preview-btn" onclick="closePreview()">✕</button>
+        </div>
+        <div id="spec-preview-area" class="spec-preview-area"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="createCategoryModal" class="spec-modal spec-hidden">
+  <div class="spec-modal-overlay" onclick="closeCreateCategoryModal()"></div>
+  <div class="spec-modal-dialog">
+    <div class="spec-modal-content">
+      <div class="spec-modal-header">
+        <h3>📁 Create Category</h3>
+        <button class="spec-modal-close" onclick="closeCreateCategoryModal()">✕</button>
+      </div>
+      <div class="spec-modal-body">
+        <div class="spec-form-group">
+          <label for="catName">Category Name *</label>
+          <input id="catName" type="text" class="spec-form-input" placeholder="e.g., AEC-Q100" />
+        </div>
+        <div class="spec-form-group">
+          <label for="catDesc">Description</label>
+          <textarea id="catDesc" class="spec-form-input" placeholder="Description for this category"></textarea>
+        </div>
+        <div class="spec-form-group">
+          <label for="catIcon">Icon</label>
+          <input id="catIcon" type="text" class="spec-form-input" value="📁" />
+        </div>
+        <div class="spec-form-group">
+          <label for="catParent">Parent Category</label>
+          <select id="catParent" class="spec-form-input">
+            <option value="">None (Root Level)</option>
+          </select>
+        </div>
+      </div>
+      <div class="spec-modal-footer">
+        <button class="spec-btn spec-btn-secondary" onclick="closeCreateCategoryModal()">Cancel</button>
+        <button class="spec-btn spec-btn-primary" onclick="submitCreateCategory()">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="uploadModal" class="spec-modal spec-hidden">
+  <div class="spec-modal-overlay" onclick="closeUploadModal()"></div>
+  <div class="spec-modal-dialog">
+    <div class="spec-modal-content">
+      <div class="spec-modal-header">
+        <h3>📤 Upload File</h3>
+        <button class="spec-modal-close" onclick="closeUploadModal()">✕</button>
+      </div>
+      <div class="spec-modal-body">
+        <div class="spec-form-group">
+          <label for="uploadFile">File *</label>
+          <div class="spec-file-upload-area" id="spec-fileDropZone">
+            <input id="uploadFile" type="file" accept=".pdf,.doc,.docx,.pptx,.xlsx,.xls" multiple webkitdirectory />
+            <div class="spec-file-upload-prompt">
+              <span class="spec-upload-icon">📤</span>
+              <p>Drag & drop or click to select file</p>
+              <small>Supported: PDF, DOC, DOCX, PPTX, XLSX, XLS</small>
+            </div>
+            <div id="spec-upload-selected" class="spec-upload-selected spec-hidden"></div>
+          </div>
+        </div>
+      </div>
+      <div class="spec-modal-footer">
+        <button class="spec-btn spec-btn-secondary" onclick="closeUploadModal()">Cancel</button>
+        <button class="spec-btn spec-btn-primary" id="uploadSubmitBtn" onclick="submitUploadFile()">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentCategoryId = null;
+let categoriesData = [];
+let defaultCategorySelected = false;
+let draggedFileId = null;
+const DEFAULT_CATEGORY_NAME = 'Original standard';
+const IS_ADMIN = {{ 'true' if is_admin else 'false' }};
+
+// Safe JSON parser to avoid uncaught SyntaxError on empty/invalid responses
+function safeJsonParse(text, fallback) {
+  if (!text) return fallback;
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.warn('JSON parse failed, using fallback', e, text.slice(0, 200));
+    return fallback;
+  }
+}
+
+// Load categories on page load
+async function initializeSpec(){
+  await fetchCategories();
+  setupUploadHandlers();
+}
+
+// Fetch categories from API
+async function fetchCategories(options = { preserveSelection: true }){
+  try {
+    const res = await fetch('/spec-center/api/categories');
+    if (!res.ok) throw new Error('Failed to fetch categories');
+    const categoriesText = await res.text();
+    categoriesData = safeJsonParse(categoriesText, []);
+    renderCategoryTree(categoriesData);
+    populateCategorySelects();
+
+    if (!defaultCategorySelected) {
+      selectDefaultCategory();
+      defaultCategorySelected = true;
+    } else if (options.preserveSelection && currentCategoryId) {
+      const currentCat = findCategoryById(currentCategoryId);
+      if (currentCat) {
+        showCategory(currentCat.id, currentCat.name, currentCat.description, currentCat.icon, currentCat.files);
+      }
+    }
+  } catch (err) {
+    console.error('Error fetching categories:', err);
+    document.getElementById('spec-tree').innerHTML = '<p class="spec-error-text">Failed to load categories</p>';
+  }
+
+  // Ensure function scope closes correctly
+  return categoriesData;
+}
+
+// Render hierarchical tree
+function renderCategoryTree(categories, container) {
+  container = container || document.getElementById('spec-tree');
+  container.innerHTML = '';
+  
+  const ul = document.createElement('ul');
+  ul.className = 'spec-category-tree-list';
+  
+  categories.forEach(cat => {
+    const li = renderCategoryNode(cat);
+    ul.appendChild(li);
+  });
+  
+  container.appendChild(ul);
+}
+
+function findCategoryByName(name, cats = categoriesData) {
+  for (const cat of cats) {
+    if (cat.name === name) return cat;
+    if (cat.children && cat.children.length) {
+      const found = findCategoryByName(name, cat.children);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function findCategoryById(id, cats = categoriesData) {
+  for (const cat of cats) {
+    if (cat.id === id) return cat;
+    if (cat.children && cat.children.length) {
+      const found = findCategoryById(id, cat.children);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function selectDefaultCategory() {
+  const target = findCategoryByName(DEFAULT_CATEGORY_NAME) || categoriesData[0];
+  if (target) {
+    showCategory(target.id, target.name, target.description, target.icon, target.files);
+  }
+}
+
+function renderCategoryNode(cat, depth = 0) {
+  const li = document.createElement('li');
+  li.className = 'spec-category-tree-item';
+  li.style.marginLeft = (depth * 16) + 'px';
+  
+  const hasChildren = cat.children && cat.children.length > 0;
+  const hasFiles = cat.files && cat.files.length > 0;
+  
+  // Category button
+  const btn = document.createElement('button');
+  btn.className = 'spec-category-tree-btn';
+  btn.dataset.categoryId = cat.id;
+  btn.dataset.categoryName = cat.name;
+  btn.dataset.depth = depth;
+  
+  // Mark root level for bold styling
+  if (depth === 0) {
+    btn.classList.add('spec-category-root');
+  }
+  
+  btn.innerHTML = `
+    ${hasChildren ? '<span class="spec-tree-toggle">▼</span>' : '<span class="spec-tree-toggle-empty"></span>'}
+    <span class="spec-category-label">${cat.name}</span>
+    ${hasFiles ? `<span class="spec-file-count">${cat.files.length}</span>` : ''}
+  `;
+  
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    showCategory(cat.id, cat.name, cat.description, cat.icon, cat.files);
+  };
+
+  if (IS_ADMIN) {
+    btn.addEventListener('dragover', (e) => handleCategoryDragOver(e, cat.id));
+    btn.addEventListener('dragleave', handleCategoryDragLeave);
+    btn.addEventListener('drop', (e) => handleCategoryDrop(e, cat.id));
+  }
+  
+  li.appendChild(btn);
+  
+  // Children container
+  if (hasChildren) {
+    const children = document.createElement('ul');
+    children.className = 'spec-category-tree-children';
+    children.style.display = 'block';
+    
+    cat.children.forEach(child => {
+      const childLi = renderCategoryNode(child, depth + 1);
+      children.appendChild(childLi);
+    });
+    
+    li.appendChild(children);
+    
+    // Toggle children
+    const toggle = btn.querySelector('.spec-tree-toggle');
+    toggle.onclick = (e) => {
+      e.stopPropagation();
+      const isHidden = children.style.display === 'none';
+      children.style.display = isHidden ? 'block' : 'none';
+      toggle.textContent = isHidden ? '▼' : '▶';
+    };
+  }
+  
+  return li;
+}
+
+// Show category and its files
+async function showCategory(catId, catName, catDesc, catIcon, files) {
+  currentCategoryId = catId;
+  
+  // Mark active category button
+  document.querySelectorAll('.spec-category-tree-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  const activeBtn = document.querySelector(`.spec-category-tree-btn[data-category-id="${catId}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+  }
+  
+  // Show header
+  document.getElementById('spec-category-header').style.display = 'block';
+  document.getElementById('spec-category-icon').textContent = catIcon || '📁';
+  document.getElementById('spec-category-name').textContent = catName;
+  document.getElementById('spec-category-description').textContent = catDesc || '';
+  
+  // Show admin buttons
+  const uploadBtn = document.getElementById('spec-upload-btn');
+  if (uploadBtn) {
+    uploadBtn.style.display = 'block';
+  }
+  const deleteCatBtn = document.getElementById('spec-delete-cat-btn');
+  if (deleteCatBtn) {
+    deleteCatBtn.style.display = 'block';
+  }
+  
+  // Hide empty state
+  document.getElementById('spec-empty-state').style.display = 'none';
+  
+  // Show files section
+  document.getElementById('spec-files-section').style.display = 'block';
+  const filesList = document.getElementById('spec-files-list');
+  filesList.innerHTML = '';
+  
+  if (!files || files.length === 0) {
+    filesList.innerHTML = '<p class="spec-no-files-text">No files in this category</p>';
+    return;
+  }
+  
+  // Create table
+  const table = document.createElement('table');
+  table.className = 'spec-files-table';
+  const actionsWidth = IS_ADMIN ? 140 : 100;
+  
+  // Table header
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th style="width: 40px;"></th>
+        <th>Name</th>
+        <th style="width: ${actionsWidth}px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+  
+  const tbody = table.querySelector('tbody');
+  
+  files.forEach(file => {
+    const row = document.createElement('tr');
+    row.className = 'spec-file-row';
+    
+    if (IS_ADMIN) {
+      row.draggable = true;
+      row.addEventListener('dragstart', (e) => handleFileDragStart(e, file));
+      row.addEventListener('dragend', handleFileDragEnd);
+    }
+    
+    const fileIcon = getFileIcon(file.file_type);
+    const safeName = encodeURIComponent(file.original_name || '');
+    const deleteBtn = IS_ADMIN 
+      ? `<button class="spec-file-action-btn" title="Delete" onclick="deleteFile(${file.id}, decodeURIComponent('${safeName}'))">🗑️</button>` 
+      : '';
+    
+    row.innerHTML = `
+      <td class="spec-file-icon">${fileIcon}</td>
+      <td class="spec-file-name" title="${file.original_name}">${file.original_name}</td>
+      <td class="spec-file-actions">
+        <button class="spec-file-action-btn" title="Preview" onclick="previewFile(${file.id})">👁️</button>
+        <a href="/spec-center/serve/${encodeURIComponent(file.filename)}" class="spec-file-action-btn" title="Download" download="${file.original_name}">⬇️</a>
+        ${deleteBtn}
+      </td>
+    `;
+    
+    tbody.appendChild(row);
+  });
+  
+  filesList.appendChild(table);
+}
+
+// Preview file in new window
+async function previewFile(fileId) {
+  try {
+    const res = await fetch(`/spec-center/api/files/${fileId}`);
+    if (!res.ok) throw new Error('Failed to fetch file info');
+    const fileText = await res.text();
+    const file = safeJsonParse(fileText, null);
+    if (!file) {
+      alert('파일 정보를 불러올 수 없습니다');
+      return;
+    }
+    const ext = file.file_type.toLowerCase();
+    
+    // Excel: open HTML preview
+    if (ext === 'xlsx' || ext === 'xls') {
+      window.open(`/spec-center/api/files/${fileId}/excel-preview`, '_blank');
+      return;
+    }
+    
+    // For PDF files, open directly
+    if (ext === 'pdf') {
+      window.open(`/spec-center/serve/${encodeURIComponent(file.filename)}?preview=true`, '_blank');
+      return;
+    }
+    
+    // For other files, try to open converted PDF or trigger conversion
+    const pdfFilename = file.filename.replace(/\.[^.]+$/, '.pdf');
+    
+    // Try to open PDF version
+    const checkRes = await fetch(`/spec-center/serve/${encodeURIComponent(pdfFilename)}`, { method: 'HEAD' });
+    if (checkRes.ok) {
+      // PDF version exists, open it
+      window.open(`/spec-center/serve/${encodeURIComponent(pdfFilename)}?preview=true`, '_blank');
+    } else {
+      // No PDF version, trigger conversion and wait
+      alert('파일을 변환하고 있습니다. 잠시만 기다려주세요...');
+      const convertRes = await fetch(`/spec-center/api/files/${fileId}/convert`, { method: 'POST' });
+      if (convertRes.ok) {
+        // Open the converted PDF
+        window.open(`/spec-center/serve/${encodeURIComponent(pdfFilename)}?preview=true`, '_blank');
+      } else {
+        alert('파일 변환에 실패했습니다. 다운로드만 가능합니다.');
+        window.open(`/spec-center/serve/${encodeURIComponent(file.filename)}`, '_blank');
+      }
+    }
+  } catch (err) {
+    console.error('Error opening preview:', err);
+    alert('Preview를 열 수 없습니다. 다시 시도해주세요.');
+  }
+}
+
+// Delete file (admin only)
+async function deleteFile(fileId, originalName) {
+  if (!IS_ADMIN) {
+    alert('Admin 권한이 없습니다');
+    return;
+  }
+  const confirmed = confirm(`파일을 삭제할까요?\n${originalName || ''}`);
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`/spec-center/api/files/${fileId}/delete`, { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const text = await res.text();
+    const data = safeJsonParse(text, {});
+    if (!res.ok) {
+      throw new Error(data.error || data.detail || 'Delete failed');
+    }
+    await fetchCategories({ preserveSelection: true });
+  } catch (err) {
+    console.error('Delete error:', err);
+    alert('삭제 실패: ' + err.message);
+  }
+}
+
+// Delete category (admin)
+async function deleteCategory() {
+  if (!IS_ADMIN) {
+    alert('Admin 권한이 없습니다');
+    return;
+  }
+  if (!currentCategoryId) {
+    alert('먼저 카테고리를 선택하세요');
+    return;
+  }
+  const name = document.getElementById('spec-category-name').textContent || '';
+  const ok = confirm(`카테고리를 삭제할까요?\n${name}`);
+  if (!ok) return;
+  try {
+    const res = await fetch(`/spec-center/api/categories/${currentCategoryId}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = safeJsonParse(await res.text(), {});
+      throw new Error(data.detail || data.error || 'Delete failed');
+    }
+    currentCategoryId = null;
+    await fetchCategories({ preserveSelection: false });
+    document.getElementById('spec-category-header').style.display = 'none';
+    document.getElementById('spec-files-section').style.display = 'none';
+    document.getElementById('spec-empty-state').style.display = 'block';
+  } catch (err) {
+    console.error('Category delete error:', err);
+    alert('삭제 실패: ' + err.message);
+  }
+}
+
+// Close preview
+function closePreview() {
+  document.getElementById('spec-preview-section').style.display = 'none';
+}
+
+// Modal functions
+function openCreateCategoryModal() {
+  document.getElementById('createCategoryModal').classList.remove('spec-hidden');
+}
+
+function closeCreateCategoryModal() {
+  document.getElementById('createCategoryModal').classList.add('spec-hidden');
+  document.getElementById('catName').value = '';
+  document.getElementById('catDesc').value = '';
+  document.getElementById('catIcon').value = '📁';
+}
+
+async function submitCreateCategory() {
+  const name = document.getElementById('catName').value.trim();
+  if (!name) {
+    alert('Please enter a category name');
+    return;
+  }
+  
+  try {
+    const res = await fetch('/spec-center/api/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        description: document.getElementById('catDesc').value,
+        icon: document.getElementById('catIcon').value,
+        parent_id: document.getElementById('catParent').value || null
+      })
+    });
+    
+    if (!res.ok) throw new Error('Failed to create category');
+    closeCreateCategoryModal();
+    await fetchCategories();
+    populateCategorySelects();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+function openUploadModal() {
+  if (!currentCategoryId) {
+    alert('Please select a category first');
+    return;
+  }
+  document.getElementById('uploadModal').classList.remove('spec-hidden');
+}
+
+function closeUploadModal() {
+  document.getElementById('uploadModal').classList.add('spec-hidden');
+  document.getElementById('uploadFile').value = '';
+}
+
+async function submitUploadFile() {
+  const catId = currentCategoryId;
+  const files = document.getElementById('uploadFile').files;
+  
+  if (!catId) {
+    alert('Please select a category first');
+    return;
+  }
+  
+  if (!files || files.length === 0) {
+    alert('Please select at least one file');
+    return;
+  }
+  
+  const btn = document.getElementById('uploadSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+  
+  try {
+    const formData = new FormData();
+    formData.append('category_id', catId);
+    Array.from(files).forEach(f => formData.append('files', f));
+    
+    const res = await fetch(`/spec-center/api/files/upload?category_id=${catId}`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!res.ok) throw new Error('Upload failed');
+    closeUploadModal();
+    document.getElementById('uploadFile').value = '';
+    updateSelectedFilesList([]);
+    await fetchCategories({ preserveSelection: true });
+    alert('File uploaded successfully!');
+  } catch (err) {
+    alert('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Upload';
+  }
+}
+
+// Populate category selects for modals
+function populateCategorySelects() {
+  const parentSelect = document.getElementById('catParent');
+  
+  if (!parentSelect) return; // Guard clause
+  
+  // Flatten categories for select
+  function flattenCategories(cats, result = [], prefix = '') {
+    cats.forEach(cat => {
+      result.push({ id: cat.id, name: prefix + cat.name });
+      if (cat.children) {
+        flattenCategories(cat.children, result, prefix + '  ');
+      }
+    });
+    return result;
+  }
+  
+  const flat = flattenCategories(categoriesData);
+  
+  parentSelect.innerHTML = '<option value="">None (Root Level)</option>';
+  
+  flat.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat.id;
+    opt.textContent = cat.name;
+    parentSelect.appendChild(opt);
+  });
+}
+
+// Setup upload handlers
+function setupUploadHandlers() {
+  const dropZone = document.getElementById('spec-fileDropZone');
+  const fileInput = document.getElementById('uploadFile');
+  
+  // Click to open file selector
+  dropZone.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => {
+    updateSelectedFilesList(fileInput.files);
+  });
+  
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+  
+  dropZone.addEventListener('dragleave', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+  });
+  
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) {
+      fileInput.files = e.dataTransfer.files;
+      updateSelectedFilesList(fileInput.files);
+    }
+  });
+}
+
+function updateSelectedFilesList(fileList) {
+  const container = document.getElementById('spec-upload-selected');
+  if (!container) return;
+  if (!fileList || fileList.length === 0) {
+    container.classList.add('spec-hidden');
+    container.innerHTML = '';
+    return;
+  }
+
+  const items = Array.from(fileList).map(file => {
+    const sizeText = typeof file.size === 'number' ? formatFileSize(file.size) : '';
+    return `<li><span class="spec-file-chip">${file.name}</span><span class="spec-file-chip-size">${sizeText}</span></li>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="spec-upload-selected-header">Selected files (${fileList.length})</div>
+    <ul>${items}</ul>
+  `;
+  container.classList.remove('spec-hidden');
+}
+
+// Search functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('spec-search');
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    document.querySelectorAll('.spec-category-tree-item').forEach(item => {
+      const label = item.querySelector('.spec-category-label').textContent.toLowerCase();
+      item.style.display = label.includes(query) ? '' : 'none';
+    });
+  });
+
+  // File search live query
+  const fileSearch = document.getElementById('spec-file-search');
+  const resultsBox = document.getElementById('spec-file-search-results');
+  let fileSearchTimer = null;
+  fileSearch.addEventListener('input', (e) => {
+    const q = e.target.value.trim();
+    if (fileSearchTimer) clearTimeout(fileSearchTimer);
+    if (!q) {
+      resultsBox.style.display = 'none';
+      resultsBox.innerHTML = '';
+      return;
+    }
+    fileSearchTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/spec-center/api/files/search?q=${encodeURIComponent(q)}&limit=30`);
+        const text = await res.text();
+        const data = safeJsonParse(text, { items: [] });
+        renderFileSearchResults(data.items, q);
+      } catch (err) {
+        console.error('file search error', err);
+      }
+    }, 250);
+  });
+  
+  // F2 key listener for renaming categories (admin only)
+  if (IS_ADMIN) {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        const activeBtn = document.querySelector('.spec-category-tree-btn.active');
+        if (activeBtn) {
+          startCategoryRename(activeBtn);
+        }
+      }
+    });
+  }
+});
+
+// Category rename functionality
+function startCategoryRename(btn) {
+  if (!IS_ADMIN) return;
+  
+  const categoryId = parseInt(btn.dataset.categoryId);
+  const labelSpan = btn.querySelector('.spec-category-label');
+  const oldName = labelSpan.textContent;
+  
+  // Create input element
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = oldName;
+  input.className = 'spec-category-rename-input';
+  input.style.cssText = 'font-size: inherit; padding: 2px 4px; border: 1px solid #3b82f6; border-radius: 3px; outline: none; width: 150px;';
+  
+  // Replace label with input
+  labelSpan.replaceWith(input);
+  input.focus();
+  input.select();
+  
+  // Handle save
+  const saveRename = async () => {
+    const newName = input.value.trim();
+    if (!newName || newName === oldName) {
+      // Restore original
+      input.replaceWith(labelSpan);
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/spec-center/api/categories/${categoryId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName })
+      });
+      
+      if (!res.ok) {
+        const data = safeJsonParse(await res.text(), {});
+        throw new Error(data.detail || data.error || 'Rename failed');
+      }
+      
+      // Update label
+      labelSpan.textContent = newName;
+      input.replaceWith(labelSpan);
+      
+      // Refresh data
+      await fetchCategories({ preserveSelection: true });
+    } catch (err) {
+      console.error('Rename error:', err);
+      alert('이름 변경 실패: ' + err.message);
+      input.replaceWith(labelSpan);
+    }
+  };
+  
+  // Handle cancel
+  const cancelRename = () => {
+    input.replaceWith(labelSpan);
+  };
+  
+  input.addEventListener('blur', saveRename);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveRename();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelRename();
+    }
+  });
+}
+
+// Drag-and-drop helpers (file -> category)
+function handleFileDragStart(e, file) {
+  if (!IS_ADMIN) return;
+  draggedFileId = file.id;
+  e.dataTransfer.setData('text/plain', String(file.id));
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleFileDragEnd() {
+  draggedFileId = null;
+  document.querySelectorAll('.spec-drop-target').forEach(el => el.classList.remove('spec-drop-target'));
+}
+
+function handleCategoryDragOver(e, categoryId) {
+  if (!IS_ADMIN || !draggedFileId) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('spec-drop-target');
+}
+
+function handleCategoryDragLeave(e) {
+  e.currentTarget.classList.remove('spec-drop-target');
+}
+
+async function handleCategoryDrop(e, targetCategoryId) {
+  if (!IS_ADMIN || !draggedFileId) return;
+  e.preventDefault();
+  e.currentTarget.classList.remove('spec-drop-target');
+  if (targetCategoryId === currentCategoryId) return; // already in category
+  await moveFiles([draggedFileId], targetCategoryId);
+  draggedFileId = null;
+}
+
+async function moveFiles(fileIds, targetCategoryId) {
+  try {
+    const res = await fetch('/spec-center/api/files/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_ids: fileIds, target_category_id: targetCategoryId })
+    });
+    const dataText = await res.text();
+    const data = safeJsonParse(dataText, {});
+    if (!res.ok) {
+      throw new Error(data.detail || data.error || 'Move failed');
+    }
+    await fetchCategories({ preserveSelection: true });
+  } catch (err) {
+    console.error('Move error:', err);
+    alert('이동 실패: ' + err.message);
+  }
+}
+
+// Utility functions
+function getFileIcon(type) {
+  const ext = type.toLowerCase();
+  const icons = {
+    'pdf': '<div style="background: #DC3E15; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">PDF</div>',
+    'doc': '<div style="background: #2B579A; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">W</div>',
+    'docx': '<div style="background: #2B579A; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">W</div>',
+    'ppt': '<div style="background: #D24726; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">P</div>',
+    'pptx': '<div style="background: #D24726; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">P</div>',
+    'xls': '<div style="background: #217346; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">X</div>',
+    'xlsx': '<div style="background: #217346; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">X</div>'
+  };
+  return icons[ext] || '<div style="background: #6B7280; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">📄</div>';
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+}
+
+// Render search results
+function renderFileSearchResults(items, query) {
+  const resultsBox = document.getElementById('spec-file-search-results');
+  if (!items || items.length === 0) {
+    resultsBox.style.display = 'block';
+    resultsBox.innerHTML = `<div class="spec-search-empty">No results for "${escapeHtml(query)}"</div>`;
+    return;
+  }
+  const html = items.map(item => {
+    const icon = getFileIcon(item.file_type || '');
+    const safeName = escapeHtml(item.original_name || item.filename);
+    const path = escapeHtml(item.category_path || '');
+    return `
+      <div class="spec-file-result">
+        <div class="spec-file-result-main">
+          <div class="spec-file-result-icon">${icon}</div>
+          <div class="spec-file-result-text">
+            <div class="spec-file-result-name">${safeName}</div>
+            <div class="spec-file-result-path">${path}</div>
+          </div>
+        </div>
+        <div class="spec-file-result-actions">
+          <button class="spec-file-action-btn" title="Preview" onclick="previewFile(${item.id})">👁️</button>
+          <a class="spec-file-action-btn" title="Download" href="/spec-center/serve/${encodeURIComponent(item.filename)}" download="${safeName}">⬇️</a>
+          <button class="spec-file-action-btn" title="Go to Category" onclick="goToCategory(${item.category_id})">➡️</button>
+        </div>
+      </div>`;
+  }).join('');
+  resultsBox.innerHTML = `<div class="spec-search-summary">${items.length} result(s)</div>${html}`;
+  resultsBox.style.display = 'block';
+}
+
+function goToCategory(catId) {
+  const cat = findCategoryById(catId);
+  if (!cat) return;
+  showCategory(cat.id, cat.name, cat.description, cat.icon, cat.files);
+  const resultsBox = document.getElementById('spec-file-search-results');
+  resultsBox.style.display = 'none';
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Initialize on page load
+initializeSpec();
+</script>
+{% endblock %}

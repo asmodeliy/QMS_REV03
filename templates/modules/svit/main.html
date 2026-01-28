@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div id="shuttlesData" class="hidden">
+  {% if shuttles %}
+    {% for shuttle in shuttles %}
+      <div class="shuttle-option" 
+           data-shuttle-id="{{ shuttle.shuttle_id }}" 
+           data-ip-ic="{{ shuttle.ip_ic or '' }}" 
+           data-node="{{ shuttle.node or '' }}" 
+           data-family="{{ shuttle.family or '' }}"
+           data-power-1="{{ shuttle.power_1 or '' }}"
+           data-power-2="{{ shuttle.power_2 or '' }}"
+           data-power-3="{{ shuttle.power_3 or '' }}"
+           data-power-4="{{ shuttle.power_4 or '' }}"
+           data-power-5="{{ shuttle.power_5 or '' }}"
+           data-power-6="{{ shuttle.power_6 or '' }}"
+           data-power-7="{{ shuttle.power_7 or '' }}"></div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+{% include "modules/svit/_includes/_issue_creation_popup.html" %}
+
+<main class="container svit-main svit-root">
+  
+  <div class="dashboard-header-section svit-header">
+    <div class="dashboard-header-content">
+      <div>
+        <h1 class="dashboard-title">SVIT</h1>
+        <p class="dashboard-subtitle">RAMSCHIP SILICON VERIFICATION ISSUE TRACKING</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="openNewIssueModal()">{{ t("svit.new_issue") }}</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="stats-section">
+    <div class="stat-card highlight-total">
+      <div class="stat-value">{{ total_issues }}</div>
+      <div class="stat-label">{{ t("svit.total_label") }}</div>
+    </div>
+    <div class="stat-card highlight-new">
+      <div class="stat-value">{{ new_issues }}</div>
+      <div class="stat-label">{{ t("svit.status_new") }}</div>
+    </div>
+    <div class="stat-card highlight-progress">
+      <div class="stat-value">{{ in_progress }}</div>
+      <div class="stat-label">{{ t("svit.status_in_progress") }}</div>
+    </div>
+    <div class="stat-card highlight-resolved">
+      <div class="stat-value">{{ resolved }}</div>
+      <div class="stat-label">{{ t("svit.status_resolved") }}</div>
+    </div>
+  </div>
+
+  
+  <div class="filters-section">
+    <form method="get" class="filter-group">
+      <select name="shuttle" id="filterShuttle" class="filter-input">
+        <option value="">{{ t('svit.filter_shuttle_all') or 'All Shuttles' }}</option>
+        {% for sid in filter_shuttle_list or [] %}
+        <option value="{{ sid }}" {% if request.query_params.get('shuttle','') == sid %}selected{% endif %}>{{ sid }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="node" id="filterNode" class="filter-input">
+        <option value="">{{ t('svit.filter_node_all') or 'All Nodes' }}</option>
+        {% for n in filter_node_list or [] %}
+        <option value="{{ n }}" {% if request.query_params.get('node','') == n %}selected{% endif %}>{{ n }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="ip" id="filterIP" class="filter-input">
+        <option value="">{{ t('svit.filter_ip_all') or 'All IP/IC' }}</option>
+        {% for ip in filter_ip_list or [] %}
+        <option value="{{ ip }}" {% if request.query_params.get('ip','') == ip %}selected{% endif %}>{{ ip }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="family" id="filterFamily" class="filter-input">
+        <option value="">{{ t('svit.filter_family_all') or 'All Families' }}</option>
+        {% for f in filter_family_list or [] %}
+        <option value="{{ f }}" {% if request.query_params.get('family','') == f %}selected{% endif %}>{{ f }}</option>
+        {% endfor %}
+      </select>
+      <select name="status" id="filterStatus" class="filter-input">
+        <option value="">{{ t('svit.filter_status_all') or 'All Status' }}</option>
+        <option value="NEW" {% if filter_status == 'NEW' %}selected{% endif %}>{{ t('svit.status_new') }}</option>
+        <option value="IN_PROGRESS" {% if filter_status == 'IN_PROGRESS' %}selected{% endif %}>{{ t('svit.status_in_progress') }}</option>
+        
+        <option value="RESOLVED" {% if filter_status == 'RESOLVED' %}selected{% endif %}>{{ t('svit.status_resolved') }}</option>
+      </select>
+      <div class="filter-actions">
+        <button type="button" class="btn btn-secondary" onclick="clearFilters()">{{ t("common.clear") or 'Clear' }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="issues-table-wrapper">
+    <table class="issues-table">
+      <thead>
+        <tr>
+          <th class="col-tracking">{{ t("svit.tracking_number") }}</th>
+          <th class="col-shuttle">{{ t("svit.shuttle_id") }}</th>
+          <th class="col-node">{{ t("svit.node") }}</th>
+          <th class="col-ip">{{ t("svit.ip_ic") }}</th>
+          <th class="col-phen">{{ t("svit.issue_phenomenon") }}</th>
+          <th class="col-report">{{ t("svit.report_date") }}</th>
+          <th class="col-update">{{ t('svit.update_date') }}</th>
+          <th class="col-status">{{ t("svit.status") }}</th>
+          <th class="col-attach">{{ t('svit.attachment') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if issues %}
+          {% for issue in issues %}
+          <tr class="issue-row status-{{ issue.status.lower().replace('-', '_') }}" data-issue-id="{{ issue.id }}" data-href="/svit/issue/{{ issue.id }}" tabindex="0" role="link">
+            <td class="tracking-no">
+              <a href="/svit/issue/{{ issue.id }}" class="link-tracking">{{ issue.tracking_no }}</a>
+            </td>
+            <td>{{ issue.shuttle_id or '—' }}</td>
+            <td>{{ issue.node or '—' }}</td>
+            <td>{{ issue.ip_ic or '—' }}</td>
+            <td class="desc-cell">{{ issue.issue_phenomenon[:80] or '—' }}{% if issue.issue_phenomenon and issue.issue_phenomenon|length > 80 %}...{% endif %}</td>
+            <td class="date-cell">
+              {%- if issue.report_date %}
+                {% if issue.report_date.__class__.__name__ == 'datetime' %}
+                  {{ issue.report_date.strftime('%Y-%m-%d') }}
+                {% else %}
+                  {{ issue.report_date }}
+                {% endif %}
+              {%- elif issue.created_at %}
+                {% if issue.created_at.__class__.__name__ == 'datetime' %}
+                  {{ issue.created_at.strftime('%Y-%m-%d') }}
+                {% else %}
+                  {{ issue.created_at }}
+                {% endif %}
+              {%- else %}
+                —
+              {%- endif %}
+            </td>
+            <td class="date-cell">
+              {%- if issue.updated_at %}
+                {% if issue.updated_at.__class__.__name__ == 'datetime' %}
+                  {{ issue.updated_at.strftime('%Y-%m-%d') }}
+                {% else %}
+                  {{ issue.updated_at }}
+                {% endif %}
+              {%- else %}
+                —
+              {%- endif %}
+            </td>
+            <td>
+              <span class="status-badge status-{{ issue.status.lower().replace('-', '_') }}">
+                {{ issue.status }}
+              </span>
+            </td>
+            <td class="attach-cell">
+              {% if issue.log_attach %}
+                {% set files = issue.log_attach.split(',') if ',' in issue.log_attach else [issue.log_attach] %}
+                <div class="attach-list">
+                {% for file in files %}
+                  {% set file = file.strip() %}
+                  {% if file %}
+                    {% if file.startswith('uploads/') %}
+                      {% set clean = file.replace('\\','/') %}
+                    {% else %}
+                      {% set clean = ('uploads/' + file).replace('\\','/') %}
+                    {% endif %}
+                    {% set lname = clean.split('/')[-1].lower() %}
+                    {% if lname.endswith('.png') or lname.endswith('.jpg') or lname.endswith('.jpeg') or lname.endswith('.gif') or lname.endswith('.webp') %}
+                      <a href="/{{ clean.lstrip('/') }}" target="_blank" class="attach-thumb-link" title="{{ lname }}">
+                        <img src="/{{ clean.lstrip('/') }}" class="attach-thumb" alt="{{ lname }}"/>
+                      </a>
+                    {% else %}
+                      <a href="/{{ clean.lstrip('/') }}" target="_blank" class="attach-link" title="Download">
+                        📎 {{ clean.split('/')[-1] }}
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                </div>
+              {% else %}
+                <span class="no-attach">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+        <tr class="empty-state">
+          <td colspan="10" class="empty-cell">
+            No issues found. <a href="#" onclick="openNewIssueModal(); return false;">Create one</a>
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+function openNewIssueModal() {
+  const modal = document.getElementById('issueModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+}
+
+function closeNewIssueModal() {
+  const modal = document.getElementById('issueModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+function deleteIssue(issueId) {
+  if (confirm('정말 이슈를 삭제하시겠습니까?')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/svit/issue/delete/' + issueId;
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+function clearFilters() {
+  document.getElementById('filterShuttle').value = '';
+  document.getElementById('filterNode').value = '';
+  document.getElementById('filterIP').value = '';
+  document.getElementById('filterFamily').value = '';
+  document.getElementById('filterStatus').value = '';
+  // submit form after clearing
+  const form = document.querySelector('.filter-group');
+  if (form) form.submit();
+}
+</script>
+
+<script>
+// Make entire issue-row clickable (except for real links/buttons)
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.issue-row[data-href]').forEach(function(row){
+    row.addEventListener('click', function(e){
+      if (e.target.closest('a') || e.target.closest('button')) return;
+      window.location.href = row.getAttribute('data-href');
+    });
+    row.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' && document.activeElement === row) {
+        window.location.href = row.getAttribute('data-href');
+      }
+    });
+  });
+
+  // Auto-submit filters: debounce text inputs, immediate on select change
+  const filterForm = document.querySelector('.filter-group');
+  if (filterForm) {
+    let timer = null;
+    filterForm.querySelectorAll('input.filter-input[type="text"]').forEach(function(inp){
+      inp.addEventListener('input', function(){
+        clearTimeout(timer);
+        timer = setTimeout(()=> filterForm.submit(), 450);
+      });
+    });
+    // select and other inputs
+    filterForm.querySelectorAll('select.filter-input').forEach(function(sel){
+      sel.addEventListener('change', function(){ filterForm.submit(); });
+    });
+  }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-page">
+  <div class="gradient-bg"></div>
+  <div class="gradient-top-section">
+    <h1 class="welcome-title top-logo">
+      <span class="brand-name">RAMSCHIP QMS</span>
+    </h1>
+  </div>
+  
+  <div class="main-container">
+    {% if request.session.get("is_authenticated") %}
+    <div class="welcome-section">
+      <div class="welcome-header">
+        <p class="welcome-subtitle">{{ t("common.choose_module", locale) if t("common.choose_module", locale) != "common.choose_module" else "Please select a module to begin" }}</p>
+      </div>
+    </div>
+
+    <div class="modules-grid">
+      <a href="/rpmt" class="module-card rpmt-card">
+        <div class="card-background"></div>
+        <div class="card-content">
+          <div class="module-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+              <path d="M10 17l-3-3 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z"/>
+            </svg>
+          </div>
+          <h2 class="module-title">RPMT</h2>
+          <p class="module-description">{{ t("common.rpmt_desc", locale) if t("common.rpmt_desc", locale) != "common.rpmt_desc" else "Risk and Project Management Tool" }}</p>
+          <span class="module-status active-status">
+            <span class="status-dot"></span>
+            {{ t("common.active", locale) if t("common.active", locale) != "common.active" else "Active" }}
+          </span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a href="/svit/" class="module-card svit-card">
+        <div class="card-background"></div>
+        <div class="card-content">
+          <div class="module-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+            </svg>
+          </div>
+          <h2 class="module-title">SVIT</h2>
+          <p class="module-description">{{ t("common.svit_desc", locale) if t("common.svit_desc", locale) != "common.svit_desc" else "Silicon Verification Issue Tracking" }}</p>
+          <span class="module-status active-status">
+            <span class="status-dot"></span>
+            {{ t("common.active", locale) if t("common.active", locale) != "common.active" else "Active" }}
+          </span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a href="/cits" class="module-card cits-card">
+        <div class="card-background"></div>
+        <div class="card-content">
+          <div class="module-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a7 7 0 100 14 7 7 0 000-14z" />
+              <path d="M4 20c1.5-3 5-5 8-5s6.5 2 8 5" />
+            </svg>
+          </div>
+          <h2 class="module-title">CITS</h2>
+          <p class="module-description">{{ t("cits.name", locale) }}</p>
+          <span class="module-status ongoing-status">
+            <span class="status-dot"></span>
+            {{ t("common.ongoing", locale) }}
+          </span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a href="/apqp" class="module-card apqp-card">
+        <div class="card-background"></div>
+        <div class="card-content">
+          <div class="module-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="4"/>
+              <path d="M8 12h8" />
+            </svg>
+          </div>
+          <h2 class="module-title">APQP</h2>
+          <p class="module-description">{{ t("apqp.title", locale) }}</p>
+          <span class="module-status planning-status">
+            <span class="status-dot"></span>
+            {{ t("common.planned", locale) }}
+          </span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a href="/spec-center/" class="module-card spec-center-card">
+        <div class="card-background"></div>
+        <div class="card-content">
+          <div class="module-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="8" r="3" />
+              <path d="M5 20c2-3 6-4 7-4s5 1 7 4" />
+            </svg>
+          </div>
+          <h2 class="module-title">{{ t('spec_center.title', locale) }}</h2>
+          <p class="module-description">{{ t('spec_center.subtitle', locale) }}</p>
+          <span class="module-status active-status">
+            <span class="status-dot"></span>
+            {{ t("common.active", locale) if t("common.active", locale) != "common.active" else "Active" }}
+          </span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a href="/product-info" class="module-card product-info-card">
+        <div class="card-background"></div>
+        <div class="card-content">
+          <div class="module-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="16" rx="3" />
+              <path d="M8 9h8" />
+              <path d="M8 13h5" />
+            </svg>
+          </div>
+          <h2 class="module-title">{{ t('product_info.title_short', locale) }}</h2>
+          <p class="module-description">{{ t('product_info.subtitle', locale) }}</p>
+          <span class="module-status active-status">
+            <span class="status-dot"></span>
+            {{ t("common.active", locale) if t("common.active", locale) != "common.active" else "Active" }}
+          </span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+    {% else %}
+    <div class="login-card-section">
+      <div class="login-card-wrapper">
+        <div class="login-form-container">
+          <h2 class="login-form-title">{{ t('login.login_button', locale) }}</h2>
+          
+          <form method="post" action="/auth/login" class="login-form">
+            <div class="form-group">
+              <label class="form-label">{{ t('login.email', locale) if t('login.email', locale) != 'login.email' else 'Email' }}</label>
+              <input class="form-input" type="email" name="email" id="login-email" placeholder="{{ t('login.email_placeholder', locale) }}" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">{{ t('login.password', locale) }}</label>
+              <input class="form-input" type="password" name="password" id="login-password" placeholder="{{ t('login.password_placeholder', locale) }}" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-checkbox">
+                <input type="checkbox" id="save-id" name="save_id">
+                <span>{{ t('login.save_id', locale) if t('login.save_id', locale) != 'login.save_id' else 'Remember ID' }}</span>
+              </label>
+            </div>
+            
+            <input type="hidden" name="next" value="/main">
+            <button class="btn-primary full-width" type="submit">{{ t('login.login_button', locale) }}</button>
+            
+            <div class="signup-link">
+              <p>{{ t('login.signup_prompt', locale) }}<a href="/auth/register">{{ t('login.signup_link', locale) }}</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const STORAGE_KEY = 'saved_user_email';
+  const saveCb = document.getElementById('save-id');
+  const emailInput = document.getElementById('login-email');
+
+  // restore on load
+  try {
+    const v = localStorage.getItem(STORAGE_KEY);
+    if (v && emailInput) {
+      emailInput.value = v;
+      if (saveCb) saveCb.checked = true;
+    }
+  } catch (e) { console.warn('[SaveEmail] restore error', e); }
+
+  // save immediately when checkbox changes
+  if (saveCb && emailInput) {
+    saveCb.addEventListener('change', function() {
+      try {
+        if (this.checked) {
+          localStorage.setItem(STORAGE_KEY, emailInput.value || '');
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (e) { console.warn('[SaveEmail] change error', e); }
+    });
+  }
+
+  // ensure save/remove on submit
+  const form = document.querySelector('.login-form');
+  if (form) {
+    form.addEventListener('submit', function() {
+      try {
+        if (saveCb && saveCb.checked && emailInput) {
+          localStorage.setItem(STORAGE_KEY, emailInput.value || '');
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (e) { console.warn('[SaveEmail] submit error', e); }
+    });
+  }
+});
+</script>
+
+{% endblock %}

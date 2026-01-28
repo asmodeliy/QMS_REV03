@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container wide wkcal-wrap rpmt-root">
+  <section class="wkcal-section">
+    {# 현재 월 달력을 실제 날짜 그리드(Sun-Sat)로 표시 #}
+    {% set first = first_of_month %}
+    {% set last = last_of_month %}
+
+    {# first day of month weekday (0=Monday .. 6=Sunday in Python) -> convert to Sunday=0..Saturday=6 #}
+    {% set py_wd = first.weekday() %}
+    {% set start_offset = (py_wd + 1) % 7 %}
+
+    {% set total_days = last.day %}
+    {% set cell_count = ((start_offset + total_days + 6) // 7) * 7 %}
+
+    <article class="wkcal-month">
+      <header class="wkcal-month-head">
+        <div class="title-line">
+          <h2>{{ cur_year }}-{{ "%02d"|format(cur_month) }}</h2>
+          <span class="muted">{{ first.strftime('%b %d') }} ~ {{ last.strftime('%b %d') }}</span>
+        </div>
+        <div class="wkcal-right">
+          <a href="/rpmt/weekly/calendar?year={{ prev_year }}&month={{ "%02d"|format(prev_month) }}" class="btn ghost small">◀</a>
+          <a href="/rpmt/weekly/calendar?year={{ next_year }}&month={{ "%02d"|format(next_month) }}" class="btn ghost small">▶</a>
+        </div>
+        <div class="muted small">{{ t('weekly.calendar_hint', locale) if t('weekly.calendar_hint', locale) != 'weekly.calendar_hint' else 'Tasks are placed on their due dates in a month-style grid.' }}</div>
+      </header>
+
+      <div class="wkcal-grid month">
+        <div class="wkcal-row wkcal-row-head days">
+          {% for dname in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] %}
+            <div class="wkcal-cell day-head">{{ dname }}</div>
+          {% endfor %}
+        </div>
+
+        {% for row in range(cell_count // 7) %}
+          <div class="wkcal-row weekline">
+            {% for col in range(7) %}
+              {% set idx = row * 7 + col %}
+              {% set day_num = idx - start_offset + 1 %}
+              {% if 1 <= day_num <= total_days %}
+                {% set cur_date = first.replace(day=day_num) %}
+                <div class="wkcal-cell day-cell{% if cur_date == today %} today{% endif %}">
+                  <div class="day-number">{{ day_num }}</div>
+                  {% set items = calendar_map.get(cur_date, []) %}
+                  {% if items %}
+                    <ul class="wkcal-list">
+                      {% for it in items %}
+                        {% set p = it.project %}
+                        {% set t = it.task %}
+                        {% set st = it.status %}
+                        <li class="wkcal-item status-{{ st|replace(' ', '_') }}">
+                          <div class="tit">{{ t.cat2 or t.cat1 or '(no title)' }}</div>
+                          <div class="meta">
+                            <span class="chip small">{{ p.code if p else '' }}</span>
+                            <span class="chip small">{{ st }}</span>
+                          </div>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+              {% else %}
+                <div class="wkcal-cell day-cell empty"></div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+</main>
+
+{% endblock %}

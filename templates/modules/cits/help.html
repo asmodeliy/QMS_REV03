@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container wide help-wrap cits-root">
+  <aside class="help-side">
+    <div class="head">CITS Help</div>
+    <ul class="toc">
+      <li><a href="#quick-start">Quick start</a></li>
+      <li><a href="#workflow">Issue workflow</a></li>
+      <li><a href="#fields">Fields & attachments</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </aside>
+
+  <section class="help-main">
+    <div id="quick-start" class="help-section">
+      <div class="page-head">
+        <h2>🚀 Customer Issue Tracking</h2>
+      </div>
+      <div class="help-hero" style="background:linear-gradient(135deg,#ffe8ea 0%, #fff5f7 60%, #ffffff 100%);">
+        <div>
+          <div class="badge">CITS</div>
+          <p>Capture inbound customer issues, track status, and keep assignees and reporters aligned.</p>
+        </div>
+        <div class="help-figure" aria-hidden="true">
+          <div class="figure-label">Issue board</div>
+          <div class="figure-lines">
+            <span></span><span></span><span></span><span class="accent"></span>
+          </div>
+        </div>
+      </div>
+      <ul class="spaced-list">
+        <li><strong>+ New Issue</strong>: Title, customer, IP, node, phenomenon</li>
+        <li><strong>Status</strong>: OPEN → PENDING → CLOSE</li>
+        <li><strong>Attachments</strong>: Logs/screenshots (clean names)</li>
+      </ul>
+    </div>
+
+    <div id="workflow" class="help-section">
+      <h2>🔄 Status</h2>
+      <ul class="spaced-list">
+        <li><strong>OPEN</strong>: New issue, verify & assign</li>
+        <li><strong>PENDING</strong>: Under investigation, update remarks</li>
+        <li><strong>CLOSE</strong>: Resolved, document solution</li>
+      </ul>
+      <div class="help-screenshot" style="margin-top: 2rem; text-align: center;">
+        <img src="/img/help/cits_dashboard_placeholder.png" alt="CITS Dashboard Overview" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+        <p style="color: #999; font-size: 0.9rem; margin-top: 0.5rem;">Replace this placeholder with a screenshot of your CITS dashboard</p>
+      </div>
+    </div>
+
+    <div id="fields" class="help-section">
+      <h2>🧾 Fields & attachments</h2>
+      <ul class="spaced-list">
+        <li><strong>Tracking</strong>: Customer, IP/IC, Node, shuttle (if applicable).</li>
+        <li><strong>Status</strong>: OPEN / PENDING / CLOSE. Choose the minimal next action before switching.</li>
+        <li><strong>Attachments</strong>: Images render inline; other files show as links. Prefer zipped logs for large bundles.</li>
+        <li><strong>Remarks</strong>: Short updates with date/time stamps (e.g., <em>[2025-01-12] reran test on v1.2, reproduced.</em>).</li>
+      </ul>
+      <div class="help-screenshot" style="margin-top: 2rem; text-align: center;">
+        <img src="/img/help/cits_dashboard_placeholder.png" alt="CITS Fields and Form" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+        <p style="color: #999; font-size: 0.9rem; margin-top: 0.5rem;">Replace this placeholder with a screenshot showing the issue creation form</p>
+      </div>
+    </div>
+
+    <div id="faq" class="help-section">
+      <h2>❓ FAQ</h2>
+      <ul class="spaced-list">
+        <li><strong>Access</strong>: All authenticated users</li>
+        <li><strong>Upload issues</strong>: Check file size/type; avoid # ? % in names</li>
+        <li><strong>Export</strong>: Filter by status → screenshot or copy</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+{% endblock %}

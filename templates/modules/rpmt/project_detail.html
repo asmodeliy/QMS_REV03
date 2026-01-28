@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container wide detail-shell variant-{{ (p.id % 8) + 1 }} rpmt-root">
+  <div class="page-head">
+    <h1 class="title">{{ p.code }} · USER INPUT</h1>
+  </div>
+
+  <div id="upload-complete-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="hideUploadModal(false)"></div>
+    <div class="modal-panel">
+      <div class="modal-body">
+        <div class="modal-title">업로드 완료</div>
+        <div class="modal-message">파일이 성공적으로 업로드되었습니다.</div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ok" onclick="hideUploadModal(true)">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% set readonly = true %}
+{% include 'modules/rpmt/_includes/pdkdk_modal.html' %}
+
+{% set v = (p.id % 8) + 1 %}
+
+{% set ns = namespace(total=p.tasks|length, done=0, inprog=0, not_started=0, na=0, late=0) %}
+{% for t in p.tasks %}
+  {% set sv = t.status.value if t.status else 'N/A' %}
+  {% if sv == 'Complete' %}{% set ns.done = ns.done + 1 %}{% endif %}
+  {% if sv == 'In-progress' %}{% set ns.inprog = ns.inprog + 1 %}{% endif %}
+  {% if sv == 'Not Started' %}{% set ns.not_started = ns.not_started + 1 %}{% endif %}
+  {% if sv == 'N/A' %}{% set ns.na = ns.na + 1 %}{% endif %}
+
+  {% set _r, _d, _sig = compute(t.due_date, sv) %}
+  {% if sv != 'Complete' and _sig == '지연중' %}{% set ns.late = ns.late + 1 %}{% endif %}
+{% endfor %}
+{% set percent = (ns.done / ns.total * 100) if ns.total > 0 else 0 %}
+
+  <div class="detail-wrap">
+  <aside class="detail-side variant-{{ v }}">
+    <div class="ps-head">
+      <h3 class="ps-title">Project Information</h3>
+    </div>
+
+    <div class="ps-tags">
+      {% if p.process %}<span class="ps-pill">{{ p.process }}</span>{% endif %}
+      {% if p.metal_option %}<span class="ps-pill">{{ p.metal_option }}</span>{% endif %}
+      {% if p.ip_code %}<span class="ps-pill">{{ p.ip_code }}</span>{% endif %}
+      {% if p.pdk_ver %}<span class="ps-pill">{{ p.pdk_ver }}</span>{% endif %}
+    </div>
+
+    <div class="ps-kpis">
+      <div class="ps-kpi total"><span class="lbl">전체</span><span class="num">{{ ns.total }}</span></div>
+      <div class="ps-kpi ok"><span class="lbl">완료</span><span class="num">{{ ns.done }}</span></div>
+      <div class="ps-kpi prog"><span class="lbl">진행중</span><span class="num">{{ ns.inprog }}</span></div>
+      <div class="ps-kpi late"><span class="lbl">지연중</span><span class="num">{{ ns.late }}</span></div>
+      <div class="ps-kpi na"><span class="lbl">준비중</span><span class="num">{{ ns.not_started }}</span></div>
+      <div class="ps-kpi na"><span class="lbl">해당 없음</span><span class="num">{{ ns.na }}</span></div>
+    </div>
+
+    <div class="ps-progress">
+      <div class="lab" style="margin:0 0 6px">Overall Progress</div>
+      <div class="ps-bar"><i style="width:{{ percent|round(0) }}%"></i></div>
+      <div class="lab" style="margin-top:6px">{{ percent|round(0) }}% ({{ ns.done }}/{{ ns.total }})</div>
+    </div>
+
+    <div class="ps-kv">
+      <div class="k">PROCESS</div><div class="v">{{ p.process or '-' }}</div>
+      <div class="k">METAL</div><div class="v">{{ p.metal_option or '-' }}</div>
+      <div class="k">IP/IC</div><div class="v">{{ p.ip_code or '-' }}</div>
+      <div class="k">PDK VER</div><div class="v">{{ p.pdk_ver or '-' }}</div>
+      <div class="k">TASKS</div><div class="v">{{ ns.total }}</div>
+      <div class="k">생성일</div><div>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+    </div>
+
+    <div style="padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.08);">
+      <button type="button" class="btn btn-secondary" style="width: 100%; padding: 10px 12px; font-size: 13px;" onclick="openPDKDKModal()">📋 PDK/DK Information</button>
+    </div>
+
+  </aside>
+
+  <section>
+    <div class="cat variant-{{ v }}">
+      <table class="task-table">
+        <colgroup>
+          <col style="width:20%">
+          <col style="width:8%">
+          <col style="width:8%">
+          <col style="width:12%">
+          <col style="width:12%">
+          <col style="width:16%">
+          <col style="width:24%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>TASK</th>
+            <th>FROM</th>
+            <th>TO</th>
+            <th>DUE</th>
+            <th>STATUS</th>
+            <th>REMARK</th>
+            <th>ATTACHMENT</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat, tasks in groups %}
+            {% for t in tasks %}
+            {% set sv = (t.status.value if t.status else 'Not Started') %}
+            {% set remain, delay, signal = compute(t.due_date, sv) %}
+            {% if loop.first %}
+            <tr class="category-divider">
+              <td colspan="7">{{ cat or '미지정' }}</td>
+            </tr>
+            {% endif %}
+            <tr class="task" data-tid="{{ t.id }}">
+              <td class="col-task">{{ t.cat2 or '(미지정)' }}</td>
+              <td class="col-from">{{ t.dept_from or '(미지정)' }}</td>
+              <td class="col-to">{{ t.dept_to or '(미지정)' }}</td>
+              <td class="col-due">{{ t.due_date.strftime('%Y-%m-%d') if t.due_date else '(미지정)' }}</td>
+              <td class="col-status">
+                <select class="sel js-status">
+                  {% for s in StatusEnum %}
+                    <option value="{{ s.value }}" {% if t.status and t.status.value==s.value %}selected{% endif %}>{{ s.value }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td class="col-remark">
+                <input class="inp js-reason" value="{{ t.reason or '' }}" placeholder="지연 이유"/>
+              </td>
+              <td class="col-attachment">
+                <div class="attach-list">
+                  {% if t.file_path %}
+                    {% set files = t.file_path.split(',') %}
+                    {% set names = (t.file_name or '').split(',') %}
+                    {% for i in range(files|length) %}
+                      {% set file_url = files[i].strip() %}
+                      {% set file_name = names[i].strip() if i < names|length else 'File' %}
+                      {% set filename_only = file_url.split('/')[-1] %}
+                      {# display name: part after second underscore when present (tid_stamp_basename) #}
+                      {% set parts = filename_only.split('_') %}
+                      {% if parts|length >= 3 %}
+                        {% set display_name = parts[2:] | join('_') %}
+                      {% else %}
+                        {% set display_name = filename_only %}
+                      {% endif %}
+                      {% set ext = display_name.split('.')[-1].lower() %}
+                      {% set is_image = ext in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}
+                      {% set is_doc = ext in ['xlsx', 'xls', 'docx', 'doc', 'pdf', 'pptx', 'ppt'] %}
+                      
+                      {# Truncate very long filenames: show first 8 chars + ... + extension #}
+                      {% if display_name|length > 20 %}
+                        {% set name_without_ext = display_name.rsplit('.', 1)[0] %}
+                        {% set short_name = name_without_ext[:8] + '...' + '.' + ext %}
+                      {% else %}
+                        {% set short_name = display_name %}
+                      {% endif %}
+                      
+                      <div class="attach-row">
+                        <a class="attach-item" href="{{ file_url }}" target="_blank" title="{{ display_name }}" {% if is_image %}onclick="return forceDownload(event, '{{ file_url }}', '{{ display_name }}')"{% endif %}>
+                          {{ short_name }}
+                        </a>
+
+                          {% if is_image %}
+                          <button type="button" class="btn-preview" 
+                                  onclick="viewImage('{{ file_url }}', '{{ display_name }}')"
+                                  title="View Image">
+                            🖼️
+                          </button>
+                          {% elif is_doc %}
+                          <button type="button" class="btn-preview" 
+                                  onclick="openPreview('{{ filename_only }}', '{{ display_name }}')"
+                                  title="Preview">
+                            🔍
+                          </button>
+                          {% else %}
+                          <button type="button" class="btn-preview" 
+                                  onclick="viewFileAsText('{{ filename_only }}', '{{ display_name }}')"
+                                  title="View File Content">
+                            📖
+                          </button>
+                          {% endif %}
+
+                          {% if request.session.get('is_authenticated') and request.session.get('role') == 'Admin' %}
+                          <button type="button" class="btn-delete" onclick="confirmDelete({{ t.id }}, '{{ file_url }}', this)" title="Delete">🗑️</button>
+                          {% endif %}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                <div class="file-input-wrapper">
+                  <input type="file" class="js-file" data-tid="{{ t.id }}" multiple/>
+                  <label class="file-input-label">+</label>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  </div>
+  </main>
+
+  <script>
+function postJSON(url, data){
+  return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .then(r=>r.json()).catch(()=>({ok:false}));
+}
+
+function openPreview(filename, displayName) {
+  const ext = filename.split('.').pop().toLowerCase();
+  if (ext === 'pdf') {
+    window.open(`/uploads/${filename}`, '_blank');
+  }
+  else if (['docx', 'doc', 'pptx', 'ppt', 'xlsx', 'xls'].includes(ext)) {
+    window.open(`/files/preview/${filename}`, '_blank');
+  }
+}
+
+function viewFileAsText(filename, displayName) {
+  const ext = filename.split('.').pop().toLowerCase();
+  
+  if (['txt', 'md', 'log', 'csv'].includes(ext)) {
+    window.open(`/files/preview/${filename}`, '_blank');
+  }
+}
+
+async function viewImage(imageUrl, imageName) {
+  const width = 900;
+  const height = 700;
+  const left = (window.screen.width - width) / 2;
+  const top = (window.screen.height - height) / 2;
+
+  try {
+    const src = (imageUrl && imageUrl.startsWith('http')) ? imageUrl : (window.location.origin + imageUrl);
+    const resp = await fetch(encodeURI(src));
+    if(!resp.ok) {
+      showUploadModal('이미지 로드 실패: HTTP ' + resp.status);
+      return;
+    }
+    const blob = await resp.blob();
+    const imgUrl = URL.createObjectURL(blob);
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>${imageName}</title>
+      <style>
+        body { margin: 0; padding: 20px; background: #f5f7fb; font-family: sans-serif; }
+        .img-container { text-align: center; background: white; padding: 20px; border-radius: 8px; }
+        img { max-width: 100%; height: auto; }
+        .img-title { margin-bottom: 15px; color: #1f2937; font-weight: 600; }
+      </style>
+    </head>
+    <body>
+      <div class="img-container">
+        <div class="img-title">📷 ${imageName}</div>
+        <img src="${imgUrl}" alt="${imageName}">
+      </div>
+    </body>
+    </html>
+  `;
+
+    const pageBlob = new Blob([html], { type: 'text/html' });
+    const pageUrl = URL.createObjectURL(pageBlob);
+    window.open(pageUrl, 'imageViewer', `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+  } catch (e) {
+    console.error('viewImage error', e);
+    showUploadModal('이미지 로드 중 오류가 발생했습니다.');
+  }
+}
+
+function forceDownload(evt, url, filename){
+  try{
+    evt.preventDefault();
+    const src = (url && url.startsWith('http')) ? url : (window.location.origin + url);
+    const a = document.createElement('a');
+    a.href = encodeURI(src);
+    if(filename) a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }catch(e){
+    console.error('forceDownload failed', e);
+    window.open(url, '_blank');
+  }
+  return false;
+}
+
+function bindRow(row){
+  const tid = row.getAttribute('data-tid');
+  console.log('bindRow for tid=', tid);
+  const $ = sel => row.querySelector(sel);
+  const save = (payload)=>postJSON(`/tasks/${tid}/update-json`, payload);
+
+  $('.js-status')?.addEventListener('change', e=>save({status:e.target.value}));
+  $('.js-reason')?.addEventListener('blur', e=>save({reason:e.target.value}));
+
+  const fileInput = row.querySelector('.js-file');
+  const label = row.querySelector('.file-input-label');
+    if(fileInput && label) {
+    label.addEventListener('click', ()=>{ console.log('label clicked for tid=', tid); fileInput.click(); });
+    fileInput.addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files);
+      console.log('fileInput change for tid=', tid, 'files=', files.map(f=>f.name));
+      if(files.length > 0) {
+        const formData = new FormData();
+        files.forEach(f => formData.append('attachments', f));
+        try {
+          label.classList.add('loading');
+          const oldLabel = label.textContent;
+          label.textContent = 'Uploading...';
+
+          console.log('Starting fetch for upload tid=', tid, 'size=', Array.from(files).reduce((s,f)=>s+f.size,0));
+          const response = await fetch(`/tasks/${tid}/upload`, {method:'POST', body:formData});
+          let res = null;
+          try { res = await response.json(); } catch(e){ res = null; }
+
+          if(response.ok && res && res.ok){
+            showUploadModal('업로드가 완료되었습니다.');
+          } else {
+            const msg = (res && res.detail) ? res.detail : (`HTTP ${response.status} ${response.statusText}`);
+            console.error('Upload failed:', response, res);
+            showUploadModal('업로드 실패: ' + msg);
+          }
+          label.classList.remove('loading');
+          label.textContent = oldLabel;
+        } catch (error) {
+          console.error('Upload error:', error);
+          label.classList.remove('loading');
+          label.textContent = '+ Add';
+          showUploadModal('업로드 중 오류가 발생했습니다.');
+        }
+      }
+      fileInput.value = '';
+    });
+  }
+}
+
+document.querySelectorAll('.task').forEach(bindRow);
+
+async function confirmDelete(tid, filePath, btn){
+  if(!confirm('이 파일을 삭제하시겠습니까? 복구할 수 없습니다.')) return;
+  const fd = new FormData();
+  fd.append('path', filePath);
+  try{
+    const res = await fetch(`/tasks/${tid}/file-delete`, { method: 'POST', body: fd });
+    const j = await res.json();
+    if(res.ok && j.ok){
+      const container = btn.closest('div');
+      if(container) container.remove();
+      else location.reload();
+    } else {
+      alert('삭제 실패: ' + (j.detail || JSON.stringify(j)));
+    }
+  }catch(e){
+    console.error(e);
+    alert('삭제 중 오류가 발생했습니다.');
+  }
+}
+
+function showUploadModal(message){
+  const modal = document.getElementById('upload-complete-modal');
+  const txt = modal.querySelector('.modal-message');
+  txt.textContent = message || '업로드 완료';
+  modal.classList.add('open');
+}
+function hideUploadModal(reload){
+  const modal = document.getElementById('upload-complete-modal');
+  modal.classList.remove('open');
+  if(reload) location.reload();
+}
+
+function openPDKDKModal(){
+  const modal = document.getElementById('pdk-dk-modal');
+  console.log('Opening modal...', modal);
+  if(modal) {
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+    console.log('Modal opened');
+  }
+}
+
+function closePDKDKModal(){
+  const modal = document.getElementById('pdk-dk-modal');
+  console.log('Closing modal...');
+  if(modal) {
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+    console.log('Modal closed');
+  }
+}
+
+function openEditPDKDKModal(entryId, projectId){
+  fetch(`/rpmt/admin/projects/${projectId}/tasks?v=None`)
+    .then(res => res.text())
+    .then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const adminContent = doc.querySelector('[id="detail"]');
+      if(adminContent) {
+        document.getElementById('detail').innerHTML = adminContent.innerHTML;
+        setTimeout(() => {
+          const row = document.querySelector(`[data-entry-id="${entryId}"]`);
+          if(row) {
+            row.scrollIntoView({behavior: 'smooth', block: 'center'});
+            row.style.backgroundColor = '#ffeb3b';
+            setTimeout(() => {
+              row.style.transition = 'background-color 0.5s';
+              row.style.backgroundColor = '';
+            }, 500);
+          }
+        }, 100);
+      }
+    })
+    .catch(err => console.error('Failed to load admin view:', err));
+}
+</script>
+{% endblock %}

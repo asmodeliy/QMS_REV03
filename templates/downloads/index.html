@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container">
+  <div style="padding:40px; text-align:center;">
+    <h1>QMS Desktop App</h1>
+    {% if metadata %}
+    <p><strong>Latest build:</strong></p>
+    <div style="margin:8px 0;">
+      <p>File: <code>{{ metadata.file }}</code></p>
+      <p>Size: <strong>{{ metadata.size }}</strong></p>
+      <p>Built: <strong>{{ metadata.builtAt }}</strong></p>
+      {% if metadata.git %}
+      <p>Commit: <code>{{ metadata.git }}</code></p>
+      {% endif %}
+      {% if metadata.sha256 %}
+      <p>SHA256: <code style="word-break:break-all">{{ metadata.sha256 }}</code></p>
+      {% endif %}
+    </div>
+    <a class="pi-btn" href="/download/app-desktop">Download QMS Desktop</a>
+    {% else %}
+    <p>You can download the Windows installer/executable below once a build is available.</p>
+    <a class="pi-btn disabled" href="#" onclick="return false;">Download not available</a>
+    <p style="margin-top:16px;color:#6b7280">If the download is not available, run the build script on the server or developer machine to produce the exe at <code>static/downloads/qms-desktop.exe</code>.</p>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

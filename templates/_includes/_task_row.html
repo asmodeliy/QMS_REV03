@@ -1,0 +1,73 @@
+{% set sv = (t.status.value if t.status else 'Not Started') %}
+{% set remain, delay, signal = compute(t.due_date, sv) %}
+<tr class="task" data-tid="{{ t.id }}">
+  <td class="col-task">{{ t.cat2 or '(미지정)' }}</td>
+  <td class="col-from">{{ t.dept_from or '(미지정)' }}</td>
+  <td class="col-to">{{ t.dept_to or '(미지정)' }}</td>
+  <td class="col-due">{{ t.due_date.strftime('%Y-%m-%d') if t.due_date else '(미지정)' }}</td>
+  <td class="col-status">
+    <select class="sel js-status">
+      {% for s in StatusEnum %}
+        <option value="{{ s.value }}" {% if t.status and t.status.value==s.value %}selected{% endif %}>{{ s.value }}</option>
+      {% endfor %}
+    </select>
+  </td>
+  <td class="col-remark">
+    <input class="inp js-reason" value="{{ t.reason or '' }}" placeholder="지연 이유"/>
+  </td>
+  <td class="col-attachment">
+    <div class="attach-list">
+      {% if t.file_path %}
+        {% set files = t.file_path.split(',') %}
+        {% set names = (t.file_name or '').split(',') %}
+        {% for i in range(files|length) %}
+          {% set file_url = files[i].strip() %}
+          {% set file_name = names[i].strip() if i < names|length else 'File' %}
+          {% set filename_only = file_url.split('/')[-1] %}
+          {# display name: part after second underscore when present (tid_stamp_basename) #}
+          {% set parts = filename_only.split('_') %}
+          {% if parts|length >= 3 %}
+            {% set display_name = parts[2:] | join('_') %}
+          {% else %}
+            {% set display_name = filename_only %}
+          {% endif %}
+          {% set ext = display_name.split('.')[-1].lower() %}
+          {% set is_image = ext in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}
+          {% set is_doc = ext in ['xlsx', 'xls', 'docx', 'doc', 'pdf', 'pptx', 'ppt'] %}
+          
+          <div style="margin-bottom:4px;">
+            {% if is_image %}
+              <a class="attach-item" href="{{ file_url }}" target="_blank" title="View Image" style="color: #2563eb; text-decoration: underline;">
+                🖼️ {{ display_name }}
+              </a>
+            {% else %}
+              <a class="attach-item" href="{{ file_url }}" target="_blank" title="Download File" style="color: #2563eb; text-decoration: underline;">
+                📎 {{ display_name }}
+              </a>
+              
+                    {% if is_doc %}
+                  <button type="button" class="btn-preview" 
+                    onclick="openPreview('{{ filename_only }}', '{{ display_name }}')"
+                    title="Preview"
+                    style="margin-left: 4px;">
+              🔍
+                  </button>
+              {% else %}
+                  <button type="button" class="btn-preview" 
+                    onclick="viewFileAsText('{{ filename_only }}', '{{ display_name }}')"
+                    title="View File Content"
+                    style="margin-left: 4px;">
+              📖
+                  </button>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endif %}
+      <div class="file-input-wrapper" style="display:inline-block;">
+        <input type="file" class="js-file" data-tid="{{ t.id }}" multiple/>
+        <label class="file-input-label" onclick="this.previousElementSibling.click();" style="cursor:pointer;">+ Add</label>
+      </div>
+    </div>
+  </td>
+</tr>

@@ -1,0 +1,841 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container pi-root">
+  <div class="pi-admin-header">
+    <div class="header-title">
+      <h2>{{ t('product_info.admin_title', locale) }}</h2>
+      <div class="pi-admin-tabs">
+        <button class="pi-tab-btn active" onclick="switchTab('data', this)">Data Table</button>
+        <button class="pi-tab-btn" onclick="switchTab('matrix', this)">IP Matrix</button>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="/product-info" class="pi-btn pi-btn-secondary">{{ t('product_info.back_to_list', locale) }}</a>
+      <button id="addRowBtn" class="pi-btn" onclick="addNewRow()">{{ t('product_info.add_new_row', locale) }}</button>
+      <button id="addMatrixBtn" class="pi-btn" onclick="addMatrixRow()" style="display: none;">Add IP</button>
+    </div>
+  </div>
+
+  <div id="dataTab" class="pi-admin-tab-content active">
+  <div class="pi-table-wrapper">
+    <div class="pi-table-scroll">
+      <table class="pi-table pi-admin-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            {% for col in columns %}
+            <th>{{ display_headers.get(col, col) }}</th>
+            {% endfor %}
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% for row in rows %}
+          <tr data-rowid="{{ row.__rowid__ }}">
+            <td class="pi-cell">
+              <span class="view-mode">{{ row.get('ip_name', '') }}</span>
+              <select class="edit-mode ip-select" style="display:none;">
+                <option value="" disabled {% if not row.get('ip_name') %}selected{% endif %}>-- Select IP --</option>
+                {% for ip in ip_list %}
+                <option value="{{ ip }}" {% if row.get('ip_name') == ip %}selected{% endif %}>{{ ip }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            {% for col in columns %}
+            <td data-col="{{ col }}" class="pi-cell">
+              <span class="view-mode">{{ row[col] if row[col] is not none else '' }}</span>
+              <input class="edit-mode" type="text" value="{{ row[col] if row[col] is not none else '' }}" style="display:none;">
+            </td>
+            {% endfor %}
+            <td class="pi-actions">
+              <button class="pi-btn icon pi-btn-secondary edit-btn" onclick="editRow(this)" title="수정">
+                <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 21v-3.75L17.8 3.44a1 1 0 011.41 0l1.34 1.34a1 1 0 010 1.41L6 20z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M14.5 4.5l3 3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+              <button class="pi-btn icon pi-btn-secondary delete-btn" onclick="deleteRow(this)" title="삭제">
+                <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 6h18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M10 11v6M14 11v6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+              <button class="pi-btn icon save-btn" onclick="saveRow(this)" title="저장" style="display:none;">
+                <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
+                  <path d="M9.5 13l1.7 1.7L15.5 10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+              <button class="pi-btn icon pi-btn-secondary cancel-btn" onclick="cancelEdit(this)" title="취소" style="display:none;">
+                <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
+                  <path d="M15 9l-6 6M9 9l6 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+
+
+  <div id="matrixTab" class="pi-admin-tab-content">
+    <div class="pi-matrix-admin">
+      <div class="pi-matrix-wrapper">
+        <table class="pi-matrix-table">
+          <thead>
+            <tr>
+              <th>IP Name</th>
+              {% for node in matrix_nodes %}
+              <th>{{ node }}</th>
+              {% endfor %}
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="matrixBody">
+            {% for row in matrix_rows %}
+            <tr data-ip="{{ row.ip }}">
+              <td class="matrix-ip-name">
+                <span class="view-mode">{{ row.ip }}</span>
+                <input class="edit-mode" type="text" value="{{ row.ip }}" style="display:none;">
+              </td>
+              {% for node in matrix_nodes %}
+              <td class="matrix-status">
+                <div class="cell-inner">
+                  <span class="view-mode">
+                    {% set st = row.statuses.get(node) %}
+                    {% if st == 'mass' %}
+                      <span class="pi-dot mass" data-status="mass" title={{ t('product_info.legend_mass', locale) | tojson }}></span>
+                    {% elif st == 'proven' %}
+                      <span class="pi-dot proven" data-status="proven" title={{ t('product_info.legend_proven', locale) | tojson }}></span>
+                    {% elif st == 'dev' %}
+                      <span class="pi-dot dev" data-status="dev" title={{ t('product_info.legend_dev', locale) | tojson }}></span>
+                    {% elif st == 'plan' %}
+                      <span class="pi-dot plan" data-status="plan" title={{ t('product_info.legend_plan', locale) | tojson }}></span>
+                    {% else %}
+                      <span class="pi-dot empty" data-status="" title="Not Set"></span>
+                    {% endif %}
+                  </span>
+                  <select class="edit-mode status-select" style="display:none;" data-node="{{ node }}">
+                    <option value="" {% if not row.statuses.get(node) %}selected{% endif %}>Not Set</option>
+                    <option value="mass" {% if row.statuses.get(node) == 'mass' %}selected{% endif %}>Mass Production</option>
+                    <option value="proven" {% if row.statuses.get(node) == 'proven' %}selected{% endif %}>Silicon Proven</option>
+                    <option value="dev" {% if row.statuses.get(node) == 'dev' %}selected{% endif %}>Under Development</option>
+                    <option value="plan" {% if row.statuses.get(node) == 'plan' %}selected{% endif %}>Planning</option>
+                  </select>
+                </div>
+              </td>
+              {% endfor %}
+              <td class="matrix-actions">
+                <div class="cell-inner">
+                  <button type="button" class="pi-btn icon pi-btn-secondary edit-matrix-btn" onclick="editMatrixRow(this); return false;" title="Edit">
+                    <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 21v-3.75L17.8 3.44a1 1 0 011.41 0l1.34 1.34a1 1 0 010 1.41L6 20z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M14.5 4.5l3 3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                  </button>
+                  <button type="button" class="pi-btn icon pi-btn-secondary delete-matrix-btn" onclick="deleteMatrixRow(this); return false;" title="Delete">
+                    <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 6h18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                  </button>
+                  <button type="button" class="pi-btn save-matrix-btn" onclick="saveMatrixRow(this); return false;" title="Save" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </button>
+                  <button type="button" class="pi-btn pi-btn-secondary cancel-matrix-btn" onclick="cancelMatrixEdit(this); return false;" title="Cancel" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+                      <path d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                  <span class="save-status" style="display:none;">Saved</span>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+function switchTab(tab, el) {
+  // Hide all tabs
+  document.querySelectorAll('.pi-admin-tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+
+  // Remove active class from all tab buttons
+  document.querySelectorAll('.pi-tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Show selected tab
+  document.getElementById(tab + 'Tab').classList.add('active');
+
+  // Add active class to clicked button (fallback if not provided)
+  const clickedBtn = el || (typeof event !== 'undefined' ? event.target : null);
+  if (clickedBtn && clickedBtn.classList) clickedBtn.classList.add('active');
+
+  // Toggle button visibility
+  const addRowBtn = document.getElementById('addRowBtn');
+  const addMatrixBtn = document.getElementById('addMatrixBtn');
+
+  if (tab === 'data') {
+    addRowBtn.style.display = 'inline-block';
+    addMatrixBtn.style.display = 'none';
+  } else {
+    addRowBtn.style.display = 'none';
+    addMatrixBtn.style.display = 'inline-block';
+  }
+}
+
+function addNewRow() {
+  const btn = document.getElementById('addRowBtn');
+  const originalText = btn.innerHTML;
+  
+  // Use JSON-escaped translated string to avoid breaking JS when translation contains quotes
+  btn.innerHTML = '⏳ ' + {{ t('product_info.adding', locale) | tojson }};
+  btn.disabled = true;
+  
+  try {
+    const tbody = document.getElementById('tableBody');
+    const columns = {{ columns|tojson }};
+    const ipList = {{ ip_list|tojson }};
+    let newRow = '<tr data-rowid="">';
+    
+    newRow += '<td class="pi-cell"><span class="view-mode"></span><select class="edit-mode ip-select" style="display:none;"><option value="" disabled selected>-- Select IP --</option>';
+    ipList.forEach(ip => {
+      newRow += `<option value="${ip}">${ip}</option>`;
+    });
+    newRow += '</select></td>';
+    
+    columns.forEach(col => {
+      newRow += `<td data-col="${col}" class="pi-cell">
+        <span class="view-mode"></span>
+        <input class="edit-mode" type="text" value="" style="display:none;">
+      </td>`;
+    });
+    newRow += `<td class="pi-actions">
+      <button class="pi-btn icon save-btn" onclick="saveRow(this)" title="저장">
+        <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
+          <path d="M9.5 13l1.7 1.7L15.5 10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+      <button class="pi-btn icon pi-btn-secondary cancel-btn" onclick="cancelEdit(this)" title="취소">
+        <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
+          <path d="M15 9l-6 6M9 9l6 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+    </td></tr>`;
+    tbody.insertAdjacentHTML('afterbegin', newRow);
+    const firstCell = tbody.firstElementChild.querySelector('.edit-mode');
+    if (firstCell) {
+      enterEditMode(tbody.firstElementChild);
+    }
+  } finally {
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }, 300);
+  }
+}
+
+function editRow(btn) {
+  const row = btn.closest('tr');
+  enterEditMode(row);
+}
+
+function enterEditMode(row) {
+  const cells = row.querySelectorAll('.pi-cell');
+  cells.forEach(cell => {
+    const view = cell.querySelector('.view-mode');
+    const edit = cell.querySelector('.edit-mode');
+    if (edit.classList.contains('ip-select')) {
+      edit.value = view.textContent;
+    } else {
+      edit.value = view.textContent;
+    }
+    view.style.display = 'none';
+    edit.style.display = 'inline-block';
+  });
+  const actions = row.querySelector('.pi-actions');
+  actions.querySelectorAll('.edit-btn, .delete-btn').forEach(b => b.style.display = 'none');
+  actions.querySelectorAll('.save-btn, .cancel-btn').forEach(b => b.style.display = 'inline-block');
+}
+
+function cancelEdit(btn) {
+  const row = btn.closest('tr');
+  const rowid = row.dataset.rowid;
+  if (!rowid) {
+    row.remove();
+    return;
+  }
+  exitEditMode(row);
+}
+
+function exitEditMode(row) {
+  const cells = row.querySelectorAll('.pi-cell');
+  cells.forEach(cell => {
+    const view = cell.querySelector('.view-mode');
+    const edit = cell.querySelector('.edit-mode');
+    if (edit && edit.classList.contains('ip-select')) {
+      const selectedValue = edit.value;
+      if (selectedValue && selectedValue !== "") {
+        const selectedOption = Array.from(edit.options).find(option => option.value === selectedValue);
+        view.textContent = selectedOption ? selectedOption.text : '';
+      } else {
+        view.textContent = '';
+      }
+    } else if (edit) {
+      view.textContent = edit.value;
+    }
+    if (view) view.style.display = 'inline';
+    if (edit) edit.style.display = 'none';
+  });
+  const actions = row.querySelector('.pi-actions');
+  if (actions) {
+    actions.querySelectorAll('.edit-btn, .delete-btn').forEach(b => b.style.display = 'inline-block');
+    actions.querySelectorAll('.save-btn, .cancel-btn').forEach(b => b.style.display = 'none');
+  }
+}
+
+async function saveRow(btn) {
+  const row = btn.closest('tr');
+  const rowid = row.dataset.rowid;
+  const data = {};
+  
+  const ipSelect = row.querySelector('.ip-select');
+  if (ipSelect) {
+    data['ip_name'] = ipSelect.value;
+  }
+  
+  const cells = row.querySelectorAll('.pi-cell[data-col]');
+  cells.forEach(cell => {
+    const col = cell.dataset.col;
+    const edit = cell.querySelector('.edit-mode');
+    data[col] = edit.value;
+  });
+
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳';
+  btn.disabled = true;
+  const actions = row.querySelector('.pi-actions');
+  actions.querySelectorAll('button').forEach(b => b.disabled = true);
+
+  try {
+    const res = await fetch('/product-info/api/rows', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rowid: rowid || null, data })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const result = await res.json();
+    
+    cells.forEach(cell => {
+      const col = cell.dataset.col;
+      const view = cell.querySelector('.view-mode');
+      view.textContent = result.row[col] || '';
+    });
+    
+    const ipCell = row.querySelector('.pi-cell .ip-select')?.closest('.pi-cell');
+    if (ipCell) {
+      const ipView = ipCell.querySelector('.view-mode');
+      ipView.textContent = result.row.ip_name || '';
+    }
+    
+    row.dataset.rowid = result.row.__rowid__;
+    exitEditMode(row);
+  } catch (e) {
+    alert('저장 실패: ' + e.message);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    actions.querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}
+
+async function deleteRow(btn) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  const row = btn.closest('tr');
+  const rowid = row.dataset.rowid;
+  if (!rowid) return;
+
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳';
+  btn.disabled = true;
+  const actions = row.querySelector('.pi-actions');
+  actions.querySelectorAll('button').forEach(b => b.disabled = true);
+
+  try {
+    const res = await fetch(`/product-info/api/rows/${rowid}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    row.remove();
+  } catch (e) {
+    alert('삭제 실패: ' + e.message);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    actions.querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}
+
+// Matrix Management Functions
+function addMatrixRow() {
+  const tbody = document.getElementById('matrixBody');
+  const nodes = {{ matrix_nodes|tojson }};
+  const newRow = document.createElement('tr');
+  newRow.dataset.ip = "";
+
+  // IP name cell
+  let rowHtml = `<td class="matrix-ip-name">
+      <span class="view-mode" style="display:none;"></span>
+      <input class="edit-mode" type="text" placeholder="Enter IP name">
+    </td>`;
+
+  // Per-node status cells with selects
+  nodes.forEach(node => {
+    rowHtml += `<td class="matrix-status">
+      <div class="cell-inner">
+        <span class="view-mode" style="display:none;"></span>
+        <select class="edit-mode status-select" style="display:block;" data-node="${node}">
+          <option value="" selected>Not Set</option>
+          <option value="mass">Mass Production</option>
+          <option value="proven">Silicon Proven</option>
+          <option value="dev">Under Development</option>
+          <option value="plan">Planning</option>
+        </select>
+      </div>
+    </td>`;
+  });
+
+  // Actions
+  rowHtml += `<td class="matrix-actions"><div class="cell-inner">
+      <button class="pi-btn icon save-matrix-btn" onclick="saveMatrixRow(this)" title="Save">
+        <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
+          <path d="M9.5 13l1.7 1.7L15.5 10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+      <button class="pi-btn pi-btn-secondary cancel-matrix-btn" onclick="cancelMatrixEdit(this)" title="Cancel">
+        <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
+          <path d="M15 9l-6 6M9 9l6 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+      </div></td>`;
+
+  newRow.innerHTML = rowHtml;
+  tbody.insertAdjacentElement('afterbegin', newRow);
+
+  // Ensure selects have change handlers bound
+  newRow.querySelectorAll('.status-select').forEach(s => {
+    s.addEventListener('change', () => updateStatus(s));
+    s.dataset.bound = 1;
+  });
+
+  // Put the row into editing state
+  editMatrixRow(newRow.querySelector('.save-matrix-btn'));
+  const firstInput = newRow.querySelector('.matrix-ip-name .edit-mode');
+  if (firstInput) firstInput.focus();
+}
+
+function editMatrixRow(btn) {
+  console.log('editMatrixRow clicked');
+  const row = btn.closest('tr');
+  const ipName = row.dataset.ip;
+  console.log('editing row', ipName);
+
+  // Enter edit mode
+  row.classList.add('editing');
+
+  // Show edit inputs, hide view spans
+  row.querySelectorAll('.view-mode').forEach(el => el.style.display = 'none');
+  row.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'block');
+
+  // Show save/cancel buttons, hide edit/delete buttons
+  const editBtn = row.querySelector('.edit-matrix-btn');
+  const delBtn = row.querySelector('.delete-matrix-btn');
+  const saveBtn = row.querySelector('.save-matrix-btn');
+  const cancelBtn = row.querySelector('.cancel-matrix-btn');
+  if (editBtn) editBtn.style.display = 'none';
+  if (delBtn) delBtn.style.display = 'none';
+  if (saveBtn) saveBtn.style.display = 'inline-block';
+  if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
+  // Bind change events for selects within this row
+  row.querySelectorAll('.status-select').forEach(s => {
+    if (!s.dataset.bound) {
+      s.addEventListener('change', () => updateStatus(s));
+      s.dataset.bound = 1;
+    }
+  });
+}
+
+// Helper renderer (for admin inline scripts)
+function renderStatusView(status){
+  if(!status) return `<span class="pi-dot empty" data-status="" title={{ t('product_info.not_set', locale) | tojson }}></span>`;
+  if(status === 'mass') return `<span class="pi-dot mass" data-status="mass" title={{ t('product_info.legend_mass', locale) | tojson }}></span>`;
+  if(status === 'proven') return `<span class="pi-dot proven" data-status="proven" title={{ t('product_info.legend_proven', locale) | tojson }}></span>`;
+  if(status === 'dev') return `<span class="pi-dot dev" data-status="dev" title={{ t('product_info.legend_dev', locale) | tojson }}></span>`;
+  if(status === 'plan') return `<span class="pi-dot plan" data-status="plan" title={{ t('product_info.legend_plan', locale) | tojson }}></span>`;
+  return `<span class="pi-dot" data-status="${status}" title="${status}"></span>`;
+}
+
+// Refresh a single row from server data (global helper)
+function refreshRow(ipName) {
+  fetch('/product-info/api/matrix')
+    .then(res => res.json())
+    .then(json => {
+      if (!json.ok) return;
+      const rowData = json.rows.find(r => r.ip === ipName);
+      const rowEl = document.querySelector(`[data-ip="${ipName.replace(/"/g, '\\"')}"]`);
+      if (!rowEl) return;
+      const nodes = json.nodes;
+      const cells = rowEl.querySelectorAll('.matrix-status');
+      nodes.forEach((node, idx) => {
+        const status = rowData ? rowData.statuses[node] : '';
+        const td = cells[idx];
+        if (!td) return;
+        const view = td.querySelector('.view-mode');
+        const select = td.querySelector('.status-select');
+        if (view) view.innerHTML = renderStatusView(status);
+        if (select) {
+          select.value = status || '';
+          select.style.display = 'none';
+        }
+        if (view) view.style.display = 'inline-block';
+      });
+    })
+    .catch(err => console.error('Failed to refresh row:', err));
+}
+
+// Update single node status immediately when changed (admin row selects)
+function updateStatus(select) {
+  const td = select.closest('td');
+  const node = select.dataset.node;
+  const row = select.closest('tr');
+  const ipName = row.dataset.ip;
+  const view = td.querySelector('.view-mode');
+
+  if (!ipName) {
+    alert('Please save the IP row first before changing individual node statuses.');
+    // revert select to previous value by reloading from view
+    const prev = view.querySelector('.pi-dot') ? view.querySelector('.pi-dot').dataset.status : '';
+    select.value = prev || '';
+    return;
+  }
+
+  const status = select.value || '';
+
+  fetch(`/product-info/api/status/${encodeURIComponent(ipName)}/${encodeURIComponent(node)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  })
+  .then(async res => {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (json.ok === false) throw new Error('Server rejected status');
+
+    // update view-mode using renderer
+    view.innerHTML = renderStatusView(status);
+
+    // refresh authoritative row from server to avoid transient inconsistencies
+    refreshRow(ipName);
+  })
+  .catch(err => {
+    console.error('Failed to update status:', err);
+    alert('Failed to update status: ' + (err.message || 'Unknown'));
+    // revert select
+    const prev = view.querySelector('.pi-dot') ? view.querySelector('.pi-dot').dataset.status : '';
+    select.value = prev || '';
+  });
+}
+
+// Bind all existing selects on DOM load (for admin page)
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.status-select').forEach(s => {
+    if (!s.dataset.bound) {
+      s.addEventListener('change', () => updateStatus(s));
+      s.dataset.bound = 1;
+    }
+  });
+
+  // small helper to show a transient notification inside admin
+  function showLocalNotification(msg, type='info'){
+    const el = document.createElement('div');
+    el.className = `notification notification-${type}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2000);
+  }
+
+  // Refresh a single row from server data
+  function refreshRow(ipName) {
+    fetch('/product-info/api/matrix')
+      .then(res => res.json())
+      .then(json => {
+        if (!json.ok) return;
+        const rowData = json.rows.find(r => r.ip === ipName);
+        const rowEl = document.querySelector(`[data-ip="${ipName.replace(/"/g, '\\"')}"]`);
+        if (!rowEl) return;
+        const nodes = json.nodes;
+        const cells = rowEl.querySelectorAll('.matrix-status');
+        nodes.forEach((node, idx) => {
+          const status = rowData ? rowData.statuses[node] : '';
+          const td = cells[idx];
+          if (!td) return;
+          const view = td.querySelector('.view-mode');
+          const select = td.querySelector('.status-select');
+          if (view) view.innerHTML = renderStatusView(status);
+          if (select) {
+            select.value = status || '';
+            select.style.display = 'none';
+          }
+          if (view) view.style.display = 'inline-block';
+        });
+      })
+      .catch(err => console.error('Failed to refresh row:', err));
+  }
+
+  // Fallback: attach action handlers only if there is no inline onclick to avoid duplicates
+  document.querySelectorAll('.edit-matrix-btn').forEach(b => {
+    if (!b.getAttribute('onclick')) b.addEventListener('click', (e) => { e.preventDefault(); editMatrixRow(b); });
+  });
+  document.querySelectorAll('.delete-matrix-btn').forEach(b => {
+    if (!b.getAttribute('onclick')) b.addEventListener('click', (e) => { e.preventDefault(); deleteMatrixRow(b); });
+  });
+  document.querySelectorAll('.save-matrix-btn').forEach(b => {
+    if (!b.getAttribute('onclick')) b.addEventListener('click', (e) => { e.preventDefault(); saveMatrixRow(b); });
+  });
+  document.querySelectorAll('.cancel-matrix-btn').forEach(b => {
+    if (!b.getAttribute('onclick')) b.addEventListener('click', (e) => { e.preventDefault(); cancelMatrixEdit(b); });
+  });
+});
+
+function saveMatrixRow(btn) {
+  console.log('saveMatrixRow clicked');
+  const row = btn.closest('tr');
+  const ipInput = row.querySelector('.matrix-ip-name .edit-mode[type="text"]');
+  const ipName = row.dataset.ip || (ipInput ? ipInput.value : '').trim();
+
+  if (!ipName) {
+    alert('IP name is required');
+    return;
+  }
+
+  // Collect status data
+  const statusData = {};
+  row.querySelectorAll('.status-select').forEach(select => {
+    const node = select.dataset.node;
+    const status = select.value;
+    statusData[node] = status || null;
+  });
+
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳';
+  btn.disabled = true;
+
+  fetch('/product-info/api/matrix', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ip_name: ipName, statuses: statusData })
+  })
+  .then(async response => {
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error('Server error');
+
+    // Update UI in-place (no reload)
+    row.dataset.ip = ipName;
+
+    // Refresh authoritative row after save
+    refreshRow(ipName);
+
+    // If needed, replace single combined cell with per-node cells (safety for older markup)
+    const nodes = {{ matrix_nodes|tojson }};
+    const matrixStatusCells = row.querySelectorAll('.matrix-status');
+    if (matrixStatusCells.length === 1 && nodes.length > 1 && matrixStatusCells[0].hasAttribute('colspan')) {
+      // rebuild the row to have one cell per node
+      const firstStatusCell = matrixStatusCells[0];
+      const after = firstStatusCell.nextElementSibling; // actions cell
+      // create per-node cells using current selects (none exist) - initialize empty selects
+      let insertHtml = '';
+      nodes.forEach(node => {
+        insertHtml += `<td class="matrix-status">
+          <div class="cell-inner">
+            <span class="view-mode" style="display:none;"></span>
+            <select class="edit-mode status-select" style="display:none;" data-node="${node}">
+              <option value="" ${'' === '' ? 'selected' : ''}>Not Set</option>
+              <option value="mass">Mass Production</option>
+              <option value="proven">Silicon Proven</option>
+              <option value="dev">Under Development</option>
+              <option value="plan">Planning</option>
+            </select>
+          </div>
+        </td>`;
+      });
+      firstStatusCell.insertAdjacentHTML('afterend', insertHtml);
+      firstStatusCell.remove();
+    }
+
+    // Now update each status cell using the selects in the row (if present) or leave as Not Set
+    row.querySelectorAll('.matrix-status').forEach(td => {
+      const select = td.querySelector('.status-select');
+      const view = td.querySelector('.view-mode');
+      if (!view) return;
+      const status = select ? select.value : '';
+      view.innerHTML = renderStatusView(status);
+      // hide the select (make it read-only view)
+      if (select) select.style.display = 'none';
+      view.style.display = 'inline-block';
+
+      // Ensure selects are bound for future edits
+      if (select && !select.dataset.bound) {
+        select.addEventListener('change', () => updateStatus(select));
+        select.dataset.bound = 1;
+      }
+    });
+
+    // Update IP name view
+    if (ipInput) {
+      const ipView = row.querySelector('.matrix-ip-name .view-mode');
+      ipView.textContent = ipInput.value;
+      ipInput.style.display = 'none';
+      ipView.style.display = 'inline-block';
+    }
+
+    // Exit edit mode UI
+    row.classList.remove('editing');
+
+    // Ensure edit/delete buttons exist and are visible
+    let editBtn = row.querySelector('.edit-matrix-btn');
+    let delBtn = row.querySelector('.delete-matrix-btn');
+    if (!editBtn) {
+      const actions = row.querySelector('.matrix-actions');
+      const btnHtml = `
+        <button type="button" class="pi-btn icon pi-btn-secondary edit-matrix-btn" onclick="editMatrixRow(this); return false;" title="Edit">
+          <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 21v-3.75L17.8 3.44a1 1 0 011.41 0l1.34 1.34a1 1 0 010 1.41L6 20z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14.5 4.5l3 3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+        <button type="button" class="pi-btn icon pi-btn-secondary delete-matrix-btn" onclick="deleteMatrixRow(this); return false;" title="Delete">
+          <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 6h18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>`;
+      // Insert into .cell-inner if present, otherwise into actions
+      const inner = actions.querySelector('.cell-inner');
+      if (inner) {
+        inner.insertAdjacentHTML('afterbegin', btnHtml);
+        inner.querySelector('.edit-matrix-btn').addEventListener('click', (e) => { e.preventDefault(); editMatrixRow(e.currentTarget); });
+        inner.querySelector('.delete-matrix-btn').addEventListener('click', (e) => { e.preventDefault(); deleteMatrixRow(e.currentTarget); });
+      } else {
+        actions.insertAdjacentHTML('afterbegin', btnHtml);
+        actions.querySelector('.edit-matrix-btn').addEventListener('click', (e) => { e.preventDefault(); editMatrixRow(e.currentTarget); });
+        actions.querySelector('.delete-matrix-btn').addEventListener('click', (e) => { e.preventDefault(); deleteMatrixRow(e.currentTarget); });
+      }
+    } else {
+      editBtn.style.display = 'inline-block';
+      delBtn.style.display = 'inline-block';
+    }
+
+    const saveBtn = row.querySelector('.save-matrix-btn'); if (saveBtn) saveBtn.style.display = 'none';
+    const cancelBtn = row.querySelector('.cancel-matrix-btn'); if (cancelBtn) cancelBtn.style.display = 'none';
+
+    // Show transient saved indicator
+    const statusEl = row.querySelector('.save-status');
+    if (statusEl) {
+      statusEl.style.display = 'inline-block';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 1500);
+    }
+
+  })
+  .catch(err => {
+    console.error('Failed to save matrix row', err);
+    alert('Failed to save matrix: ' + (err.message || 'Unknown'));
+  })
+  .finally(() => {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  });
+}
+
+function cancelMatrixEdit(btn) {
+  const row = btn.closest('tr');
+
+  if (!row.dataset.ip) {
+    // This was a new row, just remove it
+    row.remove();
+    return;
+  }
+
+  // Cancel edit mode
+  row.classList.remove('editing');
+
+  // Show view spans, hide edit inputs
+  row.querySelectorAll('.view-mode').forEach(el => el.style.display = 'block');
+  row.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
+
+  // Show edit/delete buttons, hide save/cancel buttons
+  const editBtn = row.querySelector('.edit-matrix-btn'); if (editBtn) editBtn.style.display = 'inline-block';
+  const delBtn = row.querySelector('.delete-matrix-btn'); if (delBtn) delBtn.style.display = 'inline-block';
+  const saveBtn = row.querySelector('.save-matrix-btn'); if (saveBtn) saveBtn.style.display = 'none';
+  const cancelBtn = row.querySelector('.cancel-matrix-btn'); if (cancelBtn) cancelBtn.style.display = 'none';
+}
+
+function deleteMatrixRow(btn) {
+  console.log('deleteMatrixRow clicked');
+  const row = btn.closest('tr');
+  const ipName = row.dataset.ip;
+
+  if (!confirm(`Delete IP "${ipName}" from matrix?`)) {
+    return;
+  }
+
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳';
+  btn.disabled = true;
+
+  fetch(`/product-info/api/matrix/${encodeURIComponent(ipName)}`, {
+    method: 'DELETE'
+  })
+  .then(response => {
+    if (response.status === 404) {
+      // Not found server-side: treat as removed (could be canonical-only); remove from UI but warn
+      row.remove();
+      showLocalNotification('Row removed (was not persisted).', 'info');
+      return null;
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (!data) return;
+    if (data.ok) {
+      row.remove();
+    } else {
+      alert('Failed to delete matrix row');
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to delete matrix row');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  });
+}
+</script>
+{% endblock %}

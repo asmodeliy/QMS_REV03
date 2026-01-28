@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container pi-root">
+  <div class="dashboard-header-section">
+    <div>
+      <h1 class="dashboard-title">{{ t('product_info.title', locale) }}</h1>
+      <p class="dashboard-subtitle">{{ t('product_info.subtitle', locale) }}</p>
+    </div>
+    {% if is_admin %}
+    <div class="header-actions">
+      <a href="/product-info/admin" class="pi-btn">{{ t('product_info.manage_table', locale) }}</a>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if not matrix_rows %}
+  <div class="pi-empty">
+    <div class="pi-empty-card">
+      <p class="pi-empty-title">No matrix data</p>
+    </div>
+  </div>
+  {% else %}
+  <section class="pi-readiness">
+    <div class="pi-readiness-header">
+      <div>
+        <p class="pi-eyebrow">{{ t('product_info.ip_readiness_matrix', locale) }}</p>
+        <h2 class="pi-section-title">{{ t('product_info.title_short', locale) }}</h2>
+        <p class="pi-section-sub">{{ t('product_info.click_to_view_detail', locale) }}</p>
+      </div>
+      <div class="pi-legend">
+        <div class="item"><span class="pi-dot mass" title={{ t('product_info.legend_mass', locale) | tojson }}></span><span class="label">{{ t('product_info.legend_mass', locale) }}</span></div>
+        <div class="item"><span class="pi-dot proven" title={{ t('product_info.legend_proven', locale) | tojson }}></span><span class="label">{{ t('product_info.legend_proven', locale) }}</span></div>
+        <div class="item"><span class="pi-dot dev" title={{ t('product_info.legend_dev', locale) | tojson }}></span><span class="label">{{ t('product_info.legend_dev', locale) }}</span></div>
+        <div class="item"><span class="pi-dot plan" title={{ t('product_info.legend_plan', locale) | tojson }}></span><span class="label">{{ t('product_info.legend_plan', locale) }}</span></div>
+      </div>
+    </div>
+    <div class="pi-matrix">
+      <div class="pi-matrix-head pi-matrix-sticky">IP</div>
+      {% for node in matrix_nodes %}
+      <div class="pi-matrix-head">{{ node }}</div>
+      {% endfor %}
+      {% for row in matrix_rows %}
+      <div class="pi-matrix-cell pi-matrix-ip" data-ip="{{ row.ip }}">{{ row.ip }}</div>
+      {% for node in matrix_nodes %}
+      {% set status = row.statuses.get(node) %}
+      <div class="pi-matrix-cell">
+        <div class="cell-inner">
+        {% if status %}
+          {% if status == 'mass' %}
+            <span class="pi-dot mass" data-status="mass" title={{ t('product_info.legend_mass', locale) | tojson }}></span>
+          {% elif status == 'proven' %}
+            <span class="pi-dot proven" data-status="proven" title={{ t('product_info.legend_proven', locale) | tojson }}></span>
+          {% elif status == 'dev' %}
+            <span class="pi-dot dev" data-status="dev" title={{ t('product_info.legend_dev', locale) | tojson }}></span>
+          {% elif status == 'plan' %}
+            <span class="pi-dot plan" data-status="plan" title={{ t('product_info.legend_plan', locale) | tojson }}></span>
+          {% else %}
+            <span class="pi-dot empty" data-status="" title={{ t('product_info.not_set', locale) | tojson }}></span>
+          {% endif %}
+        {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</main>
+<script>
+  (function() {
+    document.querySelectorAll('.pi-matrix-ip').forEach(function(cell) {
+      cell.addEventListener('click', function() {
+        const ipName = this.dataset.ip;
+        if (!ipName) return;
+        const encoded = encodeURIComponent(ipName);
+        window.location.href = `/product-info/ip/${encoded}`;
+      });
+    });
+  })();
+</script>
+{% endblock %}

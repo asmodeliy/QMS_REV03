@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="login-page">
+  <div class="gradient-bg"></div>
+  
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">
+          <span class="brand-name">RAMSCHIP QMS</span>
+        </h1>
+      </div>
+
+      <div class="login-content">
+        {% if error %}
+        <div class="alert alert-error">
+          {{ t('login.invalid_credentials', locale) if error == 'invalid' else error }}
+        </div>
+        {% endif %}
+
+        <div class="form-tabs">
+          <h2 style="margin:0; padding:0; grid-column:1/-1; text-align:center; color:#333; font-size:20px">{{ t('login.login_button', locale) }}</h2>
+        </div>
+
+        
+        <form id="login-form" method="post" action="/auth/login" style="display:grid;gap:12px">
+          <div class="form-group">
+            <label class="form-label">{{ t('login.email', locale) if t('login.email', locale) != 'login.email' else 'Email' }}</label>
+            <input class="form-input" type="email" name="email" id="login-email" placeholder="Enter your email" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ t('login.password', locale) }}</label>
+            <input class="form-input" type="password" name="password" id="login-password" placeholder="Enter your password" required>
+          </div>
+          <div class="form-group">
+            <label class="form-checkbox">
+              <input type="checkbox" id="save-id" name="save_id">
+              <span>{{ t('login.save_id', locale) if t('login.save_id', locale) != 'login.save_id' else 'Remember Email' }}</span>
+            </label>
+          </div>
+          <input type="hidden" name="next" value="{{ next }}">
+          <button class="btn-primary full-width" type="submit">{{ t('login.login_button', locale) }}</button>
+          
+          <div style="text-align:center; padding-top:10px; border-top:1px solid #eee">
+            <p style="margin:5px 0 0 0; color:#666; font-size:14px">
+              Don't have an account? <a href="/auth/register" style="color:#667eea; text-decoration:none; font-weight:bold">Sign Up</a>
+            </p>
+          </div>
+        </form>
+      </div>
+
+      <div class="login-footer">
+        <p class="muted">{{ t('login.protect_note', locale) }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Use a clear key and support immediate save on checkbox change
+  const STORAGE_KEY = 'saved_user_email';
+  const saveIdCheckbox = document.getElementById('save-id');
+  const userIdInput = document.getElementById('login-email');
+
+  try {
+    const savedEmail = localStorage.getItem(STORAGE_KEY);
+    if (savedEmail && userIdInput) {
+      userIdInput.value = savedEmail;
+      if (saveIdCheckbox) saveIdCheckbox.checked = true;
+      console.log('[SaveEmail] restored:', savedEmail);
+    }
+  } catch (e) { console.warn('[SaveEmail] read error', e); }
+
+  // Save/remove immediately when checkbox toggles
+  if (saveIdCheckbox && userIdInput) {
+    saveIdCheckbox.addEventListener('change', function() {
+      try {
+        if (this.checked) {
+          localStorage.setItem(STORAGE_KEY, userIdInput.value || '');
+          console.log('[SaveEmail] saved on change:', userIdInput.value);
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+          console.log('[SaveEmail] removed on change');
+        }
+      } catch (e) { console.warn('[SaveEmail] change error', e); }
+    });
+  }
+
+  // On submit, ensure current value is written/removed synchronously
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+      try {
+        if (saveIdCheckbox && saveIdCheckbox.checked && userIdInput) {
+          localStorage.setItem(STORAGE_KEY, userIdInput.value || '');
+          console.log('[SaveEmail] saved on submit:', userIdInput.value);
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+          console.log('[SaveEmail] removed on submit');
+        }
+      } catch (err) { console.warn('[SaveEmail] submit error', err); }
+      // allow normal submit to proceed
+    });
+  }
+});
+</script>
+
+<div id="save-debug" style="max-width:420px;margin:14px auto 36px;text-align:center;font-size:13px">
+  <div style="margin-bottom:6px;color:#334155">Saved Email: <strong id="savedEmailDisplay">—</strong></div>
+  <div style="display:flex;gap:8px;justify-content:center">
+    <button type="button" id="dbgSaveBtn" class="btn btn-primary">Save Now</button>
+    <button type="button" id="dbgRemoveBtn" class="btn btn-secondary">Remove</button>
+    <button type="button" id="dbgShowBtn" class="btn btn-ghost">Refresh</button>
+  </div>
+</div>
+
+<script>
+// debug helpers
+(function(){
+  const KEY = 'saved_user_email';
+  const disp = document.getElementById('savedEmailDisplay');
+  const saveBtn = document.getElementById('dbgSaveBtn');
+  const removeBtn = document.getElementById('dbgRemoveBtn');
+  const showBtn = document.getElementById('dbgShowBtn');
+  const emailInput = document.getElementById('login-email');
+
+  function refresh() {
+    try {
+      const v = localStorage.getItem(KEY);
+      disp.textContent = v || '—';
+      console.log('[SaveDebug] current=', v);
+    } catch (e) { console.warn('[SaveDebug] read err', e); disp.textContent='(error)'; }
+  }
+
+  if (saveBtn) saveBtn.addEventListener('click', function(){
+    try { localStorage.setItem(KEY, (emailInput && emailInput.value) || ''); console.log('[SaveDebug] saved'); } catch(e){console.warn(e)}; refresh();
+  });
+  if (removeBtn) removeBtn.addEventListener('click', function(){
+    try { localStorage.removeItem(KEY); console.log('[SaveDebug] removed'); } catch(e){console.warn(e)}; refresh();
+  });
+  if (showBtn) showBtn.addEventListener('click', refresh);
+
+  refresh();
+})();
+</script>
+
+{% endblock %}

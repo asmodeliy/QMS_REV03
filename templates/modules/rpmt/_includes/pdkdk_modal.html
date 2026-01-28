@@ -1,0 +1,248 @@
+<div id="pdk-dk-modal" data-project-id="{{ p.id }}" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; overflow-y: auto; padding: 20px;">
+  <div style="background: white; border-radius: 8px; max-width: 95vw; max-height: 95vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin: 20px auto; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 100;">
+      <h2 style="margin: 0; color: #1f2937; font-size: 18px;">PDK/DK Information - {{ p.code }}</h2>
+      <button type="button" onclick="closePDKDKModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+    </div>
+    
+    <div style="padding: 20px; overflow-x: auto; flex: 1;">
+      <table id="pdkdk-table" style="width: 100%; border-collapse: collapse; font-size: 11px; background: white;">
+        <thead>
+            <th rowspan="3" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #d1d5db; vertical-align: middle; background: #e5e7eb;">Type</th>
+            <th rowspan="3" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #d1d5db; vertical-align: middle; background: #e5e7eb;">Category</th>
+            <th colspan="4" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #d1d5db; background: #dbeafe;">DK Version @ Kick-off</th>
+            <th colspan="4" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #d1d5db; background: #fef3c7;">DK Version @ 1week before tape out</th>
+            <th rowspan="3" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #d1d5db; background: #f0fdf4;">Unmatch Reason</th>
+            {% if readonly is not defined or not readonly %}
+            <th rowspan="3" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #d1d5db; background: #f0fdf4;">Action</th>
+            {% endif %}
+          </tr>
+          <tr style="background: #f9fafb; border-bottom: 1px solid #d1d5db;">
+            <th colspan="2" style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">Engineer record</th>
+            <th colspan="2" style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">QA Check<br/>based on SF Connect</th>
+            <th colspan="4" style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">QA Check<br/>based on SF Connect</th>
+          </tr>
+          <tr style="background: #f9fafb; border-bottom: 1px solid #d1d5db;">
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">Name / Version</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">B2B Released Date</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">Matching check</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">check date</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">Name / Version<br/>(2025.12.23 base)<br/><span style="color: #dc2626;">DK: 가온칩스 Release</span></th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">B2B Released Date</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">Matching check</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">check date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in (pdk_dk_entries|selectattr('type')|list|sort(attribute='type', reverse=true)) %}
+          <tr style="border: 1px solid #d1d5db; background: {% if loop.index0 % 2 == 0 %}white{% else %}#fafafa{% endif %};" data-entry-id="{{ entry.id }}">
+            <td style="padding: 8px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <select id="type-{{ entry.id }}" style="padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box;" onchange="saveTypeField({{ entry.id }}, this.value)">
+                <option value="">-</option>
+                <option value="PDK" {% if entry.type == 'PDK' %}selected{% endif %}>PDK</option>
+                <option value="DK" {% if entry.type == 'DK' %}selected{% endif %}>DK</option>
+              </select>
+              {% else %}
+              <span style="display: inline-block; padding: 4px; font-weight: 600; {% if entry.type == 'PDK' %}background: #eff6ff;{% elif entry.type == 'DK' %}background: #fef3c7;{% else %}background: #f5f5f5;{% endif %}">
+                {% if entry.type == 'PDK' %}PDK{% elif entry.type == 'DK' %}DK{% else %}-{% endif %}
+              </span>
+              {% endif %}
+            </td>
+            <td style="padding: 8px; font-weight: 600; border: 1px solid #d1d5db; text-align: center;">{{ entry.category }}</td>
+            
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <input type="text" id="eng-ver-ko-{{ entry.id }}" value="{{ entry.engineer_version_kickoff or '' }}" style="width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 100px; padding: 4px; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_version_kickoff or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="b2b-date-ko-{{ entry.id }}" value="{{ entry.engineer_b2b_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_b2b_date_kickoff else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_b2b_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_b2b_date_kickoff else '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <select id="match-ko-{{ entry.id }}" style="width: 100%; padding: 4px; box-sizing: border-box; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">
+                <option value="">-</option>
+                <option value="Matched" {% if entry.engineer_matching_kickoff == 'Matched' %}selected{% endif %}>Matched</option>
+                <option value="Unmatched" {% if entry.engineer_matching_kickoff == 'Unmatched' %}selected{% endif %}>Unmatched</option>
+              </select>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_matching_kickoff or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="check-date-ko-{{ entry.id }}" value="{{ entry.engineer_check_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_check_date_kickoff else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px; {% if entry.engineer_matching_kickoff == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_check_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_check_date_kickoff else '-' }}</span>
+              {% endif %}
+            </td>
+            
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <input type="text" id="eng-ver-tweek-{{ entry.id }}" value="{{ entry.engineer_version_tweek or '' }}" style="width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 100px; padding: 4px; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_version_tweek or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="b2b-date-tweek-{{ entry.id }}" value="{{ entry.engineer_b2b_date_tweek.strftime('%Y-%m-%d') if entry.engineer_b2b_date_tweek else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_b2b_date_tweek.strftime('%Y.%m.%d') if entry.engineer_b2b_date_tweek else '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <select id="match-tweek-{{ entry.id }}" style="width: 100%; padding: 4px; box-sizing: border-box; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">
+                <option value="">-</option>
+                <option value="Matched" {% if entry.engineer_matching_tweek == 'Matched' %}selected{% endif %}>Matched</option>
+                <option value="Unmatched" {% if entry.engineer_matching_tweek == 'Unmatched' %}selected{% endif %}>Unmatched</option>
+              </select>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_matching_tweek or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="check-date-tweek-{{ entry.id }}" value="{{ entry.engineer_check_date_tweek.strftime('%Y-%m-%d') if entry.engineer_check_date_tweek else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px; {% if entry.engineer_matching_tweek == 'Unmatched' %}color: #dc2626; font-weight: 600;{% endif %}">{{ entry.engineer_check_date_tweek.strftime('%Y.%m.%d') if entry.engineer_check_date_tweek else '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #f0fdf4;">
+              {% if readonly is not defined or not readonly %}
+              <textarea id="reason-{{ entry.id }}" style="width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box; font-size: 11px; min-height: 40px;">{{ entry.qa_unmatched_reason_tweek or '' }}</textarea>
+              {% else %}
+              <span style="display: inline-block; min-width: 150px; padding: 4px; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">{{ entry.qa_unmatched_reason_tweek or '-' }}</span>
+              {% endif %}
+            </td>
+            {% if readonly is not defined or not readonly %}
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #f0fdf4; text-align: center;">
+              <button type="button" onclick="deleteEntry({{ entry.id }})" style="padding: 4px 8px; font-size: 11px; background: #ef4444; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete</button>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+          {% for entry in pdk_dk_entries if not entry.type %}
+          <tr style="border: 1px solid #d1d5db; background: {% if loop.index0 % 2 == 0 %}white{% else %}#fafafa{% endif %};" data-entry-id="{{ entry.id }}">
+            <td style="padding: 8px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <select id="type-{{ entry.id }}" style="padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box;" onchange="saveTypeField({{ entry.id }}, this.value)">
+                <option value="">-</option>
+                <option value="PDK">PDK</option>
+                <option value="DK">DK</option>
+              </select>
+              {% else %}
+              <span style="display: inline-block; padding: 4px; font-weight: 600; background: #f5f5f5;">-</span>
+              {% endif %}
+            </td>
+            <td style="padding: 8px; font-weight: 600; border: 1px solid #d1d5db; text-align: center;">{{ entry.category }}</td>
+            
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <input type="text" id="eng-ver-ko-{{ entry.id }}" value="{{ entry.engineer_version_kickoff or '' }}" style="width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box;"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 100px; padding: 4px;">{{ entry.engineer_version_kickoff or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="b2b-date-ko-{{ entry.id }}" value="{{ entry.engineer_b2b_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_b2b_date_kickoff else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box;"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_b2b_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_b2b_date_kickoff else '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <select id="match-ko-{{ entry.id }}" style="width: 100%; padding: 4px; box-sizing: border-box;">
+                <option value="">-</option>
+                <option value="Matched" {% if entry.engineer_matching_kickoff == 'Matched' %}selected{% endif %}>Matched</option>
+                <option value="Unmatched" {% if entry.engineer_matching_kickoff == 'Unmatched' %}selected{% endif %}>Unmatched</option>
+              </select>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_matching_kickoff or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="check-date-ko-{{ entry.id }}" value="{{ entry.engineer_check_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_check_date_kickoff else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box;"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_check_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_check_date_kickoff else '-' }}</span>
+              {% endif %}
+            </td>
+            
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <input type="text" id="eng-ver-tweek-{{ entry.id }}" value="{{ entry.engineer_version_tweek or '' }}" style="width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box;"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 100px; padding: 4px;">{{ entry.engineer_version_tweek or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="b2b-date-tweek-{{ entry.id }}" value="{{ entry.engineer_b2b_date_tweek.strftime('%Y-%m-%d') if entry.engineer_b2b_date_tweek else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box;"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_b2b_date_tweek.strftime('%Y.%m.%d') if entry.engineer_b2b_date_tweek else '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <select id="match-tweek-{{ entry.id }}" style="width: 100%; padding: 4px; box-sizing: border-box;">
+                <option value="">-</option>
+                <option value="Matched" {% if entry.engineer_matching_tweek == 'Matched' %}selected{% endif %}>Matched</option>
+                <option value="Unmatched" {% if entry.engineer_matching_tweek == 'Unmatched' %}selected{% endif %}>Unmatched</option>
+              </select>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_matching_tweek or '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;">
+              {% if readonly is not defined or not readonly %}
+              <input type="date" id="check-date-tweek-{{ entry.id }}" value="{{ entry.engineer_check_date_tweek.strftime('%Y-%m-%d') if entry.engineer_check_date_tweek else '' }}" style="width: 100%; padding: 4px; box-sizing: border-box;"/>
+              {% else %}
+              <span style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_check_date_tweek.strftime('%Y.%m.%d') if entry.engineer_check_date_tweek else '-' }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #f0fdf4;">
+              {% if readonly is not defined or not readonly %}
+              <textarea id="reason-{{ entry.id }}" style="width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box; font-size: 11px; min-height: 40px;">{{ entry.qa_unmatched_reason_tweek or '' }}</textarea>
+              {% else %}
+              <span style="display: inline-block; min-width: 150px; padding: 4px; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">{{ entry.qa_unmatched_reason_tweek or '-' }}</span>
+              {% endif %}
+            </td>
+            {% if readonly is not defined or not readonly %}
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #f0fdf4; text-align: center;">
+              <button type="button" onclick="deleteEntry({{ entry.id }})" style="padding: 4px 8px; font-size: 11px; background: #ef4444; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete</button>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+          {% if pdk_dk_entries|length == 0 %}
+          <tr>
+            <td colspan="{% if readonly is not defined or not readonly %}11{% else %}10{% endif %}" style="padding: 20px; text-align: center; color: #9ca3af;">No PDK/DK entries found</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+    
+    <div style="padding: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; {% if readonly is not defined or not readonly %}justify-content: space-between;{% else %}justify-content: flex-end;{% endif %}">
+      {% if readonly is not defined or not readonly %}
+      <button type="button" onclick="addNewPDKDKRow({{ p.id }})" style="padding: 10px 16px; font-size: 13px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">+ 새 항목 추가</button>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" onclick="savePDKDKData()" style="padding: 10px 20px; font-size: 13px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">💾 저장</button>
+        <button type="button" onclick="closePDKDKModal()" style="padding: 10px 20px; font-size: 13px; border: 1px solid #d1d5db; background: white; border-radius: 6px; cursor: pointer; color: #374151; font-weight: 500;">닫기</button>
+      </div>
+      {% else %}
+      <button type="button" onclick="closePDKDKModal()" style="padding: 10px 20px; font-size: 13px; border: 1px solid #d1d5db; background: white; border-radius: 6px; cursor: pointer; color: #374151; font-weight: 500;">닫기</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+.apqp-root {
+  --apqp-accent-start:#f59e0b;
+  --apqp-accent-end:#fb923c;
+  --apqp-accent-contrast:#ffffff;
+}
+
+.apqp-root .nav-link.active {
+  background: linear-gradient(90deg,var(--apqp-accent-start),var(--apqp-accent-end)) !important;
+  color:var(--apqp-accent-contrast) !important
+}
+
+.apqp-root .dashboard-header-section {
+  background: #ffffff;
+  color: var(--apqp-accent-start);
+  border-top:4px solid var(--apqp-accent-start);
+}
+
+.apqp-root .header-left {
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+
+.apqp-header {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--apqp-accent-start) 8%, #fff) 0%, color-mix(in srgb, var(--apqp-accent-end) 2%, #fff) 100%);
+  border: 1px solid color-mix(in srgb, var(--apqp-accent-start) 12%, #fff);
+}
+
+.apqp-header .dashboard-title {
+  color: var(--apqp-accent-start);
+  font-weight:800
+}
+
+.apqp-header .header-actions {
+  display:flex;
+  gap:12px;
+  align-items:center
+}
+
+.apqp-root .card.apqp-card {
+  border:1px solid rgba(245,158,11,0.14);
+}
+
+.module-card.apqp-card {
+  --apqp-accent-start: #f59e0b;
+  --apqp-accent-end: #fb923c;
+  border-top: 5px solid var(--apqp-accent-start, #f59e0b) !important;
+}
+
+.module-card.apqp-card .module-icon {
+  color: var(--apqp-accent-start, #f59e0b) !important;
+}
+
+.module-card.apqp-card:hover {
+  border-top-color: var(--apqp-accent-end, #fb923c) !important;
+  box-shadow: 0 25px 50px rgba(245,158,11,0.12) !important;
+}

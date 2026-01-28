@@ -1,0 +1,211 @@
+<div class="admin-panel">
+  <div class="admin-card">
+    <div class="admin-card-head">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <strong class="admin-title">{{ p.code }}</strong>
+        <form method="post" action="/rpmt/admin/projects/{{ p.id }}/archive?v={{ visit }}" style="display:inline; margin:0;">
+          <button class="btn small ghost" type="submit" title="Archive this project">📦</button>
+        </form>
+      </div>
+      <a class="btn ghost" href="/rpmt/projects/{{ p.id }}">상세보기</a>
+    </div>
+
+    <button type="button" onclick="togglePDKDKModal()" style="padding: 10px 16px; margin-bottom: 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px;">📋 PDK/DK Information</button>
+
+    <form method="post"
+      action="/rpmt/admin/projects/{{ p.id }}/update?v={{ visit }}"
+      class="table-form-grid cols-6">
+      <input class="inp" name="code"         value="{{ p.code or '' }}"         placeholder="PROJECT CODE">
+      <input class="inp" name="process"      value="{{ p.process or '' }}"      placeholder="PROCESS">
+      <input class="inp" name="metal_option" value="{{ p.metal_option or '' }}" placeholder="METAL OPTION">
+      <input class="inp" name="ip_code"      value="{{ p.ip_code or '' }}"      placeholder="IP/IC CODE">
+      <input class="inp" name="pdk_ver"      value="{{ p.pdk_ver or '' }}"      placeholder="PDK VER">
+      <button class="btn primary" type="submit">저장</button>
+    </form>
+  </div>
+
+  {% for cat1, tasks in groups %}
+  <div class="admin-card soft">
+    <table class="admin-task-table">
+      <thead>
+        <tr>
+          <th colspan="9" class="category-header">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span>{{ cat1 or '—' }}</span>
+              <form method="post" action="/rpmt/admin/tasks/create?v={{ visit }}" style="margin:0;">
+                <input type="hidden" name="project_id" value="{{ p.id }}">
+                <input type="hidden" name="cat1" value="{{ cat1 }}">
+                <button class="btn small" type="submit">행 추가</button>
+              </form>
+            </div>
+          </th>
+        </tr>
+        <tr>
+          <th>CATEGORY</th>
+          <th>TASK</th>
+          <th>FROM</th>
+          <th>TO</th>
+          <th>DUE</th>
+          <th>STATUS</th>
+          <th>ORD</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tasks %}
+        <tr class="task-row">
+          <form id="task-{{ t.id }}-form"
+                method="post"
+                action="/rpmt/admin/tasks/{{ t.id }}/update?v={{ visit }}"
+                style="display:contents;">
+            <td><input class="inp" name="cat1" value="{{ t.cat1 or '' }}"></td>
+            <td><input class="inp" name="cat2" value="{{ t.cat2 or '' }}"></td>
+            <td><input class="inp" name="dept_from" value="{{ t.dept_from or '' }}"></td>
+            <td><input class="inp" name="dept_to" value="{{ t.dept_to or '' }}"></td>
+            <td><input class="inp" type="date" name="due_date" value="{{ t.due_date.strftime('%Y-%m-%d') if t.due_date else '' }}"></td>
+            <td>
+              <select class="inp" name="status">
+                {% for s in StatusEnum %}
+                  <option value="{{ s.value }}" {% if t.status and t.status.value==s.value %}selected{% endif %}>{{ s.value }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input class="inp" type="number" name="ord_val" value="{{ t.ord or '' }}" style="width:60px; text-align:center;"></td>
+            <input type="hidden" name="reason" value="{{ t.reason or '' }}">
+          </form>
+          <td class="actions-cell">
+            <button class="btn small primary" type="submit" form="task-{{ t.id }}-form">저장</button>
+            <form method="post" action="/rpmt/admin/tasks/{{ t.id }}/insert-below?v={{ visit }}" style="display:inline; margin:0 2px;">
+              <button class="btn small ghost" type="submit">아래삽입</button>
+            </form>
+            <form method="post" action="/rpmt/admin/tasks/{{ t.id }}/delete?v={{ visit }}" onsubmit="return confirm('삭제하시겠습니까?');" style="display:inline; margin:0 2px;">
+              <button class="btn small danger" type="submit">삭제</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+
+        {% if tasks|length == 0 %}
+        <tr>
+          <td colspan="8" style="text-align:center; padding:20px; color:var(--muted);">등록된 항목 없음</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+
+  {% if groups|length == 0 %}
+  <div class="admin-card soft muted" style="text-align:center; padding:20px; color:var(--muted);">
+    아직 태스크가 없습니다. "행 추가"로 생성하세요.
+  </div>
+  {% endif %}
+</div>
+
+<div id="pdkdk-modal-main" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; overflow-y: auto; padding: 20px;">
+  <div style="background: white; border-radius: 8px; max-width: 95vw; max-height: 95vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin: 20px auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 100;">
+      <h2 style="margin: 0; color: #1f2937; font-size: 18px;">PDK/DK Information - {{ p.code }}</h2>
+      <button type="button" onclick="closePDKDKModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+    </div>
+    
+    <div style="padding: 20px; overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 11px; background: white;">
+        <thead>
+          <tr style="background: #f3f4f6; border: 2px solid #1f2937;">
+            <th colspan="2" rowspan="3" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #374151; vertical-align: middle; background: #e5e7eb;">Required DK PDK List</th>
+            <th colspan="4" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #374151; background: #dbeafe;">DK Version @ Kick-off</th>
+            <th colspan="4" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #374151; background: #fef3c7;">DK Version @ 1week before tape out</th>
+            <th colspan="1" rowspan="3" style="padding: 12px; text-align: center; font-weight: 700; border: 1px solid #374151; background: #fef3c7;">DK Version @ 1week before tape out</th>
+          </tr>
+          <tr style="background: #f9fafb; border-bottom: 1px solid #374151;">
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">Name / Version</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">B2B Released Date</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">Matching check</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #dbeafe;">check date</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">Name / Version</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">B2B Released Date</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">Matching check</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">check date</th>
+            <th style="padding: 8px; text-align: center; font-weight: 600; border: 1px solid #d1d5db; background: #fef3c7;">Un-matched reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in pdk_dk_entries %}
+          <tr style="border: 1px solid #d1d5db; background: {% if loop.index0 % 2 == 0 %}white{% else %}#fafafa{% endif %};" data-entry-id="{{ entry.id }}">
+            <td style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;" onclick="toggleTypeEdit(this, {{ entry.id }})">
+              <span id="display-type-{{ entry.id }}" style="display: inline-block; padding: 4px; font-weight: 600; {% if entry.type == 'PDK' %}background: #eff6ff;{% elif entry.type == 'DK' %}background: #fef3c7;{% else %}background: #f5f5f5;{% endif %}">
+                {% if entry.type == 'PDK' %}PDK{% elif entry.type == 'DK' %}DK{% else %}-{% endif %}
+              </span>
+              <select id="type-{{ entry.id }}" style="display: none; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box;" onchange="saveTypeField({{ entry.id }}, this.value)">
+                <option value="">-</option>
+                <option value="PDK">PDK</option>
+                <option value="DK">DK</option>
+              </select>
+            </td>
+            <td style="padding: 8px; font-weight: 600; border: 1px solid #d1d5db; text-align: center;">{{ entry.category }}</td>
+            
+            <td style="padding: 4px; border: 1px solid #d1d5db;" onclick="toggleEdit(this, 'eng-ver-ko-{{ entry.id }}')">
+              <span id="display-eng-ver-ko-{{ entry.id }}" style="display: inline-block; min-width: 100px; padding: 4px;">{{ entry.engineer_version_kickoff or '-' }}</span>
+              <input type="text" id="eng-ver-ko-{{ entry.id }}" value="{{ entry.engineer_version_kickoff or '' }}" style="display: none; width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_version_kickoff', this.value)"/>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;" onclick="toggleEdit(this, 'b2b-date-ko-{{ entry.id }}')">
+              <span id="display-b2b-date-ko-{{ entry.id }}" style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_b2b_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_b2b_date_kickoff else '-' }}</span>
+              <input type="date" id="b2b-date-ko-{{ entry.id }}" value="{{ entry.engineer_b2b_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_b2b_date_kickoff else '' }}" style="display: none; width: 100%; padding: 4px; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_b2b_date_kickoff', this.value)"/>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;" onclick="toggleEdit(this, 'match-ko-{{ entry.id }}')">
+              <span id="display-match-ko-{{ entry.id }}" style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_matching_kickoff or '-' }}</span>
+              <select id="match-ko-{{ entry.id }}" style="display: none; width: 100%; padding: 4px; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_matching_kickoff', this.value)">
+                <option value="">-</option>
+                <option value="Matched">Matched</option>
+                <option value="Unmatched">Unmatched</option>
+              </select>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;" onclick="toggleEdit(this, 'check-date-ko-{{ entry.id }}')">
+              <span id="display-check-date-ko-{{ entry.id }}" style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_check_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_check_date_kickoff else '-' }}</span>
+              <input type="date" id="check-date-ko-{{ entry.id }}" value="{{ entry.engineer_check_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_check_date_kickoff else '' }}" style="display: none; width: 100%; padding: 4px; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_check_date_kickoff', this.value)"/>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db;" onclick="toggleEdit(this, 'qa-check-ko-{{ entry.id }}')">
+              <span id="display-qa-check-ko-{{ entry.id }}" style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.qa_matching_kickoff or '-' }}</span>
+              <select id="qa-check-ko-{{ entry.id }}" style="display: none; width: 100%; padding: 4px; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'qa_matching_kickoff', this.value)">
+                <option value="">-</option>
+                <option value="Matched">Matched</option>
+                <option value="Unmatched">Unmatched</option>
+              </select>
+            </td>
+            
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;" onclick="toggleEdit(this, 'eng-ver-tweek-{{ entry.id }}')">
+              <span id="display-eng-ver-tweek-{{ entry.id }}" style="display: inline-block; min-width: 100px; padding: 4px;">{{ entry.engineer_version_tweek or '-' }}</span>
+              <input type="text" id="eng-ver-tweek-{{ entry.id }}" value="{{ entry.engineer_version_tweek or '' }}" style="display: none; width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_version_tweek', this.value)"/>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;" onclick="toggleEdit(this, 'b2b-date-tweek-{{ entry.id }}')">
+              <span id="display-b2b-date-tweek-{{ entry.id }}" style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_b2b_date_tweek.strftime('%Y.%m.%d') if entry.engineer_b2b_date_tweek else '-' }}</span>
+              <input type="date" id="b2b-date-tweek-{{ entry.id }}" value="{{ entry.engineer_b2b_date_tweek.strftime('%Y-%m-%d') if entry.engineer_b2b_date_tweek else '' }}" style="display: none; width: 100%; padding: 4px; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_b2b_date_tweek', this.value)"/>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;" onclick="toggleEdit(this, 'match-tweek-{{ entry.id }}')">
+              <span id="display-match-tweek-{{ entry.id }}" style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_matching_tweek or '-' }}</span>
+              <select id="match-tweek-{{ entry.id }}" style="display: none; width: 100%; padding: 4px; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_matching_tweek', this.value)">
+                <option value="">-</option>
+                <option value="Matched">Matched</option>
+                <option value="Unmatched">Unmatched</option>
+              </select>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;" onclick="toggleEdit(this, 'check-date-tweek-{{ entry.id }}')">
+              <span id="display-check-date-tweek-{{ entry.id }}" style="display: inline-block; min-width: 80px; padding: 4px;">{{ entry.engineer_check_date_tweek.strftime('%Y.%m.%d') if entry.engineer_check_date_tweek else '-' }}</span>
+              <input type="date" id="check-date-tweek-{{ entry.id }}" value="{{ entry.engineer_check_date_tweek.strftime('%Y-%m-%d') if entry.engineer_check_date_tweek else '' }}" style="display: none; width: 100%; padding: 4px; box-sizing: border-box;" onblur="saveField({{ entry.id }}, 'engineer_check_date_tweek', this.value)"/>
+            </td>
+            <td style="padding: 4px; border: 1px solid #d1d5db; background: #fffbeb;" onclick="toggleEdit(this, 'reason-{{ entry.id }}')">
+              <span id="display-reason-{{ entry.id }}" style="display: inline-block; min-width: 150px; padding: 4px; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">{{ entry.unmatched_reason_tweek or '-' }}</span>
+              <textarea id="reason-{{ entry.id }}" style="display: none; width: 100%; padding: 4px; border: 1px solid #d1d5db; box-sizing: border-box; font-size: 11px; min-height: 40px;" onblur="saveField({{ entry.id }}, 'unmatched_reason_tweek', this.value)"></textarea>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <div style="padding: 20px; border-top: 1px solid #e5e7eb; text-align: right;">
+      <button type="button" onclick="closePDKDKModal()" style="padding: 10px 20px; font-size: 13px; border: 1px solid #d1d5db; background: white; border-radius: 6px; cursor: pointer; color: #374151; font-weight: 500;">Close</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,847 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container cits-root">
+  <div class="detail-header-hero">
+    <div class="hero-breadcrumb">
+      <a href="/cits/">CITS</a> <span>/</span> <span>{{ issue.ticket_no }}</span>
+    </div>
+    <div class="hero-container">
+      <div class="hero-title-block">
+        <input id="titleInput" class="hero-title-input" value="{{ issue.title|e }}" placeholder="Issue title" />
+      </div>
+      <div class="hero-status-block">
+        <span class="status-badge status-{{ issue.status|lower }}">{{ issue.status }}</span>
+      </div>
+    </div>
+    <div class="hero-meta">
+      <span class="meta-item">{{ issue.ticket_no }}</span>
+      <span class="meta-separator">•</span>
+      <span class="meta-item">{{ issue.created_at.strftime('%Y-%m-%d') if issue.created_at else '—' }}</span>
+    </div>
+  </div>
+
+  <div class="detail-wrapper">
+    <div class="detail-main">
+      <section class="content-card">
+        <div class="details-grid">
+          <div class="detail-field">
+            <label>Customer</label>
+            <select id="customerSelect" class="form-input" onchange="loadDetailCustomerIPs()">
+              <option value="">-- Select customer --</option>
+              {% for c in customers %}
+              <option value="{{ c.name }}" {% if issue.customer == c.name %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="detail-field">
+            <label>IP/IC</label>
+            <select id="ipSelect" class="form-input">
+              <option value="">-- Select IP/IC --</option>
+              {% if issue.customer and customers %}
+                {% for c in customers %}
+                  {% if c.name == issue.customer %}
+                    {% for ip in customer_ips.get(c.id, []) %}
+                    <option value="{{ ip.name }}" {% if issue.ip_ic == ip.name %}selected{% endif %}>{{ ip.name }}</option>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </select>
+          </div>
+          <div class="detail-field">
+            <label>Tag</label>
+            <select id="tagSelect" class="form-input">
+              <option value="">—</option>
+              <option value="Technical Support" {% if issue.tag == 'Technical Support' %}selected{% endif %}>Technical Support</option>
+              <option value="Customer Claim" {% if issue.tag == 'Customer Claim' %}selected{% endif %}>Customer Claim</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-card">
+        <div class="conv-header">
+          <h3 class="card-title">Conversations</h3>
+          <button class="btn-add-conv" onclick="addConversation()">+ Add Inquiry</button>
+        </div>
+        <div id="conversationsList" class="conversations-list">
+        </div>
+      </section>
+
+      <section class="content-card">
+        <div class="details-grid">
+          <div class="detail-field">
+            <label>Inquiry Person (Customer)</label>
+            <select id="reporterSelect" class="form-input">
+              <option value="">—</option>
+              {% for c in customers %}
+              <option value="{{ c.name }}" {% if issue.reporter == c.name %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="detail-field">
+            <label>Assignee</label>
+            <select id="assigneeSelect" class="form-input">
+              <option value="">—</option>
+              {% for u in users %}
+              <option value="{{ u.english_name }}" {% if issue.assignee == u.english_name %}selected{% endif %}>{{ u.english_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-card">
+        <h3 class="card-title">Attachments</h3>
+        <div class="attachments-list">
+          {% if issue.display_attachments %}
+            {% for f in issue.display_attachments %}
+              {% set ff = f.strip().replace('\\','/') %}
+              {% set fname = ff.split('/')[-1] %}
+              <div class="attach-item">
+                <span class="attach-icon">📎</span>
+                <a href="/{{ ff.lstrip('/') }}" target="_blank" class="attach-link">{{ fname }}</a>
+                <button class="btn-remove" onclick="deleteAttachment({{ issue.id }}, '{{ fname }}', this)">Remove</button>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="no-attachments">No attachments yet</p>
+          {% endif %}
+        </div>
+        <div class="attach-upload">
+          <label for="fileInput">Add files</label>
+          <input id="fileInput" type="file" multiple />
+        </div>
+      </section>
+
+    </div>
+
+    <aside class="detail-sidebar">
+      <div class="sidebar-card">
+        <h4 class="sidebar-title">Status</h4>
+        <select id="statusSelect" class="form-input status-select-sidebar">
+          <option value="OPEN" {% if issue.status == 'OPEN' %}selected{% endif %}>OPEN</option>
+          <option value="PENDING" {% if issue.status == 'PENDING' %}selected{% endif %}>PENDING</option>
+          <option value="DELAY" {% if issue.status == 'DELAY' %}selected{% endif %}>DELAY</option>
+          <option value="CLOSE" {% if issue.status == 'CLOSE' %}selected{% endif %}>CLOSE</option>
+        </select>
+      </div>
+
+      <div class="sidebar-card">
+        <h4 class="sidebar-title">Metadata</h4>
+        <div class="meta-row">
+          <span class="meta-label">Ticket</span>
+          <span class="meta-value">{{ issue.ticket_no }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">{{ issue.created_at.strftime('%Y-%m-%d %H:%M') if issue.created_at else '—' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Updated</span>
+          <span class="meta-value">{{ issue.updated_at.strftime('%Y-%m-%d %H:%M') if issue.updated_at else '—' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Reporter</span>
+          <span class="meta-value">{{ issue.reporter or '—' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Assignee</span>
+          <span class="meta-value">{{ issue.assignee or '—' }}</span>
+        </div>
+      </div>
+
+      <div class="sidebar-card sidebar-actions">
+        <button class="btn btn-primary btn-full" onclick="saveIssueChanges({{ issue.id }})">💾 Save Changes</button>
+        <button class="btn btn-danger btn-full" onclick="deleteIssue({{ issue.id }})">🗑️ Delete Issue</button>
+      </div>
+
+    </aside>
+  </div>
+</main>
+
+<script>
+let conversations = [];
+
+// Build customer map (from modal logic)
+const customerIdByName = {
+  {% for c in customers %}
+    '{{ c.name }}': {{ c.id }},
+  {% endfor %}
+};
+
+const customerIPs = {
+  {% for c in customers %}
+    {{ c.id }}: [
+      {% for ip in customer_ips.get(c.id, []) %}
+        { id: {{ ip.id }}, name: '{{ ip.name }}' },
+      {% endfor %}
+    ],
+  {% endfor %}
+};
+
+async function loadDetailCustomerIPs() {
+  const customerName = document.getElementById('customerSelect').value;
+  const customerId = customerIdByName[customerName];
+  const ipSelect = document.getElementById('ipSelect');
+  
+  if (!customerId) {
+    ipSelect.innerHTML = '<option value="">-- Select IP/IC --</option>';
+    ipSelect.disabled = true;
+    return;
+  }
+  
+  ipSelect.disabled = false;
+  const ips = customerIPs[customerId] || [];
+  ipSelect.innerHTML = '<option value="">-- Select IP/IC --</option>' + 
+    ips.map(ip => `<option value="${ip.name}">${ip.name}</option>`).join('');
+}
+
+function loadConversations() {
+  fetch(`/cits/issue/conversations/{{issue.id}}`)
+    .then(r => r.json())
+    .then(data => {
+      conversations = data;
+      renderConversations();
+    })
+    .catch(e => console.error('Failed to load conversations:', e));
+}
+
+function renderContentWithImages(content) {
+  // Parse content and extract base64 images to render as actual img tags
+  if (!content) return '';
+  
+  let html = content;
+  
+  // 마크다운 패턴: ![텍스트](data URL)
+  // 모든 ![...](...) 패턴을 찾고 URL이 data:image/로 시작하면 이미지로 변환
+  const pattern = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  
+  html = html.replace(pattern, (match, alt, url) => {
+    // URL이 data:image/로 시작하면 resizable div로 감싼 img 태그로 변환
+    if (url.startsWith('data:image/')) {
+      return `<div class="inline-attach"><div class="resizable"><img src="${url}" alt="${alt || 'Image'}"></div></div>`;
+    }
+    // data URL이 아니면 그대로 둠
+    return match;
+  });
+  
+  return html;
+}
+
+function renderConversations() {
+  const container = document.getElementById('conversationsList');
+  if (!conversations || conversations.length === 0) {
+    container.innerHTML = '<p class="no-conv">No conversations yet</p>';
+    return;
+  }
+  
+  // Create split layout with Inquiry (left) and Reply (right)
+  let html = '<div class="conv-split-layout">';
+  
+  conversations.forEach((pair, index) => {
+    const inq = pair.inquiry;
+    const replies = pair.replies || [];
+    const inqContent = renderContentWithImages(inq.content);
+    
+    html += `
+      <div class="conv-pair" data-pair-index="${index}">
+        <div class="conv-column conv-inquiry-col">
+          <div class="conv-item conv-inquiry">
+            <div class="conv-header-row">
+              <span class="conv-type-badge inquiry">INQUIRY</span>
+              <input type="datetime-local" class="conv-datetime-input" value="${new Date(inq.created_at).toISOString().slice(0, 16)}" onchange="updateConversationDate(${inq.id}, this.value)">
+              <span class="conv-author">${inq.created_by || '—'}</span>
+              <button class="btn-delete-conv" onclick="deleteConversation(${inq.id})">🗑️</button>
+            </div>
+            <div class="conv-content conv-content-inquiry" 
+                 onclick="editConversationFromElement(this, ${inq.id}, ${index})"
+                 data-conv-id="${inq.id}"
+                 data-original-content="${inq.content.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}"
+                 id="conv-display-${inq.id}">
+              ${inqContent}
+            </div>
+            <textarea class="conv-textarea hidden" id="conv-edit-${inq.id}" data-id="${inq.id}"></textarea>
+            <button class="btn-add-reply" onclick="startAddReply(${inq.id}, ${index})">+ Add Reply</button>
+          </div>
+        </div>
+        
+        <div class="conv-connector">
+          ${replies.length > 0 ? '→' : ''}
+        </div>
+        
+        <div class="conv-column conv-reply-col">
+          ${replies.map(reply => {
+            const replyContent = renderContentWithImages(reply.content);
+            return `
+              <div class="conv-item conv-reply">
+                <div class="conv-header-row">
+                  <span class="conv-type-badge reply">REPLY</span>
+                  <input type="datetime-local" class="conv-datetime-input" value="${new Date(reply.created_at).toISOString().slice(0, 16)}" onchange="updateConversationDate(${reply.id}, this.value)">
+                  <span class="conv-author">${reply.created_by || '—'}</span>
+                  <button class="btn-delete-conv" onclick="deleteConversation(${reply.id})">🗑️</button>
+                </div>
+                <div class="conv-content conv-content-reply" 
+                     onclick="editConversationFromElement(this, ${reply.id}, ${index}, true)"
+                     data-conv-id="${reply.id}"
+                     data-original-content="${reply.content.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}"
+                     id="conv-display-${reply.id}">
+                  ${replyContent}
+                </div>
+                <textarea class="conv-textarea hidden" id="conv-edit-${reply.id}" data-id="${reply.id}"></textarea>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function addConversation() {
+  // Check if already adding
+  if (document.getElementById('newConvBox')) {
+    return;
+  }
+  
+  // Get current date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Create new conversation input box
+  const container = document.getElementById('conversationsList');
+  const box = document.createElement('div');
+  box.id = 'newConvBox';
+  box.className = 'conv-new-inquiry-wrapper';
+  box.innerHTML = `
+    <div class="conv-item conv-inquiry new-conv-edit">
+      <div class="conv-header-row">
+        <span class="conv-type-badge inquiry">INQUIRY</span>
+        <input type="date" id="newConvDate" class="conv-date-input" value="${today}">
+      </div>
+      <div class="conv-content-editable" id="newConvContent" contenteditable="true" placeholder="Enter inquiry content (paste images directly)..."></div>
+      <div class="conv-edit-actions">
+        <button class="btn-save-conv" onclick="saveNewConversation()">Save</button>
+        <button class="btn-cancel-conv" onclick="cancelNewConversation()">Cancel</button>
+      </div>
+    </div>
+  `;
+  
+  // Insert at top of conversation list
+  if (container.firstChild) {
+    container.insertBefore(box, container.firstChild);
+  } else {
+    container.appendChild(box);
+  }
+  
+  // Focus on content
+  setTimeout(() => {
+    document.getElementById('newConvContent').focus();
+    setupPasteHandler('newConvContent');
+  }, 100);
+}
+
+function saveNewConversation() {
+  const contentDiv = document.getElementById('newConvContent');
+  const dateInput = document.getElementById('newConvDate');
+  
+  // Get text content (not HTML)
+  let content = contentDiv.textContent.trim();
+  
+  // Also get HTML with images
+  const contentHtml = contentDiv.innerHTML.trim();
+  
+  // Check if there's any content (text or images)
+  const hasText = content.length > 0;
+  const hasImages = contentDiv.querySelector('img') !== null;
+  
+  if (!hasText && !hasImages) {
+    alert('Please enter content or add images');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('content', contentHtml); // Send HTML with images
+  formData.append('date', dateInput.value); // Send selected date
+  
+  fetch(`/cits/issue/conversations/{{issue.id}}/add`, {
+    method: 'POST',
+    body: formData
+  }).then(r => {
+    if (r.ok) {
+      cancelNewConversation();
+      loadConversations();
+    } else {
+      alert('Failed to add conversation');
+    }
+  }).catch(e => { console.error(e); alert('Error'); });
+}
+
+function setupPasteHandler(elementId) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+  
+  element.addEventListener('paste', function(e) {
+    const items = e.clipboardData.items;
+    
+    // Check for images first
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        e.preventDefault();
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          // Create resizable wrapper
+          const wrap = document.createElement('div');
+          wrap.className = 'inline-attach';
+          const resizable = document.createElement('div');
+          resizable.className = 'resizable';
+          const img = document.createElement('img');
+          img.src = event.target.result;
+          resizable.appendChild(img);
+          wrap.appendChild(resizable);
+          element.appendChild(wrap);
+        };
+        reader.readAsDataURL(blob);
+        return;
+      }
+    }
+    
+    // Handle text paste (Outlook cleanup)
+    const plainText = e.clipboardData.getData('text/plain');
+    const htmlText = e.clipboardData.getData('text/html');
+    
+    if (plainText || htmlText) {
+      e.preventDefault();
+      
+      // Always prefer plain text for cleaner formatting
+      if (plainText) {
+        // Aggressive cleanup for Outlook formatting
+        let cleaned = plainText
+          .replace(/\u00a0/g, ' ')      // Replace nbsp
+          .replace(/\t/g, ' ')          // Replace tabs
+          .replace(/\r\n/g, '\n')       // Normalize line endings
+          .replace(/\r/g, '\n')         
+          .replace(/^[\s\u200B]+/gm, '') // Remove leading whitespace including zero-width spaces
+          .replace(/[\s\u200B]+$/gm, '') // Remove trailing whitespace
+          .replace(/ {2,}/g, ' ')       // Multiple spaces to single space
+          .split('\n')
+          .filter(line => line.trim().length > 0) // Remove completely empty lines
+          .join('\n')
+          .replace(/\n{3,}/g, '\n\n')   // Max 2 consecutive newlines
+          .trim();                      // Trim entire text
+        
+        document.execCommand('insertText', false, cleaned);
+        return;
+      }
+      
+      // Fallback to HTML cleanup (only if no plain text available)
+      if (htmlText) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = htmlText;
+        
+        // Remove all MS Office and styling attributes
+        tmp.querySelectorAll('*').forEach(node => {
+          // Remove all attributes except href for links
+          const attrs = Array.from(node.attributes);
+          attrs.forEach(attr => {
+            if (node.tagName === 'A' && attr.name === 'href') return;
+            node.removeAttribute(attr.name);
+          });
+        });
+        
+        // Convert to plain text
+        let textContent = tmp.innerText || tmp.textContent || '';
+        
+        // Same aggressive cleanup
+        let cleaned = textContent
+          .replace(/\u00a0/g, ' ')
+          .replace(/\t/g, ' ')
+          .replace(/\r\n/g, '\n')
+          .replace(/\r/g, '\n')
+          .replace(/^[\s\u200B]+/gm, '')
+          .replace(/[\s\u200B]+$/gm, '')
+          .replace(/ {2,}/g, ' ')
+          .split('\n')
+          .filter(line => line.trim().length > 0)
+          .join('\n')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+        
+        document.execCommand('insertText', false, cleaned);
+      }
+    }
+  });
+}
+
+function handleNewConvImage(event) {
+  const file = event.target.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      img.style.margin = '8px 0';
+      document.getElementById('newConvContent').appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function cancelNewConversation() {
+  const box = document.getElementById('newConvBox');
+  if (box) {
+    box.remove();
+  }
+}
+
+function startAddReply(inquiryId, pairIndex) {
+  const pair = document.querySelector(`[data-pair-index="${pairIndex}"]`);
+  const replyCol = pair.querySelector('.conv-reply-col');
+  
+  // Check if already adding
+  if (replyCol.querySelector('.new-reply-box')) {
+    return;
+  }
+  
+  // Get users list for reply author selection
+  const users = {{ users | tojson | safe }};
+  const userOptions = users.map(u => `<option value="${u.english_name}">${u.english_name}</option>`).join('');
+  
+  const box = document.createElement('div');
+  box.className = 'conv-item conv-reply new-reply-box';
+  box.innerHTML = `
+    <div class="conv-header-row">
+      <span class="conv-type-badge reply">REPLY</span>
+      <select id="replyAuthor_${inquiryId}" class="conv-author-select">
+        <option value="">-- Select Author --</option>
+        ${userOptions}
+      </select>
+      <span class="conv-date">${new Date().toLocaleString()}</span>
+    </div>
+    <textarea class="conv-textarea" placeholder="Enter reply content..." id="newReplyTextarea_${inquiryId}"></textarea>
+    <div class="conv-edit-actions">
+      <button class="btn-save-conv" onclick="saveNewReply(${inquiryId}, ${pairIndex})">Save</button>
+      <button class="btn-cancel-conv" onclick="cancelNewReply(${pairIndex})">Cancel</button>
+    </div>
+  `;
+  
+  replyCol.appendChild(box);
+  setTimeout(() => {
+    document.getElementById(`newReplyTextarea_${inquiryId}`).focus();
+  }, 100);
+}
+
+function saveNewReply(inquiryId, pairIndex) {
+  const textarea = document.getElementById(`newReplyTextarea_${inquiryId}`);
+  const authorSelect = document.getElementById(`replyAuthor_${inquiryId}`);
+  const content = textarea.value.trim();
+  const author = authorSelect ? authorSelect.value : '';
+  
+  if (!content) {
+    alert('Please enter reply content');
+    return;
+  }
+  
+  if (!author) {
+    alert('Please select reply author');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('content', content);
+  formData.append('type', 'Reply');
+  formData.append('created_by', author);
+  formData.append('inquiry_id', inquiryId);
+  
+  fetch(`/cits/issue/conversations/{{issue.id}}/add`, {
+    method: 'POST',
+    body: formData
+  }).then(r => {
+    if (r.ok) {
+      cancelNewReply(pairIndex);
+      loadConversations();
+    } else {
+      alert('Failed to add reply');
+    }
+  }).catch(e => { console.error(e); alert('Error'); });
+}
+
+function handleReplyImage(event, inquiryId) {
+  const file = event.target.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      img.style.margin = '8px 0';
+      document.getElementById(`newReplyContent_${inquiryId}`).appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function cancelNewReply(pairIndex) {
+  const pair = document.querySelector(`[data-pair-index="${pairIndex}"]`);
+  const box = pair.querySelector('.new-reply-box');
+  if (box) {
+    box.remove();
+  }
+}
+
+function editConversationFromElement(element, convId, pairIndex, isReply) {
+  // Get original content from data attribute (HTML-decoded)
+  const originalContent = element.getAttribute('data-original-content')
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+  editConversation(convId, originalContent, pairIndex, isReply);
+}
+
+function editConversation(convId, originalContent, pairIndex, isReply) {
+  const display = document.getElementById(`conv-display-${convId}`);
+  const oldTextarea = document.getElementById(`conv-edit-${convId}`);
+  
+  if (oldTextarea && oldTextarea.classList.contains('hidden') === false) {
+    return; // Already editing
+  }
+  
+  display.classList.add('hidden');
+  
+  // Create a contenteditable div for editing with rendered images
+  const editDiv = document.createElement('div');
+  editDiv.className = 'conv-edit-div';
+  editDiv.id = `conv-edit-div-${convId}`;
+  editDiv.contentEditable = 'true';
+  editDiv.style.minHeight = '200px';
+  editDiv.style.padding = '12px';
+  editDiv.style.border = '2px solid #3b82f6';
+  editDiv.style.borderRadius = '6px';
+  editDiv.style.fontFamily = '"Menlo", "Monaco", "Courier New", monospace';
+  editDiv.style.fontSize = '14px';
+  editDiv.style.lineHeight = '1.6';
+  editDiv.style.whiteSpace = 'pre-wrap';
+  editDiv.style.wordWrap = 'break-word';
+  editDiv.style.overflowWrap = 'break-word';
+  editDiv.style.outline = 'none';
+  editDiv.style.backgroundColor = 'white';
+  
+  // Set initial content with rendered images
+  editDiv.innerHTML = renderContentWithImages(originalContent);
+  
+  display.parentElement.insertBefore(editDiv, display.nextSibling);
+  editDiv.focus();
+  
+  // 이미지 붙여넣기 지원
+  function handlePaste(e) {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        e.preventDefault();
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          // Insert img tag with base64 data
+          const img = document.createElement('img');
+          img.src = event.target.result;
+          img.style.maxWidth = '100%';
+          img.style.height = 'auto';
+          img.style.margin = '8px 0';
+          img.style.borderRadius = '4px';
+          img.style.display = 'block';
+          
+          // Insert at cursor position or append
+          const selection = window.getSelection();
+          if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.insertNode(img);
+            range.setStartAfter(img);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          } else {
+            editDiv.appendChild(img);
+          }
+        };
+        reader.readAsDataURL(blob);
+      }
+    }
+  }
+  
+  editDiv.addEventListener('paste', handlePaste);
+  
+  function saveEdit() {
+    // Convert contenteditable div back to markdown format
+    const html = editDiv.innerHTML;
+    let markdown = '';
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Convert img tags back to markdown format
+    const images = tempDiv.querySelectorAll('img');
+    images.forEach(img => {
+      const dataUrl = img.src;
+      img.replaceWith(`![image](${dataUrl})`);
+    });
+    
+    // Get text content and clean up
+    markdown = tempDiv.textContent;
+    
+    // Also preserve any remaining HTML structure
+    let content = markdown.trim();
+    if (!content) content = html;
+    
+    if (content === originalContent) {
+      cancelEdit(convId);
+      return;
+    }
+    
+    const formData = new FormData();
+    formData.append('content', content);
+    
+    fetch(`/cits/issue/conversations/${convId}/update`, {
+      method: 'POST',
+      body: formData
+    }).then(r => {
+      if (r.ok) {
+        loadConversations();
+      } else {
+        alert('Failed to save');
+        cancelEdit(convId);
+      }
+    }).catch(e => { console.error(e); cancelEdit(convId); });
+  }
+  
+  function cancelEdit(convId) {
+    display.classList.remove('hidden');
+    editDiv.remove();
+    editDiv.removeEventListener('paste', handlePaste);
+  }
+  
+  editDiv.addEventListener('blur', saveEdit);
+  editDiv.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cancelEdit(convId);
+    if (e.ctrlKey && e.key === 'Enter') saveEdit();
+  });
+}
+
+function deleteConversation(convId) {
+  if (!confirm('Delete this conversation?')) return;
+  
+  fetch(`/cits/issue/conversations/${convId}/delete`, {
+    method: 'POST'
+  }).then(r => {
+    if (r.ok) {
+      loadConversations();
+    } else {
+      alert('Failed to delete');
+    }
+  }).catch(e => { console.error(e); alert('Error'); });
+}
+
+function updateConversationDate(convId, dateTimeValue) {
+  if (!dateTimeValue) return;
+  
+  const formData = new FormData();
+  formData.append('created_at', new Date(dateTimeValue).toISOString());
+  
+  fetch(`/cits/issue/conversations/${convId}/update-date`, {
+    method: 'POST',
+    body: formData
+  }).then(r => r.json())
+    .then(data => {
+      if (!data.success) {
+        alert('Failed to update date: ' + (data.error || 'Unknown error'));
+        loadConversations();
+      }
+    })
+    .catch(e => {
+      console.error('Error updating date:', e);
+      alert('Error updating date');
+    });
+}
+
+function saveIssueChanges(issueId) {
+  const formData = new FormData();
+  formData.append('status', document.getElementById('statusSelect').value);
+  formData.append('reporter', document.getElementById('reporterSelect').value || '');
+  formData.append('assignee', document.getElementById('assigneeSelect').value || '');
+  formData.append('title', document.getElementById('titleInput').value || '');
+  formData.append('customer', document.getElementById('customerSelect').value || '');
+  formData.append('ip_ic', document.getElementById('ipSelect').value || '');
+  formData.append('tag', document.getElementById('tagSelect').value || '');
+
+  const fileInput = document.getElementById('fileInput');
+  if (fileInput && fileInput.files.length > 0) {
+    for (let i = 0; i < fileInput.files.length; i++) {
+      formData.append('attachments', fileInput.files[i]);
+    }
+  }
+
+  fetch(`/cits/issue/update/${issueId}`, {
+    method: 'POST',
+    body: formData
+  }).then(r => {
+    if (r.ok) {
+      window.location.reload();
+    } else {
+      alert('Failed to save changes');
+    }
+  }).catch(err => { console.error(err); alert('Error saving'); });
+}
+
+function updateStatus(issueId, status) {
+  const formData = new FormData();
+  formData.append('status', status);
+  fetch(`/cits/issue/update/${issueId}`, { method: 'POST', body: formData })
+    .then(r => { if (!r.ok) alert('Failed to update status'); else window.location.reload(); })
+    .catch(e => { console.error(e); alert('Error updating status'); });
+}
+
+function deleteIssue(issueId) {
+  if (!confirm('Are you sure?')) return;
+  const btn = event?.target;
+  if (btn) btn.disabled = true;
+  fetch(`/cits/issue/delete/${issueId}`, { method: 'POST' })
+    .then(r => {
+      if (r.ok || r.status === 303) {
+        // server redirects on success; just go to list
+        window.location.href = '/cits/';
+      } else {
+        alert('Failed to delete');
+        if (btn) btn.disabled = false;
+      }
+    }).catch(e => { console.error(e); alert('Error deleting'); if (btn) btn.disabled = false; });
+}
+
+function deleteAttachment(issueId, filename, btn) {
+  if (!confirm('Remove attachment "' + filename + '"?')) return;
+  if (btn) btn.disabled = true;
+  const form = new FormData();
+  form.append('filepath', filename);
+  fetch(`/cits/issue/attachment/delete/${issueId}`, { method: 'POST', body: form })
+    .then(r => {
+      if (r.ok) {
+        window.location.reload();
+      } else {
+        alert('Failed to remove attachment');
+        if (btn) btn.disabled = false;
+      }
+    }).catch(e => { console.error(e); alert('Error'); if (btn) btn.disabled = false; });
+}
+
+// Load conversations on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadConversations();
+});
+</script>
+
+{% endblock %}

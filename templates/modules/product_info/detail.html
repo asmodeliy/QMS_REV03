@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container pi-root">
+  <section class="pi-readiness">
+    <div class="pi-readiness-header">
+      <div>
+        <p class="pi-eyebrow">{{ t('product_info.ip_detail', locale) }}</p>
+        <h2 class="pi-section-title">{{ ip_name }}</h2>
+        <p class="pi-section-sub">{{ t('product_info.detail_desc', locale) }}</p>
+      </div>
+      <div class="header-actions">
+        <a href="/product-info" class="pi-btn pi-btn-secondary">{{ t('product_info.back_to_list', locale) }}</a>
+      </div>
+    </div>
+    <div class="pi-matrix pi-matrix-horizontal">
+      {% for node, status in ip_statuses.items() %}
+      <div class="pi-matrix-cell">
+        <div class="pi-matrix-head">{{ node }}</div>
+        {% if is_admin %}
+        <select class="pi-status-select" data-node="{{ node }}" onchange="updateStatus('{{ ip_name }}', '{{ node }}', this.value)">
+          <option value="" {% if not status %}selected{% endif %}>Not Set</option>
+          <option value="mass" {% if status == 'mass' %}selected{% endif %}>Mass Production</option>
+          <option value="proven" {% if status == 'proven' %}selected{% endif %}>Silicon Proven</option>
+          <option value="dev" {% if status == 'dev' %}selected{% endif %}>Under Development</option>
+          <option value="plan" {% if status == 'plan' %}selected{% endif %}>Planning</option>
+        </select>
+        {% else %}
+        {% if status %}
+        <span class="pi-dot {{ status }}" title="{{ status }}"></span>
+        {% else %}
+        <span class="pi-dot" title="Not available"></span>
+        {% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if grouped_rows %}
+  <section class="pi-data-section">
+    <h3 class="pi-section-title">{{ t('product_info.mapped_data', locale) }}</h3>
+    
+    {% for process, rows in grouped_rows.items() %}
+    <div class="pi-process-section">
+      <h4 class="pi-process-title">{{ t('product_info.process', locale) }}: {{ process }}</h4>
+      <div class="pi-table-wrapper">
+        <table class="pi-table">
+          <thead>
+            <tr>
+              {% for col in rows[0].keys() %}
+              {% if col != '__rowid__' %}
+              <th>{{ display_headers.get(col, col) }}</th>
+              {% endif %}
+              {% endfor %}
+              {% if is_admin %}
+              <th>Actions</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+            <tr data-rowid="{{ row.__rowid__ }}">
+              {% for key, value in row.items() %}
+              {% if key != '__rowid__' %}
+              <td>{{ value if value is not none else '' }}</td>
+              {% endif %}
+              {% endfor %}
+              {% if is_admin %}
+              <td class="pi-actions">
+                <button class="pi-btn icon edit-btn" onclick="editRow(this)" title="Edit">
+                  <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 21v-3.75L17.8 3.44a1 1 0 011.41 0l1.34 1.34a1 1 0 010 1.41L6 20z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M14.5 4.5l3 3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+                <button class="pi-btn icon delete-btn" onclick="deleteRow(this)" title="Delete">
+                  <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6h18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+</main>
+<script src="/static/modules/product_info/product_info.js"></script>
+{% endblock %}

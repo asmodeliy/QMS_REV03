@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="login-page">
+  <div class="gradient-bg"></div>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">
+          <span class="brand-name">RAMSCHIP QMS</span>
+        </h1>
+        <p class="login-subtitle">{{ t('login.register') }}</p>
+      </div>
+
+      <div class="login-content">
+        {% if error %}
+        <div class="alert alert-error">
+          {% set error_message = {
+            'invalid_english_name': t('register.invalid_english_name'),
+            'invalid_email': t('register.invalid_email'),
+            'password_mismatch': t('register.password_mismatch'),
+            'weak_password': t('register.weak_password'),
+            'email_exists': t('register.email_exists')
+          }.get(error, error) %}
+          {{ error_message }}
+        </div>
+        {% endif %}
+
+        
+        <form id="register-form" method="post" action="/auth/register" style="display:grid;gap:12px">
+          <div class="form-group">
+            <label class="form-label">{{ t('register.email') }} (ID)</label>
+            <input class="form-input" type="email" name="email" placeholder="{{ t('register.email_placeholder') }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{ t('register.english_name') }}</label>
+            <input class="form-input" type="text" name="english_name" placeholder="{{ t('register.english_name_placeholder') }}" required minlength="2">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{ t('common.department') }}</label>
+            <select class="form-input" name="department" required style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+              <option value="">-- Select Department --</option>
+              <option value="AS">AS</option>
+              <option value="DS">DS</option>
+              <option value="PS">PS</option>
+              <option value="QM">QM</option>
+              <option value="SS">SS</option>
+              <option value="Sales">Sales</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{ t('login.password') }}</label>
+            <input class="form-input" type="password" name="password" placeholder="{{ t('register.password_placeholder') }}" required minlength="6">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{ t('register.confirm_password') }}</label>
+            <input class="form-input" type="password" name="confirm_password" placeholder="{{ t('register.confirm_password_placeholder') }}" required minlength="6">
+          </div>
+
+          <button class="btn-primary full-width" type="submit">{{ t('login.register') }}</button>
+
+          <div style="text-align:center; padding-top:10px; border-top:1px solid #eee">
+            {% if request.cookies.get('lang', 'ko') == 'ko' %}
+            <p style="margin:10px 0 0 0; color:#666; font-size:14px">
+              이미 계정이 있으신가요? <a href="/auth/login" style="color:#667eea; text-decoration:none; font-weight:bold">로그인</a>
+            </p>
+            {% else %}
+            <p style="margin:10px 0 0 0; color:#666; font-size:14px">
+              Already have an account? <a href="/auth/login" style="color:#667eea; text-decoration:none; font-weight:bold">Log In</a>
+            </p>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+
+      <div class="login-footer">
+        <p class="muted">{{ t('register.note') }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('register-form');
+  const passwordInput = form.querySelector('input[name="password"]');
+  const confirmInput = form.querySelector('input[name="confirm_password"]');
+
+  confirmInput.addEventListener('blur', function() {
+    if (passwordInput.value !== confirmInput.value) {
+      confirmInput.setCustomValidity('Passwords do not match');
+    } else {
+      confirmInput.setCustomValidity('');
+    }
+  });
+
+  form.addEventListener('submit', function(e) {
+    if (passwordInput.value !== confirmInput.value) {
+      e.preventDefault();
+      alert('Passwords do not match');
+      return false;
+    }
+  });
+});
+</script>
+
+{% endblock %}

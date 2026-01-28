@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container cits-root">
+  <div class="dashboard-header-section cits-header">
+    <div class="dashboard-header-content">
+      <div>
+        <h1 class="dashboard-title">Customers</h1>
+        <p class="dashboard-subtitle">Manage customer information</p>
+      </div>
+      <div class="header-actions">
+        <a href="/cits" class="cits-btn ghost">← Back to Issues</a>
+        <button class="cits-btn cits-btn-primary" onclick="openNewCustomerModal()">New Customer</button>
+      </div>
+    </div>
+  </div>
+
+  {% if request.query_params.get('success') %}
+  <div style="padding: 12px; background: #d1fae5; border: 1px solid #6ee7b7; border-radius: 8px; margin-bottom: 16px; color: #065f46;">
+    ✓ Customer created successfully!
+  </div>
+  {% endif %}
+
+  {% if request.query_params.get('updated') %}
+  <div style="padding: 12px; background: #dbeafe; border: 1px solid #93c5fd; border-radius: 8px; margin-bottom: 16px; color: #1e40af;">
+    ✓ Customer updated successfully!
+  </div>
+  {% endif %}
+
+  <div class="issues-table-wrapper">
+    <table class="issues-table">
+      <thead>
+        <tr>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 20%;">Company</th>
+          <th style="width: 15%;">Contact Person</th>
+          <th style="width: 15%;">Email</th>
+          <th style="width: 12%;">Phone</th>
+          <th style="width: 10%;">Created</th>
+          <th style="width: 8%;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if customers %}
+          {% for customer in customers %}
+          <tr>
+            <td><strong>{{ customer.name }}</strong></td>
+            <td>{{ customer.company or '—' }}</td>
+            <td>{{ customer.contact_person or '—' }}</td>
+            <td>{{ customer.email or '—' }}</td>
+            <td>{{ customer.phone or '—' }}</td>
+            <td>{{ customer.created_at.strftime('%Y-%m-%d') if customer.created_at else '—' }}</td>
+            <td>
+              <button class="cits-btn ghost" style="padding: 4px 8px; font-size: 12px;" onclick="editCustomer({{ customer.id }}, '{{ customer.name }}', '{{ customer.company or '' }}', '{{ customer.email or '' }}', '{{ customer.phone or '' }}', '{{ customer.contact_person or '' }}', '{{ customer.notes or '' }}')">Edit</button>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" style="text-align: center; padding: 40px;">No customers yet. <a href="#" onclick="openNewCustomerModal();return false;">Create one</a></td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="customerModal" class="hidden">
+    <div class="modal-overlay" onclick="closeCustomerModal()"></div>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div style="display: flex; align-items: center; margin-bottom: 16px;">
+          <h2 class="modal-title" id="customerModalTitle">New Customer</h2>
+          <button class="modal-close" onclick="closeCustomerModal()" aria-label="Close">×</button>
+        </div>
+
+        <form id="customerForm" method="post" action="/cits/customers/create">
+          <div class="modal-body">
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Customer Name *</label>
+              <input type="text" name="name" id="customerName" class="form-input" required />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Company</label>
+                <input type="text" name="company" id="customerCompany" class="form-input" />
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Contact Person</label>
+                <input type="text" name="contact_person" id="customerContactPerson" class="form-input" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Email</label>
+                <input type="email" name="email" id="customerEmail" class="form-input" />
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Phone</label>
+                <input type="tel" name="phone" id="customerPhone" class="form-input" />
+              </div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Notes</label>
+              <textarea name="notes" id="customerNotes" rows="3" class="form-input"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="cits-btn cits-btn-primary">Save Customer</button>
+            <button type="button" class="cits-btn ghost" onclick="closeCustomerModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let editMode = false;
+let editCustomerId = null;
+
+function openNewCustomerModal() {
+  editMode = false;
+  editCustomerId = null;
+  document.getElementById('customerModalTitle').textContent = 'New Customer';
+  document.getElementById('customerForm').action = '/cits/customers/create';
+  document.getElementById('customerForm').reset();
+  document.getElementById('customerModal').classList.remove('hidden');
+}
+
+function editCustomer(id, name, company, email, phone, contact_person, notes) {
+  editMode = true;
+  editCustomerId = id;
+  document.getElementById('customerModalTitle').textContent = 'Edit Customer';
+  document.getElementById('customerForm').action = '/cits/customers/update/' + id;
+  document.getElementById('customerName').value = name;
+  document.getElementById('customerCompany').value = company;
+  document.getElementById('customerEmail').value = email;
+  document.getElementById('customerPhone').value = phone;
+  document.getElementById('customerContactPerson').value = contact_person;
+  document.getElementById('customerNotes').value = notes;
+  document.getElementById('customerModal').classList.remove('hidden');
+}
+
+function closeCustomerModal() {
+  document.getElementById('customerModal').classList.add('hidden');
+}
+</script>
+
+{% endblock %}

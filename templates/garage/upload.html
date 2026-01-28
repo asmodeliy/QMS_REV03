@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="garage-upload-root">
+  <div class="upload-card">
+    <h2>Upload to Garage</h2>
+    <p>Select a file (up to {{ max_size_str }}). You can drag & drop or click to choose.</p>
+    <div id="drop-area" class="drop-area">
+      <input type="file" id="file-input" />
+      <div id="drop-text">Drop files here or click to select</div>
+    </div>
+    <div id="progress-wrap" style="display:none; margin-top:12px;">
+      <div id="progress-bar" style="width:0; height:14px; background:#6d28d9; border-radius:6px;"></div>
+      <div id="progress-status" style="margin-top:6px; font-size:13px; color:#374151;"></div>
+    </div>
+    <div style="margin-top:14px;">
+      <button id="start-btn" class="btn">Start Upload</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const serverUrl = '{{ server_url }}';
+const maxSize = {{ max_size }};
+const chunkSize = 10 * 1024 * 1024; // 10MB
+let file = null;
+
+const fileInput = document.getElementById('file-input');
+const dropArea = document.getElementById('drop-area');
+fileInput.addEventListener('change', e => { file = e.target.files[0]; });
+
+['dragenter','dragover','dragleave','drop'].forEach(evtName => {
+  dropArea.addEventListener(evtName, e => e.preventDefault());
+});
+
+dropArea.addEventListener('drop', e => { file = e.dataTransfer.files[0]; });
+
+document.getElementById('start-btn').addEventListener('click', async () => {
+  if (!file) { alert('Select a file first'); return; }
+  if (file.size > maxSize) { alert('File too large'); return; }
+
+  // init
+  const initResp = await fetch(serverUrl + '/api/garage/init', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ filename: file.name, total_size: file.size, chunk_size: chunkSize }) });
+  if (!initResp.ok) { alert('Init failed'); return; }
+  const initData = await initResp.json();
+  const uploadId = initData.upload_id;
+  const totalChunks = Math.ceil(file.size / chunkSize);
+  document.getElementById('progress-wrap').style.display = 'block';
+
+  for (let idx=0; idx<totalChunks; idx++){
+    const start = idx * chunkSize;
+    const end = Math.min(file.size, start + chunkSize);
+    const chunk = file.slice(start,end);
+    const form = new FormData();
+    form.append('file', chunk);
+    const putResp = await fetch(serverUrl + `/api/garage/upload/${uploadId}/${idx}`, { method: 'PUT', body: form});
+    if (!putResp.ok) { alert('Chunk failed'); return; }
+    const progress = Math.round(((idx+1)/totalChunks)*100);
+    document.getElementById('progress-bar').style.width = progress + '%';
+    document.getElementById('progress-status').innerText = `Uploading: ${progress}% (${idx+1}/${totalChunks})`;
+  }
+
+  const comp = await fetch(serverUrl + `/api/garage/complete/${uploadId}`, { method: 'POST' });
+  if (comp.ok){
+    const data = await comp.json();
+    document.getElementById('progress-status').innerText = 'Upload complete: ' + data.path;
+    alert('Upload complete');
+  } else {
+    alert('Complete failed');
+  }
+});
+</script>
+
+<style>
+.garage-upload-root { display:flex; justify-content:center; padding:40px; }
+.upload-card{ background:white; padding:28px; border-radius:8px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); width:680px }
+.drop-area{ border:2px dashed #e6e6ef; border-radius:8px; padding:28px; text-align:center; cursor:pointer }
+.btn{ background: linear-gradient(180deg,#6d28d9,#4f46e5); color:white; padding:10px 14px; border:none; border-radius:6px }
+</style>
+
+{% endblock %}

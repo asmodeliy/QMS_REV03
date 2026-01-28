@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <main class="container wide focus-wrap rpmt-root">
+    <div class="page-head">
+      <div class="page-head-left">
+        <h1 class="title">My Focus</h1>
+        <div class="head-filters">
+          <div class="gf-row inline">
+            <span class="gf-label">Today</span>
+            <span>{{ today.strftime('%Y.%m.%d') }}</span>
+          </div>
+          <div class="gf-row inline">
+            <span class="gf-label">Next 7 days</span>
+            <span>{{ today.strftime('%Y.%m.%d') }} ~ {{ horizon.strftime('%Y.%m.%d') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="focus-grid">
+      <article class="focus-card">
+        <header class="focus-head">
+          <h2>오늘 마감</h2>
+          <span class="badge-count">{{ today_items|length }}</span>
+        </header>
+        {% if today_items|length == 0 %}
+          <p class="muted">오늘 마감 예정인 태스크가 없습니다.</p>
+        {% else %}
+          <ul class="focus-list">
+            {% for it in today_items %}
+              <li class="focus-item colored variant-{{ (it.project.id % 8) + 1 }}" data-status="{{ it.task.status.value if it.task.status else 'N/A' }}">
+                <div class="fi-main">
+                  <a href="/rpmt/projects/{{ it.project.id }}" class="fi-prj">{{ it.project.code }}</a>
+                  <span class="sep">·</span>
+                  <span class="fi-cat1">{{ it.task.cat1 or '(제목 없음)' }}</span>
+                  {% if it.task.cat2 %}<span class="muted"> — {{ it.task.cat2 }}</span>{% endif %}
+                </div>
+                <div class="fi-meta">
+                  {% if '지연' in it.signal or 'Overdue' in it.signal %}
+                    <span class="chip danger">{{ t('task.overdue', locale) }}</span>
+                  {% elif '임박' in it.signal or 'Due Soon' in it.signal %}
+                    <span class="chip warn">{{ it.signal }}</span>
+                  {% endif %}
+                  <span class="pill">{{ it.task.due_date }}</span>
+                  <span class="pill">{{ it.task.status.value if it.task.status else 'N/A' }}</span>
+                  <span class="chip route">{{ it.task.dept_from or '—' }} → {{ it.task.dept_to or '—' }}</span>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </article>
+
+      <article class="focus-card">
+        <header class="focus-head">
+          <h2>7일 이내</h2>
+          <span class="badge-count">{{ upcoming_items|length }}</span>
+        </header>
+        {% if upcoming_items|length == 0 %}
+          <p class="muted">향후 7일 이내 마감 예정인 태스크가 없습니다.</p>
+        {% else %}
+          <ul class="focus-list">
+            {% for it in upcoming_items %}
+              <li class="focus-item colored variant-{{ (it.project.id % 8) + 1 }}" data-status="{{ it.task.status.value if it.task.status else 'N/A' }}">
+                <div class="fi-main">
+                  <a href="/rpmt/projects/{{ it.project.id }}" class="fi-prj">{{ it.project.code }}</a>
+                  <span class="sep">·</span>
+                  <span class="fi-cat1">{{ it.task.cat1 or '(제목 없음)' }}</span>
+                  {% if it.task.cat2 %}<span class="muted"> — {{ it.task.cat2 }}</span>{% endif %}
+                </div>
+                <div class="fi-meta">
+                  {% if '지연' in it.signal or 'Overdue' in it.signal %}
+                    <span class="chip danger">{{ t('task.overdue', locale) }}</span>
+                  {% elif '임박' in it.signal or 'Due Soon' in it.signal %}
+                    <span class="chip warn">{{ it.signal }}</span>
+                  {% endif %}
+                  <span class="pill">{{ it.task.due_date }}</span>
+                  <span class="pill">{{ it.task.status.value if it.task.status else 'N/A' }}</span>
+                  <span class="chip route">{{ it.task.dept_from or '—' }} → {{ it.task.dept_to or '—' }}</span>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </article>
+
+      <article class="focus-card">
+        <header class="focus-head">
+          <h2>지연 / 위험</h2>
+          <span class="badge-count">{{ overdue_items|length }}</span>
+        </header>
+        {% if overdue_items|length == 0 %}
+          <p class="muted">지연 중인 태스크가 없습니다.</p>
+        {% else %}
+          <ul class="focus-list">
+            {% for it in overdue_items %}
+              <li class="focus-item colored variant-{{ (it.project.id % 8) + 1 }}" data-status="{{ it.task.status.value if it.task.status else 'N/A' }}">
+                <div class="fi-main">
+                  <a href="/rpmt/projects/{{ it.project.id }}" class="fi-prj">{{ it.project.code }}</a>
+                  <span class="sep">·</span>
+                  <span class="fi-cat1">{{ it.task.cat1 or '(제목 없음)' }}</span>
+                  {% if it.task.cat2 %}<span class="muted"> — {{ it.task.cat2 }}</span>{% endif %}
+                </div>
+                <div class="fi-meta">
+                  <span class="chip danger">{{ t('task.overdue', locale) }}</span>
+                  {% if it.delay %}<span class="pill">+{{ it.delay }}</span>{% endif %}
+                  <span class="pill">{{ it.task.due_date }}</span>
+                  <span class="pill">{{ it.task.status.value if it.task.status else 'N/A' }}</span>
+                  <span class="chip route">{{ it.task.dept_from or '—' }} → {{ it.task.dept_to or '—' }}</span>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </article>
+    </section>
+  </main>
+
+{% endblock %}

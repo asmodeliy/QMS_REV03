@@ -1,0 +1,114 @@
+<div id="citsIssueModal" class="hidden">
+  <div class="modal-overlay" onclick="closeNewCitsIssueModal()"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div style="display: flex; align-items: center; margin-bottom: 16px;">
+        <h2 class="modal-title">New Customer Issue</h2>
+        <button class="modal-close" onclick="closeNewCitsIssueModal()" aria-label="Close">×</button>
+      </div>
+
+      <form id="citsIssueForm" method="post" action="/cits/issue/create" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Customer</label>
+              <select name="customer" id="customerSelect" class="form-input" onchange="loadCustomerIPs()">
+                <option value="">-- Select customer --</option>
+                {% for c in customers %}
+                  <option value="{{ c.name }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">IP/IC</label>
+              <select name="ip_ic" id="ipSelect" class="form-input" disabled>
+                <option value="">-- Select customer first --</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Title*</label>
+            <input type="text" name="title" class="form-input" required />
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Tag</label>
+            <select name="tag" class="form-input">
+              <option value="">—</option>
+              <option value="Technical Support">Technical Support</option>
+              <option value="Customer Claim">Customer Claim</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="cits-btn cits-btn-primary">Create Issue</button>
+          <button type="button" class="cits-btn ghost" onclick="closeNewCitsIssueModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openNewCitsIssueModal(){
+  const modal = document.getElementById('citsIssueModal');
+  if(!modal) return;
+  modal.classList.remove('hidden');
+}
+function closeNewCitsIssueModal(){
+  const modal = document.getElementById('citsIssueModal');
+  if(!modal) return;
+  modal.classList.add('hidden');
+}
+
+// Build a name->id map without serializing ORM objects
+const customerIdByName = {
+  {% for c in customers %}
+    {{ c.name | tojson }}: {{ c.id }},
+  {% endfor %}
+};
+
+async function loadCustomerIPs() {
+  const select = document.getElementById('customerSelect');
+  const ipSelect = document.getElementById('ipSelect');
+  const customerName = select.value;
+  
+  if (!customerName) {
+    ipSelect.disabled = true;
+    ipSelect.innerHTML = '<option value="">-- Select customer first --</option>';
+    return;
+  }
+  
+  const customerId = customerIdByName[customerName];
+  if (!customerId) {
+    ipSelect.disabled = true;
+    ipSelect.innerHTML = '<option value="">-- No customer ID --</option>';
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/cits/api/customers/${customerId}/ips`);
+    const ips = await response.json();
+    
+    ipSelect.innerHTML = '<option value="">-- Select IP/IC --</option>';
+    ips.forEach(ip => {
+      const option = document.createElement('option');
+      option.value = ip.name;
+      option.textContent = ip.name + (ip.description ? ' - ' + ip.description : '');
+      ipSelect.appendChild(option);
+    });
+    
+    if (ips.length === 0) {
+      ipSelect.innerHTML += '<option value="" disabled>No IPs available for this customer</option>';
+    }
+    
+    ipSelect.disabled = false;
+  } catch (e) {
+    console.error('Failed to load IPs:', e);
+    ipSelect.innerHTML = '<option value="">-- Error loading IPs --</option>';
+    ipSelect.disabled = true;
+  }
+}
+</script>

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container wide help-wrap spec-center-root">
+  <aside class="help-side">
+    <div class="head">Spec Center Help</div>
+    <ul class="toc">
+      <li><a href="#quick-start">Quick start</a></li>
+      <li><a href="#browse">Browse & search</a></li>
+      <li><a href="#admin">Admin tools</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </aside>
+
+  <section class="help-main">
+    <div id="quick-start" class="help-section">
+      <div class="page-head">
+        <h2>📂 Spec Center overview</h2>
+      </div>
+      <div class="help-hero" style="background:linear-gradient(135deg,#e0f2fe 0%, #f8fbff 100%);">
+        <div>
+          <div class="badge">Spec Center</div>
+          <p>Central hub for specs, drawings, and reference docs with in-browser previews and category tree.</p>
+        </div>
+        <div class="help-figure" aria-hidden="true">
+          <div class="figure-label">Preview</div>
+          <div class="figure-lines"><span></span><span></span><span class="accent"></span></div>
+        </div>
+      </div>
+      <ul class="spaced-list">
+        <li><strong>Navigate</strong>: Category tree + breadcrumb</li>
+        <li><strong>Preview</strong>: PDF/images inline; large Office files show download link</li>
+        <li><strong>Download</strong>: Icon on each row</li>
+      </ul>
+    </div>
+
+    <div id="browse" class="help-section">
+      <h2>🔎 Browse & search</h2>
+      <ul class="spaced-list">
+        <li><strong>Typeahead search</strong>: Use the header search to find files by name; click result to jump to its folder.</li>
+        <li><strong>Columns</strong>: Size, uploader, and updated-at help validate freshness before opening.</li>
+        <li><strong>Keyboard</strong>: F2 renames a category (admin only), Enter opens selected file.</li>
+      </ul>
+      <div class="help-screenshot" style="margin-top: 2rem; text-align: center;">
+        <img src="/img/help/spec_center_browser_placeholder.png" alt="Spec Center File Browser" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+        <p style="color: #999; font-size: 0.9rem; margin-top: 0.5rem;">Replace this placeholder with a screenshot of the file browser interface</p>
+      </div>
+    </div>
+
+    <div id="admin" class="help-section">
+      <h2>⚙️ Admin actions</h2>
+      <div class="help-card-grid">
+        <div class="help-card">
+          <h4>Upload</h4>
+          <p>Drag files into a category or use the Upload button. Allowed: pdf, pptx, docx, doc, xlsx, xls.</p>
+        </div>
+        <div class="help-card">
+          <h4>Move</h4>
+          <p>Drag a file row to another category. The tree highlights valid drop targets.</p>
+        </div>
+        <div class="help-card">
+          <h4>Rename</h4>
+          <p>Select a category and press <strong>F2</strong> to inline-rename; Enter to save, Esc to cancel.</p>
+        </div>
+        <div class="help-card">
+          <h4>Delete</h4>
+          <p>Use the trash icon on a file or category. Deletions are immediate—double-check before confirming.</p>
+        </div>
+      </div>
+      {% if is_admin %}
+      <div class="box" style="margin-top:12px;">Admin only: conversions to PDF run in the background when possible (soffice/Word COM).</div>
+      {% endif %}
+      <div class="help-screenshot" style="margin-top: 2rem; text-align: center;">
+        <img src="/img/help/spec_center_browser_placeholder.png" alt="Spec Center Upload and Admin Interface" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+        <p style="color: #999; font-size: 0.9rem; margin-top: 0.5rem;">Replace this placeholder with a screenshot showing the upload interface</p>
+      </div>
+    </div>
+
+    <div id="faq" class="help-section">
+      <h2>❓ FAQ</h2>
+      <ul class="spaced-list">
+        <li><strong>Preview failed</strong>: Large files—download or convert to PDF</li>
+        <li><strong>Category</strong>: Admin adds; root=bold</li>
+        <li><strong>Filenames</strong>: Avoid commas/quotes; use descriptive names</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+{% endblock %}

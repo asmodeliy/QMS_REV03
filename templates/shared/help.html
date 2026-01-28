@@ -1,0 +1,655 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <main class="container wide help-wrap rpmt-root rpmt-help-root rpmt-help-wrap">
+    <aside class="help-side rpmt-help-side">
+      <div class="head rpmt-help-head">{{ t('help.toc', locale) }}</div>
+      <ul class="toc rpmt-help-toc">
+        <li><a href="#quick-start">{{ t('help.quick_start', locale) }}</a></li>
+        <li><a href="#dashboard">{{ t('dashboard.title', locale) }}</a></li>
+        <li><a href="#projects">{{ t('project.title', locale) }}</a></li>
+        <li><a href="#tasks">{{ t('task.title', locale) }}</a></li>
+        <li><a href="#weekly">{{ t('weekly.title', locale) }}</a></li>
+        <li><a href="#reports">Risk &amp; Delay</a></li>
+        <li><a href="#tips">{{ t('help.tips', locale) }}</a></li>
+        <li><a href="#faq">{{ t('help.faq', locale) }}</a></li>
+      </ul>
+    </aside>
+
+    <section class="help-main rpmt-help-main">
+      
+      <div id="quick-start" class="help-section rpmt-help-section">
+        <div class="page-head">
+          <h2>🚀 {{ t('help.quick_start', locale) }}</h2>
+          <div class="head-actions">
+              <button id="btn-feedback" class="btn nav rpmt-help-head-actions" style="margin-left:auto">{{ t('help.send_feedback', locale) }}</button>
+          </div>
+        </div>
+        {% if locale == 'ko' %}
+          <p><strong>RAMSCHIP RPMT</strong>는 프로젝트의 일정, 진행도, 피드백을 한곳에서 관리하는 웹 기반 프로젝트 관리 도구입니다.</p>
+          
+          <div class="feature-grid rpmt-help-feature-grid">
+            <div class="feature-card rpmt-help-feature-card">
+              <h4>📊 {{ t('dashboard.title', locale) }}</h4>
+              <p>모든 프로젝트의 진행 상황과 상태를 한눈에 확인하세요.</p>
+            </div>
+            <div class="feature-card rpmt-help-feature-card">
+              <h4>📅 {{ t('weekly.timeline', locale) }}</h4>
+              <p>마감일을 기준으로 주간 일정을 한눈에 비교하세요.</p>
+            </div>
+            <div class="feature-card rpmt-help-feature-card">
+              <h4>⚙️ {{ t('admin.title', locale) }}</h4>
+              <p>프로젝트와 태스크를 세부적으로 관리하세요.</p>
+            </div>
+          </div>
+
+          <div class="box rpmt-help-box">
+            <strong>💡 팁:</strong> "{{ t('dashboard.title', locale) }}" 또는 "{{ t('weekly.title', locale) }}"에서 개요를 확인한 후 "{{ t('admin.title', locale) }}"에서 세부사항을 관리하세요.
+          </div>
+        {% else %}
+          <p><strong>RAMSCHIP RPMT</strong>{{ " " }}{{ t("help.intro_description", locale) if t("help.intro_description", locale) != "help.intro_description" else " is a web-based project management tool that manages project schedules, progress, and feedback in one place." }}</p>
+          
+          <div class="feature-grid rpmt-help-feature-grid">
+            <div class="feature-card rpmt-help-feature-card">
+              <h4>📊 {{ t('dashboard.title', locale) }}</h4>
+              <p>{{ t("help.dashboard_card_description", locale) }}</p>
+            </div>
+            <div class="feature-card rpmt-help-feature-card">
+              <h4>📅 {{ t('weekly.timeline', locale) }}</h4>
+              <p>{{ t("help.weekly_card_description", locale) }}</p>
+            </div>
+            <div class="feature-card rpmt-help-feature-card">
+              <h4>⚙️ {{ t('admin.title', locale) }}</h4>
+              <p>{{ t("help.admin_card_description", locale) }}</p>
+            </div>
+          </div>
+
+          <div class="box rpmt-help-box">
+            <strong>{{ t("help.tip_prefix", locale) }}</strong> {{ t("help.intro_tip", locale) }}
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div id="dashboard" class="rpmt-help-section">
+        <h2>📊 {{ t('dashboard.title', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <p>모든 프로젝트의 진행 상황과 상태를 한눈에 확인할 수 있습니다.</p>
+
+          <div class="fig">
+            <img src="/img/dashboard.png" alt="{{ t('dashboard.title', locale) }}" loading="lazy">
+            <div class="cap">대시보드: 프로젝트 카드 레이아웃</div>
+          </div>
+
+          <h3>프로젝트 카드 보기</h3>
+          <ul>
+            <li><strong>{{ t('dashboard.progress', locale) }}</strong> — 완료된 태스크의 비율을 막대로 표시합니다.</li>
+            <li><strong>{{ t('dashboard.health', locale) }}</strong> — {{ t('task.complete', locale) }}, {{ t('dashboard.in_progress', locale) }}, {{ t('task.overdue', locale) }}, {{ t('dashboard.not_started', locale) }} 등 상태별 태스크 개수를 표시합니다.</li>
+            <li><strong>{{ t('common.color', locale) }}</strong> — 각 프로젝트에 고유한 색상이 할당되어 시각적 구분이 용이합니다.</li>
+            <li><strong>{{ t('project.title', locale) }} 태그</strong> — Process, Metal, IP/IC, PDK version 등 프로젝트 속성을 표시합니다.</li>
+          </ul>
+
+          <h3>{{ t('dashboard.delayed', locale) }} 알림</h3>
+          <p>상단의 🔔 아이콘은 현재 {{ t('task.overdue', locale) }}인 태스크의 개수를 표시합니다. 클릭하면 {{ t('task.overdue', locale) }}인 항목들을 볼 수 있습니다.</p>
+        {% else %}
+          <p>View the progress and status of all projects at a glance.</p>
+
+          <div class="fig">
+            <img src="/img/dashboard.png" alt="{{ t('dashboard.title', locale) }}" loading="lazy">
+            <div class="cap">Dashboard: Project Card Layout</div>
+          </div>
+
+          <h3>Project Card View</h3>
+          <ul>
+            <li><strong>{{ t('dashboard.progress', locale) }}</strong> — Displays the ratio of completed tasks as a bar.</li>
+            <li><strong>{{ t('dashboard.health', locale) }}</strong> — Shows the count of tasks by status such as {{ t('task.complete', locale) }}, {{ t('dashboard.in_progress', locale) }}, {{ t('task.overdue', locale) }}, {{ t('dashboard.not_started', locale) }}.</li>
+            <li><strong>{{ t('common.color', locale) }}</strong> — Each project is assigned a unique color for easy visual distinction.</li>
+            <li><strong>{{ t('project.title', locale) }} Tags</strong> — Displays project attributes like Process, Metal, IP/IC, PDK version.</li>
+          </ul>
+
+          <h3>{{ t('dashboard.delayed', locale) }} Notifications</h3>
+          <p>The 🔔 icon at the top shows the number of tasks currently {{ t('task.overdue', locale) }}. Click to see the {{ t('task.overdue', locale) }} items.</p>
+        {% endif %}
+      </div>
+
+      
+      <div id="projects" class="rpmt-help-section">
+        <h2>⚙️ {{ t('project.title', locale) }} {{ t('admin.title', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <p>프로젝트의 기본 정보를 관리자 패널에서 관리합니다.</p>
+
+          <div class="fig">
+            <img src="/img/admin_left_panel.png" alt="Admin Left Panel" loading="lazy">
+            <div class="cap">관리자: 프로젝트 선택 및 관리</div>
+          </div>
+
+          <h3>{{ t('project.title', locale) }} 속성</h3>
+          <p>각 프로젝트는 다음의 정보를 포함할 수 있습니다:</p>
+          <div class="tag-list">
+            <span class="tag">{{ t('project.code', locale) }}</span>
+            <span class="tag">{{ t('project.process', locale) }}</span>
+            <span class="tag">{{ t('project.metal_option', locale) }}</span>
+            <span class="tag">{{ t('project.ip_code', locale) }}</span>
+            <span class="tag">{{ t('project.pdk_version', locale) }}</span>
+          </div>
+
+          <h3>{{ t('project.create_project', locale) }}</h3>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <p>관리자 화면 왼쪽 하단의 <strong>"{{ t('project.create_new', locale) }}"</strong> 버튼을 클릭합니다.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <p><strong>{{ t('project.code', locale) }}</strong>를 입력하고, 필요하면 Process, Metal, IP/IC, PDK 정보를 입력합니다.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <p><strong>"{{ t('project.use_template', locale) }}"</strong>을 체크하면 기본 카테고리와 태스크가 자동으로 생성됩니다. (선택사항)</p>
+            </div>
+          </div>
+
+          <div class="box rpmt-help-box">
+            <strong>💡 팁:</strong> 색상은 프로젝트 ID를 기반으로 자동으로 할당되어 대시보드와 주간 보드에서 일관되게 표시됩니다.
+          </div>
+        {% else %}
+          <p>Manage the basic information of projects in Admin Panel.</p>
+
+          <div class="fig">
+            <img src="/img/admin_left_panel.png" alt="Admin Left Panel" loading="lazy">
+            <div class="cap">Admin: Project Selection and Management</div>
+          </div>
+
+          <h3>{{ t('project.title', locale) }} Attributes</h3>
+          <p>Each project can contain the following information:</p>
+          <div class="tag-list">
+            <span class="tag">{{ t('project.code', locale) }}</span>
+            <span class="tag">{{ t('project.process', locale) }}</span>
+            <span class="tag">{{ t('project.metal_option', locale) }}</span>
+            <span class="tag">{{ t('project.ip_code', locale) }}</span>
+            <span class="tag">{{ t('project.pdk_version', locale) }}</span>
+          </div>
+
+          <h3>{{ t('project.create_project', locale) }}</h3>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <p>Click the <strong>"{{ t('project.create_new', locale) }}"</strong> button at the bottom left of the admin screen.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <p>Enter the <strong>{{ t('project.code', locale) }}</strong> and, if necessary, fill in the Process, Metal, IP/IC, and PDK information.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <p>Check <strong>"{{ t('project.use_template', locale) }}"</strong> to automatically generate standard categories and tasks. (Optional)</p>
+            </div>
+          </div>
+
+          <div class="box rpmt-help-box">
+            <strong>💡 Tip:</strong> Colors are automatically assigned based on the Project ID, ensuring consistent display on the Dashboard and Weekly Board.
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div id="tasks" class="rpmt-help-section">
+        <h2>✓ {{ t('task.title', locale) }} {{ t('admin.title', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <p>프로젝트 내에서 태스크를 생성, 편집 및 추적합니다.</p>
+
+          <div class="fig">
+            <img src="/img/admin_right_task.png" alt="Admin Task Table" loading="lazy">
+            <div class="cap">관리자: 태스크 테이블 및 편집</div>
+          </div>
+
+          <h3>{{ t('task.title', locale) }} 정보</h3>
+          <table class="help-table">
+            <thead>
+              <tr>
+                <th>항목</th>
+                <th>설명</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>{{ t('task.task_name', locale) }}</strong></td>
+                <td>태스크 이름 (읽기 전용, 프로젝트 상세 페이지에서 편집)</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.from_dept', locale) }} / {{ t('task.to_dept', locale) }}</strong></td>
+                <td>부서 이동 경로 (예: SALES → SEC.S.LSI)</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.due_date', locale) }}</strong></td>
+                <td>마감일 (읽기 전용)</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.status', locale) }}</strong></td>
+                <td>현재 상태 — {{ t('task.complete', locale) }}, {{ t('dashboard.in_progress', locale) }}, {{ t('dashboard.not_started', locale) }}, {{ t('dashboard.na', locale) }}</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.remark', locale) }}</strong></td>
+                <td>진행 상황이나 지연 사유를 자유롭게 기록합니다.</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.attachment', locale) }}</strong></td>
+                <td>태스크와 관련된 파일(이미지, 문서 등)을 첨부합니다.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>{{ t('task.title', locale) }} 조작</h3>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <p><strong>{{ t('task.status', locale) }} 변경</strong> — 드롭다운에서 현재 상태를 선택합니다. (자동 저장)</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <p><strong>{{ t('task.remark', locale) }} 추가</strong> — REMARK에 진행 상황이나 지연 사유를 입력합니다. (자동 저장)</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <p><strong>파일 첨부</strong> — ATTACHMENT의 "+ 추가"를 클릭하여 여러 파일을 업로드합니다.</p>
+            </div>
+          </div>
+
+          <div class="box rpmt-help-box">
+            <strong>💡 팁:</strong> REMARK를 사용하여 지연 사유, 진행 상황 또는 중요한 메모를 간단히 기록하세요. Markdown은 지원하지 않으므로 일반 텍스트로 작성해주세요.
+          </div>
+        {% else %}
+          <p>Create, edit, and track tasks within a project.</p>
+
+          <div class="fig">
+            <img src="/img/admin_right_task.png" alt="Admin Task Table" loading="lazy">
+            <div class="cap">Admin: Task Table and Editing</div>
+          </div>
+
+          <h3>{{ t('task.title', locale) }} Information</h3>
+          <table class="help-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>{{ t('task.task_name', locale) }}</strong></td>
+                <td>Task name (read-only, edited on the project detail page)</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.from_dept', locale) }} / {{ t('task.to_dept', locale) }}</strong></td>
+                <td>Department transfer path (e.g., SALES → SEC.S.LSI)</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.due_date', locale) }}</strong></td>
+                <td>Due date (read-only)</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.status', locale) }}</strong></td>
+                <td>Current status — {{ t('task.complete', locale) }}, {{ t('dashboard.in_progress', locale) }}, {{ t('dashboard.not_started', locale) }}, {{ t('dashboard.na', locale) }}</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.remark', locale) }}</strong></td>
+                <td>Record progress or reasons for delays freely.</td>
+              </tr>
+              <tr>
+                <td><strong>{{ t('task.attachment', locale) }}</strong></td>
+                <td>Attach files (images, documents, etc.) related to the task.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>{{ t('task.title', locale) }} Operations</h3>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <p>Change <strong>{{ t('task.status', locale) }}</strong> — Select the current status from the dropdown. (Auto-save)</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <p>Add <strong>{{ t('task.remark', locale) }}</strong> — Enter progress or reasons for delays in REMARK. (Auto-save)</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <p><strong>{{ t('task.attachment', locale) }}</strong> — Click "+ Add" in ATTACHMENT to upload multiple files.</p>
+            </div>
+          </div>
+
+          <div class="box rpmt-help-box">
+            <strong>💡 Tip:</strong> Use REMARK to briefly record reasons for delays, progress, or important notes. Markdown is not supported, so please write in plain text.
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div id="weekly" class="rpmt-help-section">
+        <h2>📅 {{ t('weekly.timeline', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <p>마감일을 기준으로 주간 일정을 한눈에 비교할 수 있는 보기입니다.</p>
+          <div class="fig">
+            <img src="/img/weekly_overall.png" alt="Weekly Timeline Screen" loading="lazy">
+            <div class="cap">주간 타임라인: 주간 일정 비교</div>
+          </div>
+          <h3>사용 방법</h3>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <p><strong>기간 설정</strong> — 상단에서 날짜와 주차 단위를 선택합니다. (기본값: 현재 주부터 4주)</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <p><strong>상태 필터</strong> — "{{ t('weekly.all', locale) }}", "{{ t('dashboard.in_progress', locale) }}", "{{ t('task.complete', locale) }}", "{{ t('dashboard.not_started', locale) }}", "{{ t('dashboard.na', locale) }}" 버튼을 사용하여 빠르게 필터링합니다.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <p><strong>{{ t('common.search', locale) }}</strong> — 프로젝트 또는 태스크 이름을 입력하여 찾습니다.</p>
+            </div>
+          </div>
+
+          <h3>화면 구성</h3>
+          <ul>
+            <li><strong>행 (세로)</strong> — 각 주차의 범위 (예: W01, 2025-01-06 ~ 2025-01-12)</li>
+            <li><strong>열 (가로)</strong> — 각 프로젝트 (프로젝트별 고유 색상)</li>
+            <li><strong>셀</strong> — 해당 주차에 마감이 있는 태스크 카드를 표시합니다.</li>
+          </ul>
+
+          <div class="box rpmt-help-box">
+            <strong>💡 팁:</strong> 여러 프로젝트의 일정을 한눈에 비교하고 싶다면 주차 단위를 최대 12주까지 확대할 수 있습니다.
+          </div>
+        {% else %}
+          <p>A view that compares weekly schedules based on due dates at a glance.</p>
+          <div class="fig">
+            <img src="/img/weekly_overall.png" alt="Weekly Timeline Screen" loading="lazy">
+            <div class="cap">Weekly Timeline: Weekly Schedule Comparison</div>
+          </div>
+          <h3>Usage</h3>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <p><strong>Set Period</strong> — Select the date and week unit at the top. (Default: 4 weeks from the current week)</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <p><strong>Status Filter</strong> — Quickly filter using the "{{ t('weekly.all', locale) }}", "{{ t('dashboard.in_progress', locale) }}", "{{ t('task.complete', locale) }}", "{{ t('dashboard.not_started', locale) }}", "{{ t('dashboard.na', locale) }}" buttons.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <p><strong>{{ t('common.search', locale) }}</strong> — Enter project or task names to find them.</p>
+            </div>
+          </div>
+
+          <h3>Screen Composition</h3>
+          <ul>
+            <li><strong>Row (Vertical)</strong> — Range of each week (e.g., W01, 2025-01-06 ~ 2025-01-12)</li>
+            <li><strong>Column (Horizontal)</strong> — Each project (with unique color per project)</li>
+            <li><strong>Cell</strong> — Displays cards for tasks due in that week.</li>
+          </ul>
+
+          <div class="box rpmt-help-box">
+            <strong>💡 Tip:</strong> If you want to compare schedules of multiple projects at a glance, you can expand the week unit up to 12 weeks.
+          </div>
+        {% endif %}
+      </div>
+      
+      <div id="tips" class="rpmt-help-section">
+        <h2>⚡ {{ t('help.tips', locale) }}</h2>
+
+        {% if locale == 'ko' %}
+          <h3>빠른 입력</h3>
+          <ul>
+            <li><span class="kbd-key">Tab</span> — 입력 필드 간 이동 (관리자 태스크 테이블)</li>
+            <li><span class="kbd-key">Enter</span> — 행 저장 및 다음 줄로 이동</li>
+            <li><span class="kbd-key">Esc</span> — 편집 취소 및 모달 닫기</li>
+          </ul>
+
+          <h3>효율적인 작업</h3>
+          <ul>
+            <li><strong>자동 저장</strong> — STATUS와 REMARK는 입력하면서 자동으로 저장됩니다. 저장 버튼을 클릭할 필요가 없습니다.</li>
+            <li><strong>프로젝트 포커스</strong> — 관리자에서 작업을 완료한 후 돌아오면 마지막으로 선택한 프로젝트가 유지됩니다.</li>
+            <li><strong>색상 코딩</strong> — 각 프로젝트는 고유한 색상으로 할당되어 빠른 시각적 스캔이 가능합니다. (대시보드와 주간 보드에서 일관됨)</li>
+          </ul>
+
+          <h3>주간 타임라인 사용</h3>
+          <ul>
+            <li>상단의 <strong>날짜 입력</strong>을 사용하여 특정 주부터의 일정을 빠르게 확인할 수 있습니다.</li>
+            <li><strong>상태 필터</strong>를 조합하여 예를 들어 "이번 주의 진행 중인 항목만 보기"를 할 수 있습니다.</li>
+            <li><strong>검색 상자</strong>에 프로젝트 코드나 태스크 이름을 입력하여 관련 항목만 표시합니다.</li>
+            <li>각 태스크 우측의 <strong>⋯ 버튼</strong>을 클릭하면 상태를 빠르게 변경할 수 있습니다. (Weekly 보드에서 바로 갱신)</li>
+          </ul>
+        {% else %}
+          <h3>Quick Input</h3>
+          <ul>
+            <li><span class="kbd-key">Tab</span> — Move between input fields (Admin's Task table)</li>
+            <li><span class="kbd-key">Enter</span> — Save row and move to the next line</li>
+            <li><span class="kbd-key">Esc</span> — Cancel editing and close modal</li>
+          </ul>
+
+          <h3>Efficient Work</h3>
+          <ul>
+            <li><strong>Auto-save</strong> — STATUS and REMARK are saved automatically as you type. No need to click a save button.</li>
+            <li><strong>Project Focus</strong> — When you return to the admin after working, the last selected project is retained.</li>
+            <li><strong>Color Coding</strong> — Each project is assigned a unique color for quick visual scanning. (Consistent across Dashboard and Weekly)</li>
+          </ul>
+
+          <h3>Weekly Timeline Usage</h3>
+          <ul>
+            <li>Use the <strong>Date Input</strong> at the top to quickly view schedules starting from a specific week.</li>
+            <li>You can combine <strong>Status Filters</strong> to, for example, "View only in-progress items for this week".</li>
+            <li>Enter project codes or task names in the <strong>Search Box</strong> to display only related items.</li>
+            <li>Click the <strong>⋯ button</strong> on the right of each task to quickly change its status directly from the Weekly board.</li>
+          </ul>
+        {% endif %}
+      </div>
+
+      
+      <div id="faq" class="rpmt-help-section">
+        <h2>❓ {{ t('help.faq', locale) }}</h2>
+
+        {% if locale == 'ko' %}
+          <h3>Q. 태스크를 어떻게 추가하나요?</h3>
+          <p>관리자 페이지에서 프로젝트를 선택한 후 각 카테고리 블록 오른쪽 상단의 버튼을 사용하여 태스크를 추가합니다.</p>
+
+          <h3>Q. 마감일은 어디서 설정하나요?</h3>
+          <p>관리자 페이지에서 태스크의 마감일을 설정합니다. 프로젝트 상세 테이블의 DUE 필드는 읽기 전용입니다.</p>
+
+          <h3>Q. 파일을 첨부했는데 표시되지 않습니다.</h3>
+          <p>STATUS 또는 REMARK를 한 번 업데이트하면 첨부 파일 목록이 새로고침됩니다. 또는 페이지를 다시 로드해보세요.</p>
+
+          <h3>Q. 색상이 프로젝트마다 고정되나요?</h3>
+          <p>네, 색상은 프로젝트 ID를 기반으로 자동으로 할당되며 변경할 수 없습니다.</p>
+
+          <h3>Q. 주간 타임라인에서 과거 날짜를 어떻게 보나요?</h3>
+          <p>상단의 날짜 입력에 원하는 주차의 월요일을 입력하고 "조회"를 클릭하면 해당 주부터의 일정을 볼 수 있습니다.</p>
+        {% else %}
+          <h3>Q. How do I add a task?</h3>
+          <p>Select a project on the Admin Page, then add a task using the button at the top right of each category block.</p>
+
+          <h3>Q. Where do I set the due date?</h3>
+          <p>Set the due date for tasks on the Admin Page. The DUE field in the Project detail table is read-only.</p>
+
+          <h3>Q. I attached a file but it doesn't show up.</h3>
+          <p>The attachment list refreshes when you update STATUS or REMARK once. Or try reloading the page.</p>
+
+          <h3>Q. Are colors fixed per project?</h3>
+          <p>Yes, colors are automatically assigned based on the project ID and cannot be changed.</p>
+
+          <h3>Q. How do I view past dates in the Weekly Timeline?</h3>
+          <p>Enter the Monday of the desired week in the date input at the top and click "Query" to see the schedule starting from that week.</p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+
+  
+  <div id="feedback-modal" class="rpmt-help-modal-backdrop" aria-hidden="true">
+    <div class="rpmt-help-modal-card" role="dialog" aria-modal="true" aria-labelledby="rpmt-feedback-title">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+        <h3 id="rpmt-feedback-title" style="margin:0">{{ t('feedback.send_reply', locale) }}</h3>
+        <button id="btn-modal-close" class="icon-btn" title="{{ t('common.close', locale) }}">✕</button>
+      </div>
+
+      <p style="margin:0 0 16px; color:#475569; font-size:13px; line-height:1.6">
+        {{ t('feedback.describe_detailed', locale) }}
+      </p>
+
+      <form id="feedback-form" style="display:grid; gap:12px">
+        <select id="feedback-type" class="inp" style="padding:10px; border:1px solid var(--divider); border-radius:8px">
+          <option value="bug">{{ t('feedback.bug', locale) }}</option>
+          <option value="feature">{{ t('feedback.feature', locale) }}</option>
+          <option value="other">{{ t('feedback.other', locale) }}</option>
+        </select>
+
+        <input id="feedback-email" type="email" class="inp" placeholder="{{ t('feedback.email', locale) }}" required style="padding:10px; border:1px solid var(--divider); border-radius:8px"/>
+
+        <textarea id="feedback-message" class="inp" placeholder="{{ t('feedback.describe_detailed', locale) }}" required rows="6" style="padding:10px; border:1px solid var(--divider); border-radius:8px; resize:vertical"></textarea>
+
+        <div id="feedback-status" style="margin:0; color:#059669; font-size:13px; display:none"></div>
+
+        <div style="display:flex; gap:8px; justify-content:flex-end">
+          <button id="btn-form-close" type="button" class="btn rpmt-help-cancel" style="background:var(--bg-secondary)">{{ t('common.cancel', locale) }}</button>
+          <button type="submit" class="btn primary">{{ t('feedback.send', locale) }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const locale = "{{ locale }}";
+
+    function setLanguage(lang) {
+      window.location.href = `/api/set-language/${lang}`;
+    }
+
+    // Update active link on scroll (use entry.target.id and rpmt-prefixed selectors)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+            if(entry.isIntersecting) {
+              document.querySelectorAll('.rpmt-help-side .rpmt-help-toc a').forEach(a => { a.classList.remove('active'); a.classList.remove('rpmt-help-active'); });
+              const id = entry.target && entry.target.id ? entry.target.id : null;
+              if(id) {
+                const el = document.querySelector(`.rpmt-help-side .rpmt-help-toc a[href="#${id}"]`);
+                if(el) { el.classList.add('active'); el.classList.add('rpmt-help-active'); }
+              }
+            }
+      });
+    }, { rootMargin: '-50% 0% -50% 0%' });
+
+    document.querySelectorAll('[id]').forEach(el => observer.observe(el));
+
+    // Feedback Modal - defensive, with focus trap & restore
+    (function(){
+      const modal = document.getElementById('feedback-modal');
+      const btnFeedback = document.getElementById('btn-feedback');
+      const btnClose = document.getElementById('btn-modal-close');
+      const btnFormClose = document.getElementById('btn-form-close');
+      const form = document.getElementById('feedback-form');
+      const status = document.getElementById('feedback-status');
+
+      if(!modal) return;
+      if(!modal.style.display) modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+
+      let lastFocused = null;
+      let trapHandler = null;
+
+      const getFocusable = (container) => {
+        if(!container) return [];
+        return Array.from(container.querySelectorAll('a[href], button:not([disabled]), textarea, input:not([type="hidden"]), select, [tabindex]:not([tabindex="-1"])'))
+          .filter(el => el.offsetParent !== null);
+      };
+
+      const openModal = (e) => {
+        if(e && e.isTrusted === false) return;
+        lastFocused = document.activeElement;
+        if(modal.parentElement !== document.body) document.body.appendChild(modal);
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+
+        const focusable = getFocusable(modal);
+        if(focusable.length) focusable[0].focus();
+
+        trapHandler = function(ev){
+          if(ev.key === 'Tab'){
+            const f = getFocusable(modal);
+            if(f.length === 0){ ev.preventDefault(); return; }
+            const first = f[0];
+            const last = f[f.length -1];
+            if(ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
+            else if(!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
+          }
+        };
+        modal.addEventListener('keydown', trapHandler);
+      };
+
+      const closeModal = () => {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        if(form) form.reset();
+        if(status) status.style.display = 'none';
+        if(trapHandler) modal.removeEventListener('keydown', trapHandler);
+        trapHandler = null;
+        if(lastFocused && lastFocused.focus) lastFocused.focus();
+      };
+
+      if(btnFeedback) btnFeedback.addEventListener('click', openModal);
+      if(btnClose) btnClose.addEventListener('click', closeModal);
+      if(btnFormClose) btnFormClose.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+      document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && modal.style.display === 'flex') closeModal(); });
+
+      if(form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const typeEl = document.getElementById('feedback-type');
+          const emailEl = document.getElementById('feedback-email');
+          const messageEl = document.getElementById('feedback-message');
+          const type = typeEl ? typeEl.value : '';
+          const email = emailEl ? emailEl.value : '';
+          const message = messageEl ? messageEl.value : '';
+
+          try {
+            const res = await fetch('/feedback', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type, email, message}) });
+            const data = await res.json();
+            if(data.ok && status) {
+              status.textContent = '{{ t("feedback.feedback_received", locale) }}';
+              status.style.display = 'block';
+              status.style.color = '#059669';
+              setTimeout(closeModal, 1500);
+            } else if(status) {
+              status.textContent = (data && data.error) || '{{ t("feedback.send_failed", locale) }}';
+              status.style.display = 'block'; status.style.color = '#dc2626';
+            }
+          } catch(err) { if(status){ status.textContent = '{{ t("feedback.send_error", locale) }}'; status.style.display='block'; status.style.color='#dc2626'; } }
+        });
+      }
+    })();
+  </script>
+{% endblock %}

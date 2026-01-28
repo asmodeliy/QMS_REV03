@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container wide help-wrap apqp-root">
+  <aside class="help-side">
+    <div class="head">APQP Help</div>
+    <ul class="toc">
+      <li><a href="#quick-start">Quick start</a></li>
+      <li><a href="#phases">Phases</a></li>
+      <li><a href="#deliverables">Deliverables</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </aside>
+
+  <section class="help-main">
+    <div id="quick-start" class="help-section">
+      <div class="page-head">
+        <h2>🚀 APQP overview</h2>
+      </div>
+      <div class="help-hero" style="background:linear-gradient(135deg,#fef3c7 0%, #fff7e6 100%);">
+        <div>
+          <div class="badge">APQP</div>
+          <p>Plan and track Advanced Product Quality Planning milestones with clear owners and due dates.</p>
+        </div>
+        <div class="help-figure" aria-hidden="true">
+          <div class="figure-label">Timeline</div>
+          <div class="figure-lines"><span></span><span class="accent"></span><span></span></div>
+        </div>
+      </div>
+      <ul class="spaced-list">
+        <li><strong>Select</strong>: Program + gate (Plan/Design/Validate/Launch)</li>
+        <li><strong>Track</strong>: Due dates, owners, status</li>
+        <li><strong>Evidence</strong>: Attach reports (descriptive names)</li>
+      </ul>
+    </div>
+
+    <div id="phases" class="help-section">
+      <h2>🗂️ Phases</h2>
+      <ul class="spaced-list">
+        <li><strong>Plan & Define</strong>: Voice of customer, feasibility, program charter.</li>
+        <li><strong>Product Design</strong>: DFMEA, specs, drawing releases, prototype builds.</li>
+        <li><strong>Process Design</strong>: PFMEA, control plan drafts, tooling readiness.</li>
+        <li><strong>Validate</strong>: Run@rate, MSA/GRR, capability (Cpk/Ppk) evidence.</li>
+        <li><strong>Launch & Feedback</strong>: PPAP, lessons learned, change management.</li>
+      </ul>
+    </div>
+
+    <div id="deliverables" class="help-section">
+      <h2>📑 Deliverables & owners</h2>
+      <div class="help-card-grid">
+        <div class="help-card">
+          <h4>Assignments</h4>
+          <p>Each card lists owner and due date. Keep remarks brief and date-stamped for traceability.</p>
+        </div>
+        <div class="help-card">
+          <h4>Evidence</h4>
+          <p>Upload key artifacts: DFMEA/PFMEA, control plans, MSA, capability reports, PPAP packages.</p>
+        </div>
+        <div class="help-card">
+          <h4>Reviews</h4>
+          <p>Use status to flag review needs; summarize decisions after each gate meeting.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="faq" class="help-section">
+      <h2>❓ FAQ</h2>
+      <ul class="spaced-list">
+        <li><strong>Files</strong>: PDF/Office; zip large files</li>
+        <li><strong>New fields</strong>: Contact admin (gate + deliverable type)</li>
+        <li><strong>Export</strong>: Screenshot boards before reviews</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+{% endblock %}

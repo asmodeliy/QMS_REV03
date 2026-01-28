@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Feedback Management · Admin</title>
+  <link rel="stylesheet" href="/static/shared.css?v=feedback-2"/>
+</head>
+<body class="bg">
+<header class="header">
+  <div class="container admin-top">
+    <div class="brand"><a href="/rpmt/admin?v={{ visit }}">&lt; Previous</a></div>
+  </div>
+</header>
+
+<main class="container rpmt-root">
+  <div class="fb-wrap">
+    <div class="fb-head">
+      <div style="display:flex;align-items:center;gap:8px">
+        <strong>Feedback List</strong>
+        <span class="chip" id="countChip">0 items</span>
+      </div>
+      <div class="tools">
+        <div class="search">
+          <input class="inp" id="q" placeholder="Search: Content/Email/Type"/>
+          <button class="btn ghost" id="btnReload">🔄 Reload</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fb-list" id="fbList">
+      <div style="color:var(--muted); text-align:center; padding:20px">Loading...</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let currentReplyId = null;
+  const visit = "{{ visit }}";
+  
+  async function load() {
+    try {
+      const url = `/rpmt/admin/feedback.json?v=${visit}`;
+      const res = await fetch(url);
+      
+      if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = '/auth/login?next=/rpmt/admin/feedback';
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+      
+      const data = await res.json();
+      const q = (document.getElementById('q').value || '').toLowerCase();
+      const items = [];
+      let cnt = 0;
+
+      for(const it of data){
+        const text = [
+          it.timestamp||'',
+          it.type||'',
+          it.email||'',
+          it.message||'',
+          it.url||''
+        ].join(' ').toLowerCase();
+        if(q && !text.includes(q)) continue;
+
+        cnt++;
+        
+        const typeClass = (it.type || 'other').toLowerCase();
+        const statusClass = (it.status || 'new').toLowerCase();
+        const timestamp = new Date(it.timestamp).toLocaleString('ko-KR');
+        
+        let adminReplyHtml = '';
+        if(it.admin_reply){
+          const repliedTime = it.replied_at ? new Date(it.replied_at).toLocaleString('ko-KR') : '';
+          adminReplyHtml = `
+            <div class="admin-reply-box">
+              <div class="label">✅ Admin Reply (Sent)</div>
+              <div class="content">${escapeHtml(it.admin_reply)}</div>
+              ${repliedTime ? `<div class="timestamp">Sent: ${repliedTime}</div>` : ''}
+            </div>
+          `;
+        }
+        
+        items.push(`
+          <div class="fb-item ${statusClass}" data-id="${it.id}">
+            <div class="fb-meta">
+              <div class="fb-timestamp">${timestamp}</div>
+              <div class="fb-type ${typeClass}">${it.type || 'Other'}</div>
+              <div class="fb-status ${statusClass}">${it.status || 'New'}</div>
+              ${it.email ? `<div class="fb-email">📧 ${escapeHtml(it.email)}</div>` : '<div style="color:#9ca3af">익명</div>'}
+            </div>
+            
+            <div class="fb-message">${escapeHtml(it.message || '')}</div>
+            
+            ${adminReplyHtml}
+            
+            <div class="fb-details">
+              ${it.url ? `<div class="mono">🔗 ${escapeHtml(it.url)}</div>` : ''}
+              ${it.ip ? `<div class="mono">📍 IP: ${it.ip}</div>` : ''}
+              ${it.user_agent ? `<div class="mono">💻 ${escapeHtml(it.user_agent.slice(0,80))}...</div>` : ''}
+            </div>
+            
+            <div class="fb-actions">
+              ${it.status === 'New' ? `<button class="btn small ghost" onclick="markAsRead(${it.id})">Mark as Read</button>` : ''}
+              ${it.email && !it.admin_reply ? `<button class="btn small primary" onclick="toggleReply(${it.id})">Reply</button>` : ''}
+              ${it.status !== 'Resolved' ? `<button class="btn small ghost" onclick="markAsResolved(${it.id})">Mark as Resolved</button>` : ''}
+            </div>
+            
+            <div class="reply-box" id="reply-${it.id}" style="display:none">
+              <textarea id="reply-text-${it.id}" placeholder="Enter your reply..."></textarea>
+              <div class="actions">
+                <button class="btn small primary" onclick="sendReply(${it.id})">📧 Send</button>
+                <button class="btn small ghost" onclick="toggleReply(${it.id})">Cancel</button>
+              </div>
+            </div>
+          </div>
+        `);
+      }
+
+      document.getElementById('fbList').innerHTML = items.join('') || 
+        '<div style="color:var(--muted); text-align:center; padding:20px">No items to display.</div>';
+      document.getElementById('countChip').textContent = cnt + ' items';
+    } catch (err) {
+      console.error('Failed to load feedback:', err);
+    }
+  }
+  
+  async function updateUnreadCount() {
+    try {
+      const url = `/rpmt/admin/feedback/unread-count?v=${visit}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        const badge = document.querySelector('.btn.icon.bell .badge');
+        if (badge) {
+          badge.textContent = data.count;
+          badge.style.display = data.count > 0 ? 'block' : 'none';
+        }
+      }
+    } catch (err) {
+      console.error('Failed to update unread count:', err);
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function toggleReply(id) {
+    const box = document.getElementById(`reply-${id}`);
+    if(currentReplyId && currentReplyId !== id){
+      document.getElementById(`reply-${currentReplyId}`).style.display = 'none';
+    }
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    currentReplyId = box.style.display === 'block' ? id : null;
+  }
+
+  async function markAsRead(id) {
+    try {
+      const res = await fetch(`/rpmt/admin/feedback/${id}/status?v=${encodeURIComponent(visit)}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({status: 'Read'})
+      });
+      const data = await res.json();
+      if(data.ok){
+        load();
+      } else {
+        alert('Error: ' + (data.error || 'Unknown'));
+      }
+    } catch(e){
+      alert('Request failed: ' + e.message);
+    }
+  }
+
+  async function markAsResolved(id) {
+    if(!confirm('Mark this feedback as resolved?')) return;
+    try {
+      const res = await fetch(`/rpmt/admin/feedback/${id}/status?v=${encodeURIComponent(visit)}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({status: 'Resolved'})
+      });
+      const data = await res.json();
+      if(data.ok){
+        load();
+      } else {
+        alert('Error: ' + (data.error || 'Unknown'));
+      }
+    } catch(e){
+      alert('Request failed: ' + e.message);
+    }
+  }
+
+  async function sendReply(id) {
+    const text = document.getElementById(`reply-text-${id}`).value.trim();
+    if(!text){
+      alert('Please enter your reply.');
+      return;
+    }
+    
+    if(!confirm('Send the email?')) return;
+    
+    try {
+      const res = await fetch(`/rpmt/admin/feedback/${id}/reply?v=${encodeURIComponent(visit)}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({reply: text})
+      });
+      const data = await res.json();
+      if(data.ok){
+        alert('✅ ' + data.message);
+        load();
+      } else {
+        alert('❌ ' + (data.error || 'Unknown'));
+      }
+    } catch(e){
+      alert('Request failed: ' + e.message);
+    }
+  }
+
+  document.getElementById('btnReload').addEventListener('click', ()=>load());
+  document.getElementById('q').addEventListener('input', ()=>load());
+  load();
+  updateUnreadCount();
+  setInterval(updateUnreadCount, 5 * 60 * 1000);
+</script>
+</body>
+</html>

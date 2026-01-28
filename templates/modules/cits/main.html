@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container cits-root">
+  <div class="dashboard-header-section cits-header">
+    <div class="dashboard-header-content">
+      <div>
+        <h1 class="dashboard-title">{{ t('cits.title') }}</h1>
+        <p class="dashboard-subtitle">{{ t('cits.name') }}</p>
+      </div>
+        <div class="header-actions">
+        <button class="cits-btn ghost" onclick="openCustomerModal()">{{ t('cits.manage_customers') }}</button>
+        <button class="cits-btn cits-btn-primary" onclick="openNewCitsIssueModal()">{{ t('cits.new_issue') }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-section">
+    <div class="stat-card">
+      <div class="stat-value">{{ total_issues }}</div>
+      <div class="stat-label">{{ t('common.total') or 'Total' }}</div>
+    </div>
+    {% for s in status_list %}
+    {% set cls = 'stat-open' if s == 'OPEN' else ('stat-pending' if s == 'PENDING' else 'stat-close') %}
+    <div class="stat-card {{ cls }}" data-status="{{ s }}">
+      <div class="stat-value">{{ status_counts[s] or 0 }}</div>
+      <div class="stat-label">{{ s.title() }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-group">
+      <label>{{ t('common.status') }}</label>
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">{{ t('common.all') }}</option>
+        <option value="OPEN">{{ t('cits.status_open') }}</option>
+        <option value="PENDING">{{ t('cits.status_pending') }}</option>
+        <option value="CLOSED">{{ t('cits.status_closed') }}</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label>{{ t('cits.from_date') }}</label>
+      <input type="date" id="filterDateFrom" onchange="applyFilters()">
+    </div>
+    
+    <div class="filter-group">
+      <label>{{ t('cits.to_date') }}</label>
+      <input type="date" id="filterDateTo" onchange="applyFilters()">
+    </div>
+    
+    <div class="filter-group">
+      <label>{{ t('cits.customer') }}</label>
+      <select id="filterCustomer" onchange="applyFilters()">
+        <option value="">{{ t('common.all') }}</option>
+        {% for c in customers %}
+        <option value="{{ c.name }}">{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label>{{ t('cits.assign') }}</label>
+      <select id="filterAssignee" onchange="applyFilters()">
+        <option value="">{{ t('common.all') }}</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label>{{ t('cits.keyword') }}</label>
+      <input type="text" id="filterKeyword" placeholder="{{ t('common.search') }}..." onkeyup="applyFilters()">
+    </div>
+    
+    <button class="filter-clear-btn" onclick="clearFilters()">{{ t('common.clear') }}</button>
+  </div>
+
+  <div class="issues-table-wrapper">
+    <table class="issues-table">
+      <colgroup>
+        <col class="col-ticket" />
+        <col class="col-title" />
+        <col class="col-customer" />
+        <col class="col-ip" />
+        <col class="col-inquiry-person" />
+        <col class="col-assignee" />
+        <col class="col-created" />
+        <col class="col-attachments" />
+        <col class="col-status" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="ticket-col">{{ t('cits.ticket') }}</th>
+          <th>{{ t('common.name') }}</th>
+          <th>{{ t('cits.customer') }}</th>
+          <th>{{ t('cits.ip_ic') }}</th>
+          <th>{{ t('cits.inquiry_person') }}</th>
+          <th>{{ t('cits.assignee') }}</th>
+          <th>{{ t('cits.created_date') }}</th>
+          <th>{{ t('cits.attachments') }}</th>
+          <th class="status-col">{{ t('common.status') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if issues %}
+          {% for issue in issues %}
+          <tr data-ticket="{{ issue.ticket_no }}" 
+              data-title="{{ issue.title|e }}" 
+              data-customer="{{ issue.customer|e or '' }}" 
+              data-ip="{{ issue.ip_ic|e or '' }}"
+              data-created="{{ issue.created_at.strftime('%Y-%m-%d') if issue.created_at else '' }}"
+              data-status="{{ issue.status }}"
+              data-assignee="{{ issue.assignee|e or '' }}">
+            <td class="ticket-col"><a href="/cits/issue/{{ issue.id }}">{{ issue.ticket_no }}</a></td>
+            <td>{{ issue.title }}</td>
+            <td>{{ issue.customer or '—' }}</td>
+            <td>{{ issue.ip_ic or '—' }}</td>
+            <td>{{ issue.reporter or '—' }}</td>
+            <td>{{ issue.assignee or '—' }}</td>
+            <td>{{ issue.created_at.strftime('%Y-%m-%d') if issue.created_at else '—' }}</td>
+            <td class="attachments-cell">
+              {% if issue.display_attachments %}
+                {% for p in issue.display_attachments %}
+                  {% set fname = p.split('/')[-1] %}
+                  {% if fname.startswith('cits_') %}
+                    {% set parts = fname.split('_') %}
+                    {% if parts|length > 4 %}
+                      {% set display_name = parts[4:]|join('_') %}
+                    {% else %}
+                      {% set display_name = fname %}
+                    {% endif %}
+                  {% else %}
+                    {% set display_name = fname %}
+                  {% endif %}
+                  <a class="attach-link" href="/{{ p }}" target="_blank">📎 {{ display_name }}</a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td class="status-col">
+              {% if issue.status == 'OPEN' %}
+                <span class="status-open">Open</span>
+              {% elif issue.status == 'PENDING' %}
+                <span class="status-pending">Pending</span>
+              {% else %}
+                <span class="status-close">Closed</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="10">{{ t('cits.no_issues') }} <a href="#" onclick="openNewCitsIssueModal();return false;">{{ t('cits.create_one') }}</a></td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "modules/cits/_includes/_modal.html" %}
+  
+  <div id="customerModal" class="modal-overlay hidden">
+    <div class="modal-dialog customer-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>{{ t('cits.customer_management') }}</h2>
+          <button class="modal-close" onclick="closeCustomerModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="customer-form-section">
+            <h3 id="customerFormTitle">{{ t('cits.new_customer') }}</h3>
+            <form id="customerForm" method="POST" action="/cits/customers/create">
+              <input type="hidden" id="customerId" name="customer_id">
+              
+              <div class="form-row">
+                <label for="customerName">{{ t('cits.customer') }}*</label>
+                <input type="text" id="customerName" name="name" placeholder="e.g. Samsung Electronics" required>
+              </div>
+              
+              <div class="form-row">
+                <label for="customerEmail">Email*</label>
+                <input type="email" id="customerEmail" name="email" placeholder="contact@example.com" required>
+              </div>
+              
+              <div class="form-row">
+                <label for="customerNotes">Notes</label>
+                <textarea id="customerNotes" name="notes" rows="2" placeholder="Optional remarks"></textarea>
+              </div>
+              
+              <div class="form-actions">
+                <button type="button" class="cits-btn ghost" onclick="resetCustomerForm()">Cancel</button>
+                <button type="submit" class="cits-btn cits-btn-primary">Save Customer</button>
+              </div>
+            </form>
+          </div>
+          
+          <div class="customer-list-section">
+            <h3>Customer List</h3>
+            <table class="issues-table customer-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th>IPs</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customerTableBody">
+                {% if customers %}
+                  {% for customer in customers %}
+                  <tr data-customer-id="{{ customer.id }}">
+                    <td>{{ customer.name }}</td>
+                    <td>{{ customer.email }}</td>
+                    <td>
+                      <button class="cits-btn ghost small" onclick="manageCustomerIPs({{ customer.id }}, '{{ customer.name }}')">Manage IPs</button>
+                    </td>
+                    <td>
+                      <button class="cits-btn ghost small" onclick="editCustomer({{ customer.id }})">Edit</button>
+                      <button class="cits-btn ghost small" onclick="deleteCustomer({{ customer.id }})">Delete</button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr><td colspan="4">No customers yet</td></tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ipModal" class="modal-overlay hidden">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Manage IPs for <span id="ipModalCustomerName"></span></h2>
+          <button class="modal-close" onclick="closeIPModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="ipForm" method="POST" action="/cits/ips/create">
+            <input type="hidden" id="ipCustomerId" name="customer_id">
+            
+            <div class="form-row">
+              <label for="ipName">IP/IC Name*</label>
+              <input type="text" id="ipName" name="name" required>
+            </div>
+            
+            <div class="form-row">
+              <label for="ipDescription">Description</label>
+              <textarea id="ipDescription" name="description" rows="2"></textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="cits-btn cits-btn-primary">Add IP</button>
+            </div>
+          </form>
+          
+          <div id="ipListSection">
+            <h3>Current IPs</h3>
+            <ul id="ipList" class="ip-list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function applyFilters() {
+  const statusFilter = document.getElementById('filterStatus').value;
+  const dateFromFilter = document.getElementById('filterDateFrom').value;
+  const dateToFilter = document.getElementById('filterDateTo').value;
+  const customerFilter = document.getElementById('filterCustomer').value.toLowerCase();
+  const assigneeFilter = document.getElementById('filterAssignee').value.toLowerCase();
+  const keywordFilter = document.getElementById('filterKeyword').value.toLowerCase();
+  
+  const rows = document.querySelectorAll('.issues-table tbody tr');
+  let visibleCount = 0;
+  
+  rows.forEach(row => {
+    if (row.children.length === 1) return; // "No issues" 행 제외
+    
+    const title = row.getAttribute('data-title').toLowerCase();
+    const status = row.getAttribute('data-status');
+    const created = row.getAttribute('data-created');
+    const customer = row.getAttribute('data-customer').toLowerCase();
+    const assignee = row.getAttribute('data-assignee').toLowerCase();
+    
+    let show = true;
+    
+    // Status 필터
+    if (statusFilter && status !== statusFilter) {
+      show = false;
+    }
+    
+    // 날짜 From 필터
+    if (show && dateFromFilter && created < dateFromFilter) {
+      show = false;
+    }
+    
+    // 날짜 To 필터
+    if (show && dateToFilter && created > dateToFilter) {
+      show = false;
+    }
+    
+    // Customer 필터
+    if (show && customerFilter && !customer.includes(customerFilter)) {
+      show = false;
+    }
+    
+    // Assignee 필터
+    if (show && assigneeFilter && !assignee.includes(assigneeFilter)) {
+      show = false;
+    }
+    
+    // Keyword 필터
+    if (show && keywordFilter) {
+      if (!title.includes(keywordFilter)) {
+        show = false;
+      }
+    }
+    
+    row.style.display = show ? 'table-row' : 'none';
+    if (show) visibleCount++;
+  });
+  
+  // 결과 표시
+  console.log(`필터링 결과: ${visibleCount}개 이슈 표시`);
+}
+
+function clearFilters() {
+  document.getElementById('filterStatus').value = '';
+  document.getElementById('filterDateFrom').value = '';
+  document.getElementById('filterDateTo').value = '';
+  document.getElementById('filterCustomer').value = '';
+  document.getElementById('filterAssignee').value = '';
+  document.getElementById('filterKeyword').value = '';
+  
+  document.querySelectorAll('.issues-table tbody tr').forEach(row => {
+    row.style.display = 'table-row';
+  });
+}
+
+// Assign 필터 드롭다운 초기화
+function initAssigneeFilter() {
+  const assigneeSet = new Set();
+  const rows = document.querySelectorAll('.issues-table tbody tr');
+  
+  rows.forEach(row => {
+    if (row.children.length > 1) {
+      const assignee = row.getAttribute('data-assignee');
+      if (assignee && assignee.trim()) {
+        assigneeSet.add(assignee);
+      }
+    }
+  });
+  
+  const assigneeSelect = document.getElementById('filterAssignee');
+  const options = Array.from(assigneeSet).sort();
+  
+  options.forEach(assignee => {
+    const option = document.createElement('option');
+    option.value = assignee;
+    option.textContent = assignee;
+    assigneeSelect.appendChild(option);
+  });
+}
+
+// 페이지 로드 시 Assign 필터 초기화
+document.addEventListener('DOMContentLoaded', function() {
+  initAssigneeFilter();
+});
+
+function openNewCitsIssueModal(){
+  const modal = document.getElementById('citsIssueModal');
+  if(!modal) return;
+  modal.classList.remove('hidden');
+}
+
+function closeNewCitsIssueModal(){
+  const modal = document.getElementById('citsIssueModal');
+  if(!modal) return;
+  modal.classList.add('hidden');
+}
+
+function openCustomerModal(){
+  const modal = document.getElementById('customerModal');
+  if(!modal) return;
+  modal.classList.remove('hidden');
+}
+
+function closeCustomerModal(){
+  const modal = document.getElementById('customerModal');
+  if(!modal) return;
+  modal.classList.add('hidden');
+  resetCustomerForm();
+}
+
+function resetCustomerForm(){
+  document.getElementById('customerForm').reset();
+  document.getElementById('customerForm').action = '/cits/customers/create';
+  document.getElementById('customerId').value = '';
+  document.getElementById('customerFormTitle').textContent = 'New Customer';
+}
+
+function editCustomer(customerId){
+  const row = document.querySelector(`tr[data-customer-id="${customerId}"]`);
+  if(!row) return;
+  
+  const cells = row.children;
+  document.getElementById('customerName').value = cells[0].textContent;
+  document.getElementById('customerEmail').value = cells[1].textContent;
+  
+  document.getElementById('customerId').value = customerId;
+  document.getElementById('customerForm').action = `/cits/customers/update/${customerId}`;
+  document.getElementById('customerFormTitle').textContent = 'Edit Customer';
+}
+
+async function deleteCustomer(customerId){
+  if(!confirm('Delete this customer?')) return;
+  
+  try {
+    const response = await fetch(`/cits/customers/delete/${customerId}`, { method: 'POST' });
+    if(response.ok) {
+      location.reload();
+    } else {
+      alert('Failed to delete customer');
+    }
+  } catch(e) {
+    alert('Error deleting customer');
+  }
+}
+
+function manageCustomerIPs(customerId, customerName){
+  document.getElementById('ipCustomerId').value = customerId;
+  document.getElementById('ipModalCustomerName').textContent = customerName;
+  loadIPList(customerId);
+  
+  document.getElementById('ipModal').classList.remove('hidden');
+}
+
+function closeIPModal(){
+  document.getElementById('ipModal').classList.add('hidden');
+  document.getElementById('ipForm').reset();
+}
+
+async function loadIPList(customerId){
+  try {
+    const response = await fetch(`/cits/api/customers/${customerId}/ips`);
+    const ips = await response.json();
+    
+    const list = document.getElementById('ipList');
+    if(ips.length === 0) {
+      list.innerHTML = '<li>No IPs yet</li>';
+      return;
+    }
+    
+    list.innerHTML = ips.map(ip => `
+      <li class="ip-item">
+        <div class="ip-info">
+          <strong>${ip.name}</strong>
+          ${ip.description ? `<span class="ip-desc">${ip.description}</span>` : ''}
+        </div>
+        <button class="cits-btn ghost small" onclick="deleteIP(${ip.id})">Delete</button>
+      </li>
+    `).join('');
+  } catch(e) {
+    console.error('Failed to load IPs:', e);
+  }
+}
+
+async function deleteIP(ipId){
+  if(!confirm('Delete this IP?')) return;
+  
+  try {
+    const response = await fetch(`/cits/ips/delete/${ipId}`, { method: 'POST' });
+    if(response.ok) {
+      const customerId = document.getElementById('ipCustomerId').value;
+      loadIPList(customerId);
+    } else {
+      alert('Failed to delete IP');
+    }
+  } catch(e) {
+    alert('Error deleting IP');
+  }
+}
+</script>
+
+{% endblock %}

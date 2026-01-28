@@ -1,0 +1,39 @@
+﻿
+"""
+RPMT 紐⑤뱢 DB ?곌껐 愿由?(rpmt.db)
+"""
+
+from sqlalchemy import create_engine 
+from sqlalchemy .orm import sessionmaker ,Session 
+from pathlib import Path 
+from modules .rpmt .models import Base 
+from core .config import BASE_DIR 
+
+
+RPMT_DB_PATH =BASE_DIR /"rpmt.db"
+
+
+rpmt_engine = create_engine(f"sqlite:///{RPMT_DB_PATH}", future=True)
+RPMTSessionLocal = sessionmaker(bind=rpmt_engine, expire_on_commit=False, future=True)
+
+try:
+    Base.metadata.create_all(rpmt_engine)
+except Exception as e:
+    # Index or table might already exist - this is OK
+    pass
+
+
+def get_rpmt_db ()->Session :
+    """RPMT DB ?몄뀡 ?앹꽦 (?섏〈??二쇱엯??"""
+    db =RPMTSessionLocal ()
+    try :
+        yield db 
+    finally :
+        db .close ()
+
+
+def get_rpmt_db_sync ()->Session :
+    """?숆린 肄붾뱶?먯꽌 ?ъ슜??RPMT DB ?몄뀡"""
+    db =RPMTSessionLocal ()
+    return db 
+

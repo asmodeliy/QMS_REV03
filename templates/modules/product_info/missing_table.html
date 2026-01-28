@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container pi-root">
+  <div class="dashboard-header-section">
+    <h1 class="dashboard-title">{{ t('product_info.missing_table_title', locale) }}</h1>
+    <p class="dashboard-subtitle">{{ t('product_info.missing_table_subtitle', locale) }}</p>
+    <div class="header-actions">
+      <a href="/product-info" class="pi-btn pi-btn-secondary">{{ t('product_info.back_to_list', locale) }}</a>
+    </div>
+  </div>
+  <section class="pi-empty">
+    <div class="pi-empty-card">
+      <p class="pi-empty-title">테이블 데이터가 없습니다</p>
+    </div>
+  </section>
+</main>
+{% endblock %}

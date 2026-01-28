@@ -1,0 +1,35 @@
+"""
+Add inquiry_id column to issue_conversations table
+"""
+import sqlite3
+
+DB_PATH = "modules/cits/cits.db"
+
+def add_inquiry_id_column():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    try:
+                                
+        cursor.execute("PRAGMA table_info(issue_conversations)")
+        columns = [col[1] for col in cursor.fetchall()]
+        
+        if 'inquiry_id' not in columns:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info('Adding inquiry_id column...')
+            cursor.execute("ALTER TABLE issue_conversations ADD COLUMN inquiry_id INTEGER")
+            cursor.execute("CREATE INDEX IF NOT EXISTS ix_conversations_inquiry_id ON issue_conversations(inquiry_id)")
+            conn.commit()
+            logger.info('inquiry_id column added successfully')
+        else:
+            logger.info('inquiry_id column already exists')
+            
+    except Exception:
+        logger.exception('Error adding inquiry_id column')
+        conn.rollback()
+    finally:
+        conn.close()
+
+if __name__ == "__main__":
+    add_inquiry_id_column()

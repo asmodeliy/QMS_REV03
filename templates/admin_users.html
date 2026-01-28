@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container" style="max-width: 1100px; margin: 0 auto; padding: 24px 0;">
+  <h1 style="margin-bottom: 16px;">Admin Users</h1>
+
+  <section style="margin-bottom: 32px;">
+    <h2 style="margin-bottom: 12px;">Pending Users</h2>
+    {% if pending_users %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th style="width: 240px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in pending_users %}
+          <tr>
+            <td>{{ p.email }}</td>
+            <td>{{ p.english_name }}</td>
+            <td>{{ p.department }}</td>
+            <td>
+              <form method="post" action="/main/admin/users/{{ p.id }}/approve" style="display: inline-block;">
+                <select name="role" style="margin-right: 8px;">
+                  <option value="User">User</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Admin">Admin</option>
+                </select>
+                <button class="btn btn-success" type="submit">Approve</button>
+              </form>
+              <form method="post" action="/main/admin/users/{{ p.id }}/reject" style="display: inline-block; margin-left: 6px;">
+                <button class="btn btn-danger" type="submit">Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p>No pending users.</p>
+    {% endif %}
+  </section>
+
+  <section style="margin-bottom: 32px;">
+    <h2 style="margin-bottom: 12px;">Recently Approved</h2>
+    {% if approved_users %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Role</th>
+            <th>Reviewed By</th>
+            <th>Reviewed At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in approved_users %}
+          <tr>
+            <td>{{ row.user.email }}</td>
+            <td>{{ row.user.english_name }}</td>
+            <td>{{ row.user.department }}</td>
+            <td>{{ row.user.role }}</td>
+            <td>{{ row.reviewer.english_name if row.reviewer else '-' }}</td>
+            <td>{{ row.pending.reviewed_at }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p>No approved users.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2 style="margin-bottom: 12px;">Rejected</h2>
+    {% if rejected_users %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Reviewed At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rejected_users %}
+          <tr>
+            <td>{{ r.email }}</td>
+            <td>{{ r.english_name }}</td>
+            <td>{{ r.department }}</td>
+            <td>{{ r.reviewed_at }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p>No rejected users.</p>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

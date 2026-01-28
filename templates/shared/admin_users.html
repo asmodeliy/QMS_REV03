@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="container admin-users-wrap">
+  <div class="admin-top">
+    <div class="brand">
+      <a href="/">{{ t('common.previous') }}</a>
+    </div>
+    <div style="flex:1; text-align:center;">
+      <h1 style="margin:0; font-size:1.5rem; color:#333;">{{ t('admin.user_approval') }}</h1>
+    </div>
+    <div style="width:220px; display:flex; gap:8px; justify-content:flex-end;">
+      <a href="/admin-dashboard" style="padding:8px 14px; background:#2563eb; color:white; border-radius:4px; text-decoration:none; font-size:0.85rem; white-space:nowrap;">📊 Dashboard</a>
+    </div>
+  </div>
+
+  <div class="users-container">
+    <section class="users-section pending">
+      <h2>{{ t('admin.pending_users') }} ({{ pending_users|length }})</h2>
+      
+      {% if pending_users %}
+      <div class="users-table">
+        <div class="table-header">
+          <div class="col-id">{{ t('register.english_name') }}</div>
+          <div class="col-email">{{ t('register.email') }}</div>
+          <div class="col-dept">{{ t('common.department') }}</div>
+          <div class="col-date">{{ t('admin.request_date') }}</div>
+          <div class="col-actions">{{ t('common.action') }}</div>
+        </div>
+        
+        {% for user in pending_users %}
+        <div class="table-row" data-user-id="{{ user.id }}">
+          <div class="col-id"><strong>{{ user.english_name }}</strong></div>
+          <div class="col-email">{{ user.email }}</div>
+          <div class="col-dept">{{ user.department or '-' }}</div>
+          <div class="col-date">{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '-' }}</div>
+          <div class="col-actions">
+            <select class="role-select" data-user-id="{{ user.id }}">
+              <option value="User">{{ t('admin.role_user') }}</option>
+              <option value="Manager">{{ t('admin.role_manager') }}</option>
+              <option value="Admin">{{ t('admin.role_admin') }}</option>
+            </select>
+            <button class="btn btn-approve" onclick="approveUser({{ user.id }})">{{ t('admin.approve') }}</button>
+            <button class="btn btn-reject" onclick="rejectUser({{ user.id }})">{{ t('admin.reject') }}</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty-message">{{ t('admin.no_pending_users') }}</p>
+      {% endif %}
+    </section>
+
+    <section class="users-section approved">
+      <h2>{{ t('admin.approved_users') }} ({{ approved_users|length }})</h2>
+      
+      {% if approved_users %}
+      <div class="users-table">
+        <div class="table-header">
+          <div class="col-id">{{ t('register.english_name') }}</div>
+          <div class="col-email">{{ t('register.email') }}</div>
+          <div class="col-dept">{{ t('common.department') }}</div>
+          <div class="col-role">{{ t('common.role') }}</div>
+          <div class="col-date">{{ t('admin.approved_date') }}</div>
+          <div class="col-reviewer">{{ t('admin.reviewed_by') }}</div>
+          <div class="col-actions">{{ t('common.action') }}</div>
+        </div>
+        
+        {% for item in approved_users %}
+        <div class="table-row approved" data-user-id="{{ item.user.id }}">
+          <div class="col-id"><strong>{{ item.pending.english_name }}</strong></div>
+          <div class="col-email">{{ item.pending.email }}</div>
+          <div class="col-dept">{{ item.pending.department or '-' }}</div>
+          <div class="col-role">
+            <select class="role-select-approved" data-user-id="{{ item.user.id }}">
+              <option value="User" {% if item.user.role == 'User' %}selected{% endif %}>{{ t('admin.role_user') }}</option>
+              <option value="Manager" {% if item.user.role == 'Manager' %}selected{% endif %}>{{ t('admin.role_manager') }}</option>
+              <option value="Admin" {% if item.user.role == 'Admin' %}selected{% endif %}>{{ t('admin.role_admin') }}</option>
+            </select>
+          </div>
+          <div class="col-date">{{ item.pending.reviewed_at.strftime('%Y-%m-%d %H:%M') if item.pending.reviewed_at else '-' }}</div>
+          <div class="col-reviewer">{{ item.reviewer.english_name if item.reviewer else '-' }}</div>
+          <div class="col-actions">
+            <button class="btn btn-sm btn-save" onclick="updateUserRole({{ item.user.id }})">{{ t('common.save') }}</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty-message">{{ t('admin.no_approved_users') }}</p>
+      {% endif %}
+    </section>
+
+    <section class="users-section rejected">
+      <h2>{{ t('admin.rejected_users') }} ({{ rejected_users|length }})</h2>
+      
+      {% if rejected_users %}
+      <div class="users-table">
+        <div class="table-header">
+          <div class="col-id">{{ t('register.english_name') }}</div>
+          <div class="col-email">{{ t('register.email') }}</div>
+          <div class="col-dept">{{ t('common.department') }}</div>
+          <div class="col-date">{{ t('admin.rejected_date') }}</div>
+          <div class="col-reviewer">{{ t('admin.reviewed_by') }}</div>
+        </div>
+        
+        {% for user in rejected_users %}
+        <div class="table-row rejected">
+          <div class="col-id"><strong>{{ user.english_name }}</strong></div>
+          <div class="col-email">{{ user.email }}</div>
+          <div class="col-dept">{{ user.department or '-' }}</div>
+          <div class="col-date">{{ user.reviewed_at.strftime('%Y-%m-%d %H:%M') if user.reviewed_at else '-' }}</div>
+          <div class="col-reviewer">{{ user.reviewed_by or '-' }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty-message">{{ t('admin.no_rejected_users') }}</p>
+      {% endif %}
+    </section>
+
+    <section class="users-section feedback-section">
+      <h2>💬 {{ t('admin.feedback') }} </h2>
+      <div id="feedbacks-container" class="feedbacks-list">
+        <p class="empty-message">{{ t('feedback.loading') }}</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+async function approveUser(userId) {
+  const row = document.querySelector(`[data-user-id="${userId}"]`);
+  const roleSelect = row.querySelector('.role-select');
+  const role = roleSelect.value;
+
+  const formData = new FormData();
+  formData.append('role', role);
+
+  try {
+    const res = await fetch(`/main/admin/users/${userId}/approve`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      alert('사용자가 승인되었습니다');
+      location.reload();
+    } else {
+      alert('오류가 발생했습니다');
+    }
+  } catch (e) {
+    alert('요청 실패: ' + e.message);
+  }
+}
+
+async function updateUserRole(userId) {
+  const row = document.querySelector(`[data-user-id="${userId}"]`);
+  const roleSelect = row.querySelector('.role-select-approved');
+  const role = roleSelect.value;
+
+  const formData = new FormData();
+  formData.append('role', role);
+
+  try {
+    const res = await fetch(`/main/admin/users/${userId}/update-role`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      alert('역할이 업데이트되었습니다');
+      location.reload();
+    } else {
+      alert('오류가 발생했습니다');
+    }
+  } catch (e) {
+    alert('요청 실패: ' + e.message);
+  }
+}
+
+async function rejectUser(userId) {
+  if (!confirm('정말 거부하시겠습니까?')) return;
+
+  try {
+    const res = await fetch(`/main/admin/users/${userId}/reject`, {
+      method: 'POST'
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      alert('사용자가 거부되었습니다');
+      location.reload();
+    } else {
+      alert('오류가 발생했습니다');
+    }
+  } catch (e) {
+    alert('요청 실패: ' + e.message);
+  }
+}
+
+
+async function loadFeedbacks() {
+  try {
+    const res = await fetch(`/main/admin/feedback.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const feedbacks = await res.json();
+    
+    const container = document.getElementById('feedbacks-container');
+    if (!feedbacks || feedbacks.length === 0) {
+      container.innerHTML = '<p class="empty-message">{{ t("feedback.no_feedback") }}</p>';
+      return;
+    }
+    
+    container.innerHTML = feedbacks.map((f, idx) => `
+      <div class="feedback-item" data-feedback-id="${f.id}">
+        <div class="feedback-header">
+          <span class="feedback-id">#${f.id}</span>
+          <span class="feedback-type">${f.type || 'General'}</span>
+          <span class="feedback-status ${f.status.toLowerCase()}">${f.status}</span>
+          <span class="feedback-date">${new Date(f.timestamp).toLocaleString()}</span>
+        </div>
+        <div class="feedback-body">
+          <p><strong>${f.user_name || 'Anonymous'}</strong> (${f.email || '-'})</p>
+          <p>${f.content}</p>
+        </div>
+        <div class="feedback-actions">
+          <button class="btn btn-small" onclick="markFeedbackAs('${f.id}', 'Read')">{{ t('feedback.mark_read') }}</button>
+          <button class="btn btn-small" onclick="markFeedbackAs('${f.id}', 'Resolved')">{{ t('feedback.mark_resolved') }}</button>
+          <button class="btn btn-small" onclick="toggleReplyBox('${f.id}')">{{ t('feedback.reply') }}</button>
+        </div>
+        <div id="reply-box-${f.id}" class="reply-box" style="display:none;">
+          <textarea placeholder="{{ t('feedback.reply_message') }}" id="reply-text-${f.id}"></textarea>
+          <button class="btn" onclick="sendReply('${f.id}')">{{ t('feedback.send_reply') }}</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Failed to load feedbacks:', e);
+    document.getElementById('feedbacks-container').innerHTML = '<p class="error">피드백을 불러올 수 없습니다</p>';
+  }
+}
+
+function toggleReplyBox(feedbackId) {
+  const box = document.getElementById(`reply-box-${feedbackId}`);
+  if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+async function markFeedbackAs(feedbackId, status) {
+  try {
+    const res = await fetch(`/main/admin/feedback/${feedbackId}/status`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({status: status})
+    });
+    const data = await res.json();
+    if (data.ok) {
+      loadFeedbacks();
+    } else {
+      alert('오류: ' + (data.error || '알 수 없는 오류'));
+    }
+  } catch (e) {
+    alert('요청 실패: ' + e.message);
+  }
+}
+
+async function sendReply(feedbackId) {
+  const text = document.getElementById(`reply-text-${feedbackId}`).value;
+  if (!text.trim()) {
+    alert('회신 내용을 입력해주세요');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`/main/admin/feedback/${feedbackId}/reply`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({reply: text})
+    });
+    const data = await res.json();
+    if (data.ok) {
+      alert('회신이 전송되었습니다');
+      loadFeedbacks();
+    } else {
+      alert('오류: ' + (data.error || '알 수 없는 오류'));
+    }
+  } catch (e) {
+    alert('요청 실패: ' + e.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadFeedbacks();
+});
+</script>
+
+{% endblock %}

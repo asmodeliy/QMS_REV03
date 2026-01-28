@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container spec-center-root viewer">
+  <div class="dashboard-header-section">
+    <h1 class="dashboard-title">Spec Viewer</h1>
+    <p class="dashboard-subtitle">Preview (read-only)</p>
+  </div>
+  <h2>{{ filename }}</h2>
+  <div style="display:flex;gap:12px;align-items:flex-start">
+    <div style="flex:1">
+      <div id="pdf-viewer" style="height:80vh;border:1px solid #ddd;display:flex;align-items:center;justify-content:center"></div>
+      <div style="margin-top:8px;text-align:center">
+        <button id="prevBtn">◀ Prev</button>
+        <span id="pageInfo"></span>
+        <button id="nextBtn">Next ▶</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const url = "/uploads/spec_center/{{ filename }}";
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+const container = document.getElementById('pdf-viewer');
+(async ()=>{
+  const pdf = await pdfjsLib.getDocument({url}).promise;
+  let currentPage = 1;
+  const totalPages = pdf.numPages;
+  const renderPage = async (pageNum)=>{
+    container.innerHTML = '';
+    const page = await pdf.getPage(pageNum);
+    const viewport = page.getViewport({scale:1.2});
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width; canvas.height = viewport.height;
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    await page.render({canvasContext:ctx, viewport}).promise;
+    document.getElementById('pageInfo').textContent = `${pageNum} / ${totalPages}`;
+  };
+
+  document.getElementById('prevBtn').addEventListener('click', ()=>{ if(currentPage>1){ currentPage--; renderPage(currentPage); }});
+  document.getElementById('nextBtn').addEventListener('click', ()=>{ if(currentPage<totalPages){ currentPage++; renderPage(currentPage); }});
+
+  await renderPage(currentPage);
+})();
+</script>
+{% endblock %}

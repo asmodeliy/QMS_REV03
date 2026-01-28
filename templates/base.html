@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <base href="{{ request.scope.get('root_path', '/') }}">
+  <title>ram-sCHIP QMS</title>
+  
+  
+  <link rel="icon" href="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+      <defs>
+        <linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' style='stop-color:%232e5bff;stop-opacity:1' />
+          <stop offset='100%' style='stop-color:%23204ecf;stop-opacity:1' />
+        </linearGradient>
+      </defs>
+      <rect width='100' height='100' fill='url(%23grad)' rx='15'/>
+      <circle cx='50' cy='30' r='18' fill='%23fff' opacity='0.3'/>
+      <text x='50' y='70' font-size='60' font-weight='bold' fill='%23fff' text-anchor='middle' font-family='Arial'>R</text>
+    </svg>" />  
+  
+  <link rel="stylesheet" href="/static/shared.css" />
+  <link rel="stylesheet" href="/static/main.css" />
+  <link rel="stylesheet" href="/static/auth.css" />
+  <link rel="stylesheet" href="/static/admin_dashboard.css" />
+  
+  {% set path = request.url.path %}
+  {% if path.startswith('/rpmt') or path.startswith('/admin') %}
+  <link rel="stylesheet" href="/static/modules/rpmt/rpmt.css?v=4" />
+  {% elif path.startswith('/svit') %}
+  <link rel="stylesheet" href="/static/modules/svit/svit.css" />
+  {% elif path.startswith('/cits') %}
+  <link rel="stylesheet" href="/static/modules/cits/cits.css" />
+  {% elif path.startswith('/apqp') %}
+  <link rel="stylesheet" href="/static/modules/apqp/apqp.css" />
+  {% elif path.startswith('/spec-center') %}
+  <link rel="stylesheet" href="/static/modules/spec_center/spec_center.css" />
+  {% elif path.startswith('/product-info') %}
+  <link rel="stylesheet" href="/static/modules/product_info/product_info.css" />
+  {% else %}
+  <link rel="stylesheet" href="/static/modules/rpmt/rpmt.css?v=4" />
+  <link rel="stylesheet" href="/static/modules/svit/svit.css" />
+  <link rel="stylesheet" href="/static/modules/apqp/apqp.css" />
+  <link rel="stylesheet" href="/static/modules/spec_center/spec_center.css" />
+  <link rel="stylesheet" href="/static/modules/cits/cits.css" />
+  <link rel="stylesheet" href="/static/modules/product_info/product_info.css" />
+  {% endif %}
+  
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    (function(){
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = function(input, init){
+        try {
+          if (typeof input === 'string'){
+            // prepend leading slash if missing for relative api paths
+            if (/^(?:api\/|main\/)/.test(input)) input = '/' + input;
+            // normalize common bad prefixes
+            if (input.startsWith('/main/api/')) input = input.replace(/^\/main\/api\//, '/api/');
+            if (input.startsWith('/main/auth/api/')) input = input.replace(/^\/main\/auth\/api\//, '/auth/api/');
+            if (input.startsWith('/main/auth/api')) input = input.replace(/^\/main\/auth\/api/, '/auth/api');
+          } else if (input && input.url && typeof input.url === 'string'){
+            let url = input.url;
+            if (/^(?:api\/|main\/)/.test(url)) url = '/' + url;
+            url = url.replace(/^\/main\/api\//, '/api/').replace(/^\/main\/auth\/api\//, '/auth/api/');
+            input = new Request(url, input);
+          }
+        } catch (e){ /* ignore */ }
+        return originalFetch(input, init);
+      }
+    })();
+  </script>
+</head>
+<body class="bg">
+  <header class="app-header header">
+    <div class="header-inner">
+      <div class="header-left">
+        {% if path.startswith('/rpmt') or path.startswith('/admin') or path.startswith('/svit') or path.startswith('/main') or path.startswith('/admin-dashboard') or path.startswith('/apqp') or path.startswith('/spec-center') or path.startswith('/cits') or path.startswith('/profile') or path.startswith('/product-info') %}
+        <nav class="nav-links">
+          <a href="/" class="nav-link {% if path == '/' %}active{% endif %}">{{ t("common.home") }}</a>
+          {% if path.startswith('/rpmt') or path.startswith('/admin') %}
+          <a href="/rpmt" class="nav-link {% if path.startswith('/rpmt') or path.startswith('/admin') %}active{% endif %}">{{ t("nav.rpmt") }}</a>
+          <a href="/rpmt/weekly" class="nav-link {% if path.startswith('/rpmt/weekly') %}active{% endif %}">{{ t("nav.weekly") }}</a>
+          <a href="/rpmt/help" class="nav-link {% if path.startswith('/rpmt/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          {% if request.session.get("role") == "Admin" %}
+          <a href="/rpmt/admin" class="nav-link {% if path.startswith('/rpmt/admin') or path.startswith('/admin') %}active{% endif %}">⚙️ {{ t("nav.admin", locale) }}</a>
+          {% endif %}
+          {% elif path.startswith('/svit') %}
+          <a href="/svit" class="nav-link {% if path == '/svit' or path.startswith('/svit/') %}active{% endif %}">SVIT</a>
+          <a href="/svit/help" class="nav-link {% if path.startswith('/svit/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          {% if request.session.get("role") == "Admin" %}
+          <a href="/svit/admin/register" class="nav-link {% if path.startswith('/svit/admin') %}active{% endif %}">⚙️ {{ t("nav.admin", locale) }}</a>
+          {% endif %}
+          {% elif path.startswith('/apqp') %}
+          <a href="/apqp" class="nav-link {% if path.startswith('/apqp') %}active{% endif %}">APQP</a>
+          <a href="/apqp/help" class="nav-link {% if path.startswith('/apqp/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          {% elif path.startswith('/cits') %}
+          <a href="/cits" class="nav-link {% if path.startswith('/cits') %}active{% endif %}">CITS</a>
+          <a href="/cits/help" class="nav-link {% if path.startswith('/cits/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          {% elif path.startswith('/spec-center') %}
+          <a href="/spec-center/" class="nav-link {% if path.startswith('/spec-center') %}active{% endif %}">{{ t("nav.spec_center", locale) }}</a>
+          <a href="/spec-center/help" class="nav-link {% if path.startswith('/spec-center/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          {% elif path.startswith('/product-info') %}
+          <a href="/product-info" class="nav-link {% if path.startswith('/product-info') %}active{% endif %}">{{ t("nav.product_info", locale) }}</a>
+          {% elif path.startswith('/main') %}
+          <a href="/main" class="nav-link {% if path == '/main' %}active{% endif %}">{{ t("nav.main") }}</a>
+          {% if request.session.get("role") == "Admin" %}
+          <a href="/main/admin" class="nav-link {% if path == '/main/admin' %}active{% endif %}">⚙️ {{ t("nav.admin", locale) }}</a>
+          {% endif %}
+          {% endif %}
+        </nav>
+        {% endif %}
+      </div>
+      <div class="header-right">
+        <div class="lang-selector" role="group" aria-label="Language selector">
+          <button onclick="setLanguage('ko')" aria-label="{{ t('common.lang_ko') }}" class="lang-btn {% if request.cookies.get('lang', 'ko') == 'ko' %}active{% endif %}">KO</button>
+          <button onclick="setLanguage('en')" aria-label="{{ t('common.lang_en') }}" class="lang-btn {% if request.cookies.get('lang', 'ko') == 'en' %}active{% endif %}">EN</button>
+        </div>
+        
+        {% if request.session.get("is_authenticated") %}
+        <span class="divider">|</span>
+        <div class="notification-container">
+          <button class="notification-bell" id="notificationBell" aria-label="Notifications" title="{{ t('common.notifications', locale) }}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+          </button>
+          <div class="notification-panel" id="notificationPanel">
+            <div class="notification-panel-header">
+              <h3>🔔 {{ t("common.notifications", locale) }}</h3>
+              <button class="notification-close" id="notificationClose" aria-label="Close">✕</button>
+            </div>
+            <div class="notification-panel-body" id="notificationList">
+              <div class="notification-empty">{{ t("common.no_notifications_empty", locale) }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if request.session.get("is_authenticated") %}
+        <span class="divider">|</span>
+        <div class="user-info">
+          <a href="/profile" class="user-id-link">{{ request.session.get("english_name") }}</a>
+          <a href="/auth/logout" class="btn small ghost logout-link">{{ t("common.logout") }}</a>
+        </div>
+        {% elif request.url.path.startswith('/main') or request.url.path.startswith('/rpmt/admin') or request.url.path.startswith('/svit/admin') %}
+        <span class="divider">|</span>
+        <a href="/auth/logout" class="btn small ghost logout-link">{{ t("common.logout") }}</a>
+        {% endif %}
+        
+        <a href="/" class="brand header-logo">
+          <img src="/static/ramschip_logo.png" alt="Ramschip" class="logo" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="app-footer">
+    <div>© {{ now().year if now else 2025 }} Ramschip</div>
+  </footer>
+
+  <script>
+  function setLanguage(lang) {
+    window.location.href = `/api/set-language/${lang}`;
+  }
+
+  let notificationPollInterval;
+  let lastNotificationCount = 0;
+  
+  // Request notification permission on page load
+  function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+  
+  async function fetchNotificationCount() {
+    try {
+      const response = await fetch('/api/notifications/count');
+      const data = await response.json();
+      const badge = document.getElementById('notificationBadge');
+      
+      // Show desktop notification if new notifications appeared
+      if (data.count > lastNotificationCount && lastNotificationCount > 0) {
+        const newCount = data.count - lastNotificationCount;
+        showDesktopNotification(newCount);
+      }
+      
+      lastNotificationCount = data.count;
+      
+      if (data.count > 0) {
+        badge.textContent = data.count;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch (error) {
+      console.error('Failed to fetch notification count:', error);
+    }
+  }
+  
+  function showDesktopNotification(count) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const title = count === 1 ? '새 알람 1개 도착' : `새 알람 ${count}개 도착`;
+      const options = {
+        icon: '/static/ramschip_logo.png',
+        badge: '/static/ramschip_logo.png',
+        tag: 'notification',
+        requireInteraction: false
+      };
+      
+      const notification = new Notification(title, options);
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+    }
+  }
+
+  async function fetchNotifications() {
+    try {
+      const response = await fetch('/api/notifications');
+      const data = await response.json();
+      const list = document.getElementById('notificationList');
+      
+      if (data.notifications && data.notifications.length > 0) {
+        const iconMap = {
+          'rpmt': '📋',
+          'svit': '🔧',
+          'cits': '⚠️'
+        };
+        
+        list.innerHTML = data.notifications.map(n => {
+          const icon = iconMap[n.module] || '📌';
+          const moduleClass = `notification-type-${n.module}`;
+          
+          return `
+            <a href="${n.link}" class="notification-message ${moduleClass}">
+              <div class="notification-msg-icon">${icon}</div>
+              <div class="notification-msg-content">
+                <div class="notification-msg-title">${n.title}</div>
+                <div class="notification-msg-desc">${n.description}</div>
+                <div class="notification-msg-time">${n.time}</div>
+              </div>
+            </a>
+          `;
+        }).join('');
+      } else {
+        list.innerHTML = '<div class="notification-empty">{{ t("common.no_notifications_empty", locale) }}</div>';
+      }
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Request notification permission
+    requestNotificationPermission();
+    
+    const bell = document.getElementById('notificationBell');
+    const panel = document.getElementById('notificationPanel');
+    const closeBtn = document.getElementById('notificationClose');
+    
+    if (bell && panel && closeBtn) {
+      bell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.classList.toggle('show');
+        if (panel.classList.contains('show')) {
+          fetchNotifications();
+        }
+      });
+
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.classList.remove('show');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && e.target !== bell && !bell.contains(e.target)) {
+          panel.classList.remove('show');
+        }
+      });
+
+      fetchNotificationCount();
+      notificationPollInterval = setInterval(fetchNotificationCount, 30000);
+    }
+  });
+  </script>
+</body>
+</html>

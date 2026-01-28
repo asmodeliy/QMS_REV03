@@ -1,0 +1,11 @@
+import sqlite3, logging
+logger = logging.getLogger(__name__)
+conn=sqlite3.connect('rpmt.db')
+cur=conn.cursor()
+cur.execute("SELECT status FROM IP_MATRIX WHERE ip_name=? AND node=?", ('MIPI D/C PHY Combo','SF4nm'))
+logger.info('before: %s', cur.fetchone())
+cur.execute('INSERT OR REPLACE INTO IP_MATRIX (ip_name,node,status,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP)', ('MIPI D/C PHY Combo','SF4nm','mass'))
+conn.commit()
+cur.execute("SELECT status FROM IP_MATRIX WHERE ip_name=? AND node=?", ('MIPI D/C PHY Combo','SF4nm'))
+logger.info('after: %s', cur.fetchone())
+conn.close()

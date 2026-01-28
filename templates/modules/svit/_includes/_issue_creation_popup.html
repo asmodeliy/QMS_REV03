@@ -1,0 +1,222 @@
+
+<div id="issueModal" class="modal hidden">
+  <div class="modal-overlay" onclick="closeNewIssueModal()"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" data-i18n="svit.new_issue">{{ t('svit.new_issue') }}</h2>
+        <button class="modal-close" onclick="closeNewIssueModal()" aria-label="Close">×</button>
+      </div>
+
+      <form id="issueForm" method="post" action="/svit/issue/create" class="modal-form" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="form-col">
+            
+            <div class="form-row">
+              <div class="field">
+                <label data-i18n="svit.shuttle_id">Shuttle ID *</label>
+                <select id="shuttleSelect" name="shuttle_id" required class="form-input" onchange="updateShuttleInfo()">
+                  <option value="">-- Select Registered MPW --</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label data-i18n="svit.issue_phenomenon">Issue / Phenomenon Description</label>
+                <textarea name="issue_phenomenon" placeholder="Describe the issue and phenomena in detail..." rows="6" class="form-input"></textarea>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label data-i18n="svit.condition_parameters">Power / Condition</label>
+                <div id="powerInputGrid" class="power-input-grid"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label data-i18n="svit.temperature">Temperature (°C)</label>
+                <input type="number" name="temp" step="0.1" placeholder="e.g., 25.5" class="form-input"/>
+              </div>
+              <div class="field">
+                <label data-i18n="svit.frequency">Frequency</label>
+                <input type="text" name="frequency" placeholder="e.g., 100MHz" class="form-input"/>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label data-i18n="svit.pattern">Pattern</label>
+                <input type="text" name="pattern" placeholder="e.g., Periodic" class="form-input"/>
+              </div>
+              <div class="field">
+                <label data-i18n="svit.status">Status</label>
+                <select name="status" class="form-input">
+                  <option value="NEW" selected>🆕 {{ t('svit.status_new') }}</option>
+                  <option value="IN_PROGRESS">🔄 {{ t('svit.status_in_progress') }}</option>
+                  <option value="RESOLVED">✓ {{ t('svit.status_resolved') }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <aside class="side-col">
+            <div style="margin-bottom:12px">
+              <label>IP/IC</label>
+              <input type="text" id="displayIpIc" class="form-input" readonly />
+            </div>
+            <div class="side-field">
+              <label>Node</label>
+              <input type="text" id="displayNode" class="form-input" readonly />
+            </div>
+            <div class="side-field">
+              <label>Family</label>
+              <input type="text" id="displayFamily" class="form-input" readonly />
+            </div>
+            <div class="side-field">
+            <div style="margin-top:6px">
+              <label>Attachments</label>
+              <input type="file" id="logAttach" name="log_attach" class="file-input" multiple />
+            <div class="attachments-area">
+            </div>
+          </aside>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="#issueModal btn btn-primary" data-i18n="svit.create_issue">{{ t('svit.create_issue') }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openNewIssueModal() {
+  const modal = document.getElementById('issueModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('issueForm').reset();
+  document.getElementById('displayIpIc').value = '';
+  document.getElementById('displayNode').value = '';
+  document.getElementById('displayFamily').value = '';
+  document.getElementById('powerInputGrid').innerHTML = '';
+  populateShuttleDropdown();
+}
+
+function closeNewIssueModal() {
+  const modal = document.getElementById('issueModal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function populateShuttleDropdown() {
+  const shuttleSelect = document.getElementById('shuttleSelect');
+  if (!shuttleSelect) return;
+  if (shuttleSelect.options.length > 1) return;
+  const shuttlesData = document.getElementById('shuttlesData');
+  if (!shuttlesData) return;
+  const shuttleElements = shuttlesData.querySelectorAll('.shuttle-option');
+  shuttleElements.forEach(shuttle => {
+    const shuttleId = shuttle.getAttribute('data-shuttle-id');
+    const ipIc = shuttle.getAttribute('data-ip-ic');
+    const node = shuttle.getAttribute('data-node');
+    const family = shuttle.getAttribute('data-family');
+    const option = document.createElement('option');
+    option.value = shuttleId + '|' + (ipIc||'');
+    option.textContent = ipIc ? `${shuttleId} - ${ipIc}` : shuttleId;
+    option.setAttribute('data-shuttle-id', shuttleId);
+    option.setAttribute('data-ip-ic', ipIc);
+    option.setAttribute('data-node', node);
+    option.setAttribute('data-family', family);
+    for (let i=1;i<=7;i++){ const p = shuttle.getAttribute('data-power-'+i); if(p) option.setAttribute('data-power-'+i,p); }
+    shuttleSelect.appendChild(option);
+  });
+}
+
+function updateShuttleInfo() {
+  const shuttleSelect = document.getElementById('shuttleSelect');
+  if (!shuttleSelect) return;
+  const sel = shuttleSelect.options[shuttleSelect.selectedIndex];
+  if (!sel) return;
+  const ipIc = sel.getAttribute('data-ip-ic') || '';
+  const node = sel.getAttribute('data-node') || '';
+  const family = sel.getAttribute('data-family') || '';
+  document.getElementById('displayIpIc').value = ipIc;
+  document.getElementById('displayNode').value = node;
+  document.getElementById('displayFamily').value = family;
+  const grid = document.getElementById('powerInputGrid'); grid.innerHTML = '';
+  const exampleValues = { 'AVDD':'0.8','DVDD':'1.2','AVDD18':'1.8','VREF':'0.6','PVDD':'2.5','BGVDD':'1.0' };
+  for (let i=1;i<=7;i++){
+    const p = sel.getAttribute('data-power-'+i) || '';
+    if(!p) continue;
+    const wrap = document.createElement('div'); wrap.className='power-input-item';
+    const label = document.createElement('label'); label.textContent = p;
+    const input = document.createElement('input'); input.type='text'; input.name=`power_${i}`; input.className='power-input'; input.placeholder = exampleValues[p]||'';
+    wrap.appendChild(label); wrap.appendChild(input); grid.appendChild(wrap);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  const fileInput = document.getElementById('logAttach');
+  const fileList = document.getElementById('fileList');
+  const dt = new DataTransfer();
+
+  function renderFileList(){
+    fileList.innerHTML = '';
+    Array.from(dt.files).forEach((f, idx) => {
+      const div = document.createElement('div'); div.className='file-item';
+      const nameSpan = document.createElement('span'); nameSpan.className='fname'; nameSpan.textContent = `📎 ${f.name}`;
+      const sizeSpan = document.createElement('span'); sizeSpan.className='fsize'; sizeSpan.textContent = `(${Math.round(f.size/1024)} KB)`;
+      const removeBtn = document.createElement('button'); removeBtn.type='button'; removeBtn.className='btn btn-link'; removeBtn.textContent='✕';
+      removeBtn.style.marginLeft = '8px'; removeBtn.style.border = 'none'; removeBtn.style.background = 'transparent'; removeBtn.style.cursor='pointer';
+      removeBtn.addEventListener('click', function(){
+        const newDt = new DataTransfer();
+        Array.from(dt.files).forEach((ff, i)=>{ if(i!==idx) newDt.items.add(ff); });
+        while(dt.items.length) dt.items.remove(0);
+        Array.from(newDt.files).forEach(f2 => dt.items.add(f2));
+        fileInput.files = dt.files;
+        renderFileList();
+      });
+
+      div.appendChild(nameSpan); div.appendChild(sizeSpan); div.appendChild(removeBtn);
+      fileList.appendChild(div);
+    });
+  }
+
+  if (fileInput && fileList) {
+    fileInput.addEventListener('change', function(){
+      Array.from(this.files).forEach(f => {
+        const exists = Array.from(dt.files).some(d => d.name===f.name && d.size===f.size);
+        if(!exists) dt.items.add(f);
+      });
+      fileInput.files = dt.files;
+      renderFileList();
+    });
+  }
+  populateShuttleDropdown();
+});
+
+document.addEventListener('DOMContentLoaded', function(){
+  const form = document.getElementById('issueForm');
+  if (!form) return;
+  form.addEventListener('submit', function(e){
+    const shuttleSelect = document.getElementById('shuttleSelect');
+    const shuttleValue = shuttleSelect ? shuttleSelect.value : '';
+    const shuttleId = shuttleValue.split('|')[0] || '';
+    let shuttleIdInput = document.querySelector('input[name="shuttle_id_actual"]');
+    if(!shuttleIdInput){ shuttleIdInput = document.createElement('input'); shuttleIdInput.type='hidden'; shuttleIdInput.name='shuttle_id_actual'; form.appendChild(shuttleIdInput); }
+    shuttleIdInput.value = shuttleId;
+    const powerInputs = document.querySelectorAll('.power-input');
+    const powerValues = Array.from(powerInputs).filter(i=>i.value.trim()!=='').map(i=>`${i.previousElementSibling.textContent}: ${i.value}`).join('; ');
+    let input_vField = document.querySelector('input[name="input_v"]');
+    if(!input_vField){ input_vField = document.createElement('input'); input_vField.type='hidden'; input_vField.name='input_v'; form.appendChild(input_vField); }
+    input_vField.value = powerValues;
+  });
+});
+
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeNewIssueModal(); });
+</script>

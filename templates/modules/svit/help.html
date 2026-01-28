@@ -1,0 +1,638 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <main class="container wide help-wrap svit-root svit-help-wrap svit-help-root">
+    <aside class="help-side svit-help-side">
+      <div class="head svit-help-head">{{ t('svit.help_toc', locale) }}</div>
+      <ul class="toc svit-help-toc">
+        <li><a href="#quick-start">{{ t('svit.help_quick_start', locale) }}</a></li>
+        <li><a href="#issue-workflow">{{ t('svit.help_issue_workflow', locale) }}</a></li>
+        <li><a href="#status-details">{{ t('svit.help_status_details', locale) }}</a></li>
+        <li><a href="#best-practices">{{ t('svit.help_best_practices', locale) }}</a></li>
+        <li><a href="#faq">{{ t('help.faq', locale) }}</a></li>
+      </ul>
+    </aside>
+
+    <section class="help-main svit-help-main">
+      
+      <div id="quick-start" class="help-section svit-help-section">
+        <div class="page-head">
+          <h2>🚀 {{ t('svit.help_quick_start', locale) }}</h2>
+          <div class="head-actions">
+            <button id="btn-feedback" class="btn nav">{{ t('help.send_feedback', locale) }}</button>
+          </div>
+        </div>
+        {% if locale == 'ko' %}
+          <p><strong>SVIT (시스템 검증 이슈 추적)</strong>는 시스템 검증 과정에서 발견되는 이슈를 효과적으로 관리하고 추적하는 도구입니다.</p>
+          
+          <div class="feature-grid svit-help-feature-grid">
+            <div class="feature-card svit-help-feature-card">
+              <h4>📝 이슈 생성</h4>
+              <p>시스템 검증 중 발견된 문제를 빠르게 기록하고 추적하세요.</p>
+            </div>
+            <div class="feature-card svit-help-feature-card">
+              <h4>🔄 상태 관리</h4>
+              <p>이슈의 진행 상황을 New → In Progress → Under Review → Resolved로 추적하세요.</p>
+            </div>
+            <div class="feature-card svit-help-feature-card">
+              <h4>⚠️ 우선순위 설정</h4>
+              <p>Critical, High, Medium, Low 우선순위로 이슈의 중요도를 구분하세요.</p>
+            </div>
+          </div>
+
+          <div class="box svit-help-box">
+            <strong>💡 팁:</strong> 각 이슈는 고유한 ID (예: MPW27_0001)로 관리되므로 추적과 참조가 용이합니다.
+          </div>
+        {% else %}
+          <p><strong>SVIT (System Verification Issue Tracking)</strong> is a tool for effectively managing and tracking issues discovered during system verification processes.</p>
+          
+          <div class="feature-grid">
+            <div class="feature-card">
+              <h4>📝 Create Issues</h4>
+              <p>Quickly record and track problems discovered during system verification.</p>
+            </div>
+            <div class="feature-card">
+              <h4>🔄 Manage Status</h4>
+              <p>Track issue progress through New → In Progress → Under Review → Resolved.</p>
+            </div>
+            <div class="feature-card">
+              <h4>⚠️ Set Priority</h4>
+              <p>Distinguish issue importance with Critical, High, Medium, Low priority levels.</p>
+            </div>
+          </div>
+
+          <div class="box">
+            <strong>💡 Tip:</strong> Each issue is managed with a unique ID (e.g., MPW27_0001) for easy tracking and reference.
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div id="issue-workflow" class="help-section">
+        <h2>🔄 {{ t('svit.help_issue_workflow', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <p>SVIT의 이슈는 다음과 같은 라이프사이클을 따릅니다:</p>
+
+          <div class="step svit-help-step">
+            <div class="step-num svit-help-step-num">1</div>
+            <div class="step-content svit-help-step-content">
+              <strong>이슈 생성</strong>
+              <p>"+ New Issue" 버튼을 클릭하여 새 이슈를 생성합니다. 제목, 현상, 설명, 심각도 등의 필수 정보를 입력합니다.</p>
+            </div>
+          </div>
+          <div class="step svit-help-step">
+            <div class="step-num svit-help-step-num">2</div>
+            <div class="step-content svit-help-step-content">
+              <strong>분석 및 진행</strong>
+              <p>이슈를 선택하고 상태를 "In Progress"로 변경하여 문제 분석을 시작합니다.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>검토 중</strong>
+              <p>분석 완료 후 상태를 "검토 중 (Under Review)"로 변경하여 검토를 요청합니다. 검토자는 첨부된 로그와 메모를 검토하고, 필요시 재현 절차를 요청합니다.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>해결</strong>
+              <p>이슈가 해결되었으면 상태를 "Resolved"로 변경합니다.</p>
+            </div>
+          </div>
+        {% else %}
+          <p>SVIT issues follow the following lifecycle:</p>
+
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Create Issue</strong>
+              <p>Click the "+ New Issue" button to create a new issue. Enter required information such as title, phenomenon, description, and severity.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Analyze and Progress</strong>
+              <p>Select the issue and change its status to "In Progress" to start analyzing the problem.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Wait for Review</strong>
+              <p>After analysis is complete, change the status to "Under Review" to request review. The reviewer will confirm analysis, request additional data if needed, and then approve or ask for more work.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Resolve</strong>
+              <p>Once the issue is resolved, change its status to "Resolved".</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div id="status-details" class="help-section svit-help-section">
+        <h2>📊 {{ t('svit.help_status_details', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <p>각 이슈 상태의 의미를 이해하세요:</p>
+
+          <table class="help-table svit-help-table">
+            <thead>
+              <tr>
+                <th>상태</th>
+                <th>설명</th>
+                <th>다음 단계</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-new svit-help-badge svit-help-badge-new">{{ t('svit.status_new', locale) }}</span></td>
+                <td>새로 생성된 이슈. 아직 분석이 시작되지 않은 상태입니다. 담당자가 할당되어야 합니다.</td>
+                <td>In Progress</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-in_progress svit-help-badge svit-help-badge-in-progress">{{ t('svit.status_in_progress', locale) }}</span></td>
+                <td>현재 분석이 진행 중인 상태입니다. 원인 분석, 재현 테스트, 임시 해결책 적용 등이 진행됩니다.</td>
+                <td>Under Review</td>
+              </tr>
+              
+              <tr>
+                <td><span class="badge badge-resolved svit-help-badge svit-help-badge-resolved">{{ t('svit.status_resolved', locale) }}</span></td>
+                <td>이슈가 완전히 해결된 상태입니다. 최종 결과와 해결 방법이 기록됩니다.</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>상태별 주요 활동</h3>
+          <div class="box svit-help-box">
+            <p><strong>📋 New 상태에서:</strong></p>
+            <ul class="spaced-list svit-help-spaced-list">
+              <li>이슈 정보의 완전성 확인 (제목, 현상, 재현 단계, 심각도)</li>
+              <li>담당자(Owner) 지정 및 초기 우선순위 설정</li>
+              <li>관련 MPW/Node/환경 정보 기입</li>
+            </ul>
+
+            <p><strong>🔧 In Progress 상태에서:</strong></p>
+            <ul class="spaced-list">
+              <li>원인 분석 및 재현 절차 문서화</li>
+              <li>로그, 스크린샷, 테스트 파일 첨부 (파일 이름 규칙 권장: MPWID_timestamp_type.log)</li>
+              <li>임시 해결(워크어라운드) 적용 및 결과 기록</li>
+              <li>분석 메모에 시간/테스트 조건을 기록</li>
+            </ul>
+
+            <p><strong>✅ 검토 중 (Under Review) 상태에서:</strong></p>
+            <ul class="spaced-list">
+              <li>검토자는 분석 내용을 확인하고, 재현 또는 추가 로그를 요청할 수 있습니다</li>
+              <li>승인 시 상태를 "Resolved"로 변경하거나, 추가 작업 요청 시 "In Progress"로 되돌립니다</li>
+            </ul>
+          </div>
+        {% else %}
+          <p>Understand the meaning of each issue status:</p>
+
+          <table class="help-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Next Step</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-new">{{ t('svit.status_new', locale) }}</span></td>
+                <td>Newly created issue. Analysis has not yet started. An owner should be assigned.</td>
+                <td>In Progress</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-in_progress">{{ t('svit.status_in_progress', locale) }}</span></td>
+                <td>Analysis is currently in progress. Root cause analysis, reproduction testing, and temporary fixes are being implemented.</td>
+                <td>Under Review</td>
+              </tr>
+              
+              <tr>
+                <td><span class="badge badge-resolved">{{ t('svit.status_resolved', locale) }}</span></td>
+                <td>Issue is completely resolved. Final results and resolution methods are recorded.</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Key Activities by Status</h3>
+          <div class="status-grid svit-help-status-grid">
+            <div class="status-card svit-help-status-card">
+              <div class="status-head svit-help-status-head">
+                <div class="status-pill pill-new svit-help-status-pill svit-help-status-pill-new">NEW</div>
+                <h4>New</h4>
+              </div>
+              <p>Initial triage and owner assignment.</p>
+              <ul class="spaced-list svit-help-spaced-list">
+                <li>Verify issue information completeness (title, phenomenon, env).</li>
+                <li>Assign owner and initial priority.</li>
+              </ul>
+            </div>
+
+            <div class="status-card svit-help-status-card">
+              <div class="status-head svit-help-status-head">
+                <div class="status-pill pill-progress svit-help-status-pill svit-help-status-pill-progress">IN</div>
+                <h4>In Progress</h4>
+              </div>
+              <p>Active analysis and testing.</p>
+              <ul class="spaced-list svit-help-spaced-list">
+                <li>Perform root cause analysis and document steps.</li>
+                <li>Attach logs, screenshots, and test files.</li>
+                <li>Record timestamps and test conditions.</li>
+              </ul>
+            </div>
+
+            <div class="status-card svit-help-status-card">
+              <div class="status-head svit-help-status-head">
+                <div class="status-pill pill-resolved svit-help-status-pill svit-help-status-pill-resolved">OK</div>
+                <h4>Resolved</h4>
+              </div>
+              <p>Final verification and closure.</p>
+              <ul class="spaced-list svit-help-spaced-list">
+                <li>Confirm fix and update resolution notes.</li>
+                <li>Attach final test results and regression checks.</li>
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div id="reviewer-checklist" class="help-section svit-help-section">
+        <div class="box">
+          {% if locale == 'ko' %}
+            <h3>검토자 체크리스트</h3>
+            <ul class="spaced-list">
+              <li>분석 로그와 재현 단계가 충분히 포함되었는지 확인하세요.</li>
+              <li>첨부 파일(로그, 스크린샷, 테스트 결과)을 검토하세요.</li>
+              <li>해결 기준(재현 불가, 정상 동작 확인 등)을 명확히 판단하세요.</li>
+              <li>승인 또는 추가 분석 요청을 메모로 남기세요.</li>
+            </ul>
+          {% else %}
+            <h3>Reviewer checklist</h3>
+            <ul class="spaced-list">
+              <li>Confirm analysis logs and reproduction steps are sufficient.</li>
+              <li>Review attachments (logs, screenshots, test results).</li>
+              <li>Decide clear resolution criteria (cannot reproduce, verified fixed, etc.).</li>
+              <li>Approve or request further investigation with notes.</li>
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+
+      
+      <div id="best-practices" class="help-section svit-help-section">
+        <h2>✨ {{ t('svit.help_best_practices', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <h3>이슈 생성 시 팁</h3>
+          <ul>
+            <li><strong>명확한 제목:</strong> 이슈의 핵심을 한눈에 알 수 있도록 작성하세요. (예: "MPW27 메모리 누수 - Reset 후 메모리 증가")</li>
+            <li><strong>상세한 현상:</strong> 발생하는 구체적인 현상을 설명하세요. (어떤 모듈에서, 어떤 조건에서)</li>
+            <li><strong>재현 단계:</strong> 문제를 재현할 수 있는 정확한 단계를 명시하세요.</li>
+            <li><strong>예상 결과:</strong> 정상 동작시 예상되는 결과를 기술하세요.</li>
+            <li><strong>파일 첨부:</strong> 로그 파일, 스크린샷, 테스트 패턴 파일 등을 첨부하세요.</li>
+            <li><strong>환경 정보:</strong> MPW ID, Node, IP/IC 코드, 테스트 환경 등을 명시하세요.</li>
+          </ul>
+
+          <h3>상태 관리 팁</h3>
+          <ul>
+            <li><strong>적시 업데이트:</strong> 이슈의 진행 상황을 매일 또는 주기적으로 업데이트하세요.</li>
+            <li><strong>상세 메모:</strong> 분석 결과, 원인 분석, 임시 해결책 등을 메모에 기록하세요.</li>
+            <li><strong>담당자 명확화:</strong> 담당 인력과 검토자를 명확히 지정하세요.</li>
+            <li><strong>첨부 자료 관리:</strong> 분석 결과 파일, 패치 파일 등을 첨부하세요.</li>
+          </ul>
+
+          <h3>검증 테스트 팁</h3>
+          <ul>
+            <li><strong>다양한 환경 테스트:</strong> 여러 노드, IP/IC, 전원 조건에서 테스트하세요.</li>
+            <li><strong>반복 테스트:</strong> 재현성을 확인하기 위해 여러 번 반복 테스트하세요.</li>
+            <li><strong>회귀 테스트:</strong> 해결 후 다른 기능이 영향을 받지 않는지 확인하세요.</li>
+            <li><strong>극한 조건 테스트:</strong> 온도, 주파수, 전압의 극한값에서도 테스트하세요.</li>
+          </ul>
+
+          <h3>팀 협업 팁</h3>
+          <ul>
+            <li><strong>명확한 커뮤니케이션:</strong> 이슈 상태와 진행 상황을 명확히 전달하세요.</li>
+            <li><strong>정기 검토:</strong> 주간 회의에서 "검토 중 (Under Review)" 상태의 이슈를 검토하세요.</li>
+            <li><strong>원인 공유:</strong> 발견된 원인과 해결 방법을 팀과 공유하세요.</li>
+          </ul>
+        {% else %}
+          <h3>Tips for Creating Issues</h3>
+          <ul>
+            <li><strong>Clear Title:</strong> Write a title that clearly shows the essence. (e.g., "MPW27 Memory Leak - Memory Increases After Reset")</li>
+            <li><strong>Detailed Phenomenon:</strong> Describe the specific phenomenon. (Which module, under what conditions)</li>
+            <li><strong>Reproduction Steps:</strong> Specify the exact steps to reproduce the problem.</li>
+            <li><strong>Expected Result:</strong> Describe the expected result of normal operation.</li>
+            <li><strong>Attach Files:</strong> Attach log files, screenshots, test pattern files, etc.</li>
+            <li><strong>Environment Info:</strong> Specify MPW ID, Node, IP/IC code, test environment, etc.</li>
+          </ul>
+
+          <h3>Status Management Tips</h3>
+          <ul>
+            <li><strong>Timely Updates:</strong> Update issue progress daily or periodically.</li>
+            <li><strong>Detailed Notes:</strong> Record analysis results, root cause analysis, temporary fixes in notes.</li>
+            <li><strong>Clear Assignment:</strong> Clearly assign responsible personnel and reviewers.</li>
+            <li><strong>Manage Attachments:</strong> Attach analysis result files, patch files, etc.</li>
+          </ul>
+
+          <h3>Verification Test Tips</h3>
+          <ul>
+            <li><strong>Multi-Environment Testing:</strong> Test on various nodes, IPs/ICs, and power conditions.</li>
+            <li><strong>Repetitive Testing:</strong> Perform multiple repetition tests to confirm reproducibility.</li>
+            <li><strong>Regression Testing:</strong> Verify that other functions are not affected after resolution.</li>
+            <li><strong>Extreme Condition Testing:</strong> Test at extreme values of temperature, frequency, and voltage.</li>
+          </ul>
+
+          <h3>Team Collaboration Tips</h3>
+          <ul>
+            <li><strong>Clear Communication:</strong> Clearly communicate issue status and progress.</li>
+            <li><strong>Regular Reviews:</strong> Review "Under Review" status issues in weekly meetings.</li>
+            <li><strong>Share Solutions:</strong> Share discovered root causes and resolution methods with the team.</li>
+          </ul>
+        {% endif %}
+      </div>
+
+      
+      <div id="faq" class="help-section svit-help-section">
+        <h2>❓ {{ t('help.faq', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <div class="faq-item">
+            <h4>Q: 이슈 ID는 어떻게 생성되나요?</h4>
+            <p>A: 이슈 ID는 셔틀 코드와 생성 순서로 자동 생성됩니다. (예: MPW27_0001) 각 셔틀별로 순번이 독립적으로 증가합니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 새로운 이슈를 생성하려면 어떻게 해야 하나요?</h4>
+            <p>A: 메인 페이지의 "+ New Issue" 버튼을 클릭하면 이슈 생성 팝업이 나타납니다. 필수 항목(제목, 현상, 설명)을 입력하고 제출하면 됩니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 이슈를 수정할 수 있나요?</h4>
+            <p>A: 이슈를 클릭하여 상세 페이지를 열면 대부분의 필드를 수정할 수 있습니다. 상태, 메모, 파일 첨부 등이 가능합니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 여러 파일을 첨부할 수 있나요?</h4>
+            <p>A: 네, 파일 첨부 영역에 여러 파일을 드래그 앤 드롭하거나 파일 선택으로 여러 파일을 첨부할 수 있습니다. 각 파일은 개별적으로 다운로드할 수 있습니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 이슈의 상태를 되돌릴 수 있나요?</h4>
+            <p>A: 네, 이슈 상세 페이지에서 상태 드롭다운을 통해 이전 상태로 변경할 수 있습니다. 예를 들어 "검토 중 (Under Review)"에서 "In Progress"로 되돌릴 수 있습니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 이슈를 검색하거나 필터링할 수 있나요?</h4>
+            <p>A: 메인 페이지의 필터 영역에서 Shuttle ID, Node, IP/IC, Family로 필터링할 수 있습니다. 필터 조건을 적용하면 일치하는 이슈만 표시됩니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 통계 정보는 어떻게 확인하나요?</h4>
+            <p>A: 메인 페이지 상단의 통계 카드에서 전체 이슈 수, NEW, IN_PROGRESS, RESOLVED 상태별 이슈 수를 확인할 수 있습니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 이슈 분석 중에 로그 파일을 어떻게 첨부하나요?</h4>
+            <p>A: 이슈 상세 페이지의 "파일 첨부" 섹션에서 로그 파일을 드래그 앤 드롭하거나 파일 선택으로 업로드할 수 있습니다. 최대 파일 크기는 50MB입니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 팀원들과 분석 결과를 어떻게 공유하나요?</h4>
+            <p>A: 이슈의 메모 필드에 분석 결과를 작성하고, 필요한 파일을 첨부하세요. 상태를 "검토 중 (Under Review)"로 변경하면 검토자에게 알림이 전달됩니다.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 환경 조건 정보(전력, 온도, 주파수)는 어디에 입력하나요?</h4>
+            <p>A: 이슈 상세 페이지의 "⚡ Condition Parameters" 섹션에서 AVDD, DVDD, VDD, Temperature, Frequency, Pattern 등을 입력할 수 있습니다.</p>
+          </div>
+        {% else %}
+          <div class="faq-item">
+            <h4>Q: How is the Issue ID generated?</h4>
+            <p>A: The Issue ID is automatically generated from the shuttle code and creation sequence. (e.g., MPW27_0001) The sequence increases independently for each shuttle.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: How do I create a new issue?</h4>
+            <p>A: Click the "+ New Issue" button on the main page to open the issue creation popup. Fill in the required fields (title, phenomenon, description) and submit.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: Can I edit an issue?</h4>
+            <p>A: Yes, you can edit most fields by clicking on an issue to open its detail page. You can modify status, notes, attachments, etc.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: Can I attach multiple files?</h4>
+            <p>A: Yes, you can attach multiple files by dragging and dropping them into the attachment area or by file selection. Each file can be downloaded individually.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: Can I revert the issue status?</h4>
+            <p>A: Yes, you can change the status to a previous state using the status dropdown on the issue detail page. For example, you can revert from "Under Review" to "In Progress".</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: Can I search or filter issues?</h4>
+            <p>A: Yes, you can filter issues by Shuttle ID, Node, IP/IC, and Family in the filter area on the main page. Applying filter conditions will display only matching issues.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: How do I view statistics?</h4>
+            <p>A: You can view the total number of issues and the number of issues by status (NEW, IN_PROGRESS, RESOLVED) in the statistics cards at the top of the main page.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: How do I attach log files during issue analysis?</h4>
+            <p>A: You can upload log files by dragging and dropping them into the "Attachment" section on the issue detail page or by file selection. Maximum file size is 50MB.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: How do I share analysis results with team members?</h4>
+            <p>A: Write the analysis results in the notes field of the issue and attach necessary files. Change the status to "Under Review" to notify the reviewer.</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: Where do I enter environment condition information (power, temperature, frequency)?</h4>
+            <p>A: You can enter AVDD, DVDD, VDD, Temperature, Frequency, Pattern, etc. in the "⚡ Condition Parameters" section on the issue detail page.</p>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+
+  
+  <div id="feedback-modal" class="svit-help-modal-backdrop" aria-hidden="true">
+    <div class="svit-help-modal-card" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+        <h3 id="feedback-title" style="margin:0">{{ t('help.send_feedback', locale) }}</h3>
+        <button id="btn-modal-close" class="icon-btn" title="{{ t('common.close', locale) }}">✕</button>
+      </div>
+
+      <p style="margin:0 0 16px; color:#475569; font-size:13px; line-height:1.6">
+        {{ t('feedback.describe_detailed', locale) }}
+      </p>
+
+      <form id="feedback-form" style="display:grid; gap:12px">
+        <select id="feedback-type" class="inp" style="padding:10px; border:1px solid var(--divider); border-radius:8px">
+          <option value="bug">{{ t('feedback.bug', locale) }}</option>
+          <option value="feature">{{ t('feedback.feature', locale) }}</option>
+          <option value="other">{{ t('feedback.other', locale) }}</option>
+        </select>
+
+        <input id="feedback-email" type="email" class="inp" placeholder="{{ t('feedback.email', locale) }}" required style="padding:10px; border:1px solid var(--divider); border-radius:8px"/>
+
+        <textarea id="feedback-message" class="inp" placeholder="{{ t('feedback.describe_detailed', locale) }}" required rows="6" style="padding:10px; border:1px solid var(--divider); border-radius:8px; resize:vertical"></textarea>
+
+        <div id="feedback-status" style="margin:0; color:#059669; font-size:13px; display:none"></div>
+
+        <div style="display:flex; gap:8px; justify-content:flex-end">
+          <button id="btn-form-close" type="button" class="btn" style="background:var(--bg-secondary)">{{ t('common.cancel', locale) }}</button>
+          <button type="submit" class="btn primary">{{ t('feedback.send', locale) }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <style>
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-new { background: #fef08a; color: #854d0e; }
+    .badge-in_progress { background: #bfdbfe; color: #1e40af; }
+    .badge-pending_review { background: #fecaca; color: #991b1b; }
+    .badge-resolved { background: #a7f3d0; color: #065f46; }
+    .badge-critical { background: #fee2e2; color: #991b1b; }
+    .badge-high { background: #fed7aa; color: #92400e; }
+    .badge-medium { background: #fef3c7; color: #78350f; }
+    .badge-low { background: #d1fae5; color: #065f46; }
+
+    .severity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .severity-box {
+      background: #fafbfc;
+      border: 1px solid var(--divider);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .severity-box .badge { display: block; margin-bottom: 8px; width: fit-content; }
+    .severity-box p { margin: 0; font-size: 12px; color: #6b7280; line-height: 1.5; }
+  </style>
+
+  <script>
+    // Smooth scroll for Table of Contents
+    (function(){
+      const toc = document.querySelectorAll('.toc a');
+      const sections = document.querySelectorAll('.help-section');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting) {
+            toc.forEach(a => { a.classList.remove('active'); a.classList.remove('svit-help-active'); });
+            const activeLink = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+            if(activeLink) { activeLink.classList.add('active'); activeLink.classList.add('svit-help-active'); }
+          }
+        });
+      }, { threshold: 0.5 });
+
+      sections.forEach(section => observer.observe(section));
+
+      toc.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = document.querySelector(link.getAttribute('href'));
+          target.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    })();
+
+    // Feedback Modal - defensive, with focus trap & restore
+    (function(){
+      const modal = document.getElementById('feedback-modal');
+      const btnFeedback = document.getElementById('btn-feedback');
+      const btnClose = document.getElementById('btn-modal-close');
+      const btnFormClose = document.getElementById('btn-form-close');
+      const form = document.getElementById('feedback-form');
+      const status = document.getElementById('feedback-status');
+
+      if(!modal) return;
+      if(!modal.style.display) modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+
+      let lastFocused = null;
+      let trapHandler = null;
+
+      const getFocusable = (container) => {
+        if(!container) return [];
+        return Array.from(container.querySelectorAll('a[href], button:not([disabled]), textarea, input:not([type="hidden"]), select, [tabindex]:not([tabindex="-1"])'))
+          .filter(el => el.offsetParent !== null);
+      };
+
+      const openModal = (e) => {
+        if(e && e.isTrusted === false) return;
+        lastFocused = document.activeElement;
+        if(modal.parentElement !== document.body) document.body.appendChild(modal);
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+
+        const focusable = getFocusable(modal);
+        if(focusable.length) focusable[0].focus();
+
+        trapHandler = function(ev){
+          if(ev.key === 'Tab'){
+            const f = getFocusable(modal);
+            if(f.length === 0){ ev.preventDefault(); return; }
+            const first = f[0];
+            const last = f[f.length -1];
+            if(ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
+            else if(!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
+          }
+        };
+        modal.addEventListener('keydown', trapHandler);
+      };
+
+      const closeModal = () => {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        if(form) form.reset();
+        if(status) status.style.display = 'none';
+        if(trapHandler) modal.removeEventListener('keydown', trapHandler);
+        trapHandler = null;
+        if(lastFocused && lastFocused.focus) lastFocused.focus();
+      };
+
+      if(btnFeedback) btnFeedback.addEventListener('click', openModal);
+      if(btnClose) btnClose.addEventListener('click', closeModal);
+      if(btnFormClose) btnFormClose.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+      document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && modal.style.display === 'flex') closeModal(); });
+
+      if(form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const typeEl = document.getElementById('feedback-type');
+          const emailEl = document.getElementById('feedback-email');
+          const messageEl = document.getElementById('feedback-message');
+          const type = typeEl ? typeEl.value : '';
+          const email = emailEl ? emailEl.value : '';
+          const message = messageEl ? messageEl.value : '';
+
+          try {
+            const res = await fetch('/feedback', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type, email, message}) });
+            const data = await res.json();
+            if(data.ok && status) {
+              status.textContent = '{{ t("feedback.feedback_received", locale) }}';
+              status.style.display = 'block';
+              status.style.color = '#059669';
+              setTimeout(closeModal, 1500);
+            } else if(status) {
+              status.textContent = (data && data.error) || '{{ t("feedback.send_failed", locale) }}';
+              status.style.display = 'block'; status.style.color = '#dc2626';
+            }
+          } catch(err) { if(status){ status.textContent = '{{ t("feedback.send_error", locale) }}'; status.style.display='block'; status.style.color='#dc2626'; } }
+        });
+      }
+    })();
+  </script>
+
+{% endblock %}

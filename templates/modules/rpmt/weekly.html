@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <main class="container wide wk2-wrap rpmt-root">
+    <div class="wk2-head">
+      <div class="range">
+        {% set end_date = start_monday + timedelta(days=weeks*7 - 1) %}
+        {{ start_monday.strftime('%Y.%m.%d') }} — {{ end_date.strftime('%Y.%m.%d') }}
+        <span class="muted">· {{ weeks }}{{ t('weekly.weeks_display', locale) }} 표시</span>
+      </div>
+
+      <div class="wk2-filters" role="toolbar" aria-label="{{ t('weekly.filter', locale) }}">
+        <button class="btn toggle active" data-status="all">{{ t('weekly.all', locale) }}</button>
+        <button class="btn toggle" data-status="In-progress">{{ t('dashboard.in_progress', locale) }}</button>
+        <button class="btn toggle" data-status="Complete">{{ t('task.complete', locale) }}</button>
+        <button class="btn toggle" data-status="Not Started">{{ t('dashboard.not_started', locale) }}</button>
+        <button class="btn toggle" data-status="N/A">{{ t('dashboard.na', locale) }}</button>
+        <input class="inp" id="wk2-search" type="text" placeholder="{{ t('weekly.search_project', locale) }}"/>
+        <form method="get" action="/rpmt/weekly" style="display:flex;gap:8px;align-items:center">
+          <input class="inp" type="date" name="start" value="{{ start_monday.isoformat() }}" style="width:140px"/>
+          <select class="sel" name="weeks" style="width:100px">
+            {% for n in range(1,13) %}
+              <option value="{{n}}" {% if n==weeks %}selected{% endif %}>{{n}}{{ t('weekly.weeks_display', locale) }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn primary" style="width:60px">{{ t('weekly.query', locale) }}</button>
+          <a href="/rpmt/weekly/calendar" class="btn ghost" style="margin-left:8px;white-space:nowrap">
+            {{ t('weekly.calendar_link', locale) if t('weekly.calendar_link', locale) != 'weekly.calendar_link' else 'Calendar View' }}
+          </a>
+        </form>
+      </div>
+    </div>
+
+    <div class="wk2-grid" style="--cols: {{ projects|length }}">
+      <div class="cell head wcol"><span style="color:var(--muted)">주간</span></div>
+
+      {% for prj in projects %}
+      <div class="cell head pcol variant-{{ variants[prj.id] }}">
+        <div style="display:flex;flex-direction:column; gap:6px;">
+          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+            <strong class="clamp-1" style="color:var(--pc)">{{ prj.code }}</strong>
+          </div>
+          <div class="prj-meta" aria-hidden="false">
+            {% for v in [prj.process, prj.metal_option, prj.pdk_ver, prj.ip_code, prj.tech] %}
+              {% if v %}
+                <span class="chip" style="background:var(--pc-50);border-color:var(--pc-200);color:var(--pc)">{{ v }}</span>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% for (yy,ww,ws,we) in week_rows %}
+      {% set end_incl = ws + timedelta(days=6) %}
+      <div class="cell wcol">
+        <div style="font-weight:700;color:#0b1933">W{{ "%02d"|format(ww) }}</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:2px">{{ ws.strftime('%m-%d') }} ~ {{ end_incl.strftime('%m-%d') }}</div>
+        <div style="color:var(--muted);font-size:12px">{{ yy }}</div>
+      </div>
+
+      {% for prj in projects %}
+        {% set items = pivot.get((yy,ww), {}).get(prj.id, []) %}
+        <div class="cell body pcol variant-{{ variants[prj.id] }}" data-week="{{ yy }}-W{{ "%02d"|format(ww) }}" data-project="{{ prj.code }}">
+          {% if items|length == 0 %}
+            <div style="color:var(--muted);text-align:center;padding:20px 0">—</div>
+          {% else %}
+            <ul style="list-style:none;margin:0;padding:0">
+              {% for t in items %}
+              <li class="wk2-task" data-status="{{ (t.status and t.status.value) or 'N/A' }}" data-text="{{ (t.cat2 or t.cat1 or '').lower() }}" data-task-id="{{ t.id }}">
+                <div class="tit">{{ t.cat2 or t.cat1 or '(제목 없음)' }}</div>
+                <div class="meta">
+                  {% set st = (t.status and t.status.value) or 'N/A' %}
+                  <span class="chip" style="font-size:10px">{{ st }}</span>
+                  <span class="chip" style="font-size:10px">마감 {{ t.due_date.strftime('%m-%d') if t.due_date else '미설정' }}</span>
+                  {% if t.dept_from or t.dept_to %}
+                  <span class="chip" style="font-size:10px">{{ t.dept_from or '—' }} → {{ t.dept_to or '—' }}</span>
+                  {% endif %}
+                  <button class="wk2-quick-status" type="button" aria-label="Quick status change">⋯</button>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </main>
+
+  <script>
+    const locale = "{{ locale }}";
+
+    function setLanguage(lang) {
+      window.location.href = `/api/set-language/${lang}`;
+    }
+
+    (function(){
+      let curStatus = 'all';
+      const bar = document.querySelector('.wk2-filters');
+      const search = document.getElementById('wk2-search');
+
+      function apply(){
+        const term = (search?.value || '').trim().toLowerCase();
+        document.querySelectorAll('.wk2-task').forEach(task=>{
+          const st = (task.getAttribute('data-status') || 'N/A').trim();
+          const txt = (task.getAttribute('data-text') || '').trim();
+          const passStatus = (curStatus === 'all' || st === curStatus);
+          const passQuery = (!term || txt.includes(term));
+          task.style.display = (passStatus && passQuery) ? '' : 'none';
+        });
+
+        document.querySelectorAll('.cell.body').forEach(cell=>{
+          const ul = cell.querySelector('ul');
+          if(!ul) return;
+          const anyVisible = Array.from(ul.querySelectorAll('.wk2-task')).some(n=>n.style.display!=='none');
+          let placeholder = cell.querySelector('.__empty');
+          if(!anyVisible){
+            if(!placeholder){
+              placeholder = document.createElement('div');
+              placeholder.className='__empty';
+              placeholder.textContent='필터 결과: 표시할 항목 없음';
+              cell.appendChild(placeholder);
+            }
+            ul.style.display = 'none';
+          } else {
+            if(placeholder) placeholder.remove();
+            ul.style.display = '';
+          }
+        });
+      }
+
+      bar?.addEventListener('click', e=>{
+        const b = e.target.closest('button[data-status]'); if(!b) return;
+        curStatus = b.dataset.status;
+        bar.querySelectorAll('.btn.toggle').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        apply();
+      });
+
+      search?.addEventListener('input', apply);
+
+      window.addEventListener('DOMContentLoaded', apply);
+      apply();
+
+      // Quick status change
+      const menu = document.createElement('div');
+      menu.className = 'wk2-status-menu';
+      const LABEL = {
+        ko: { 'Complete':'완료', 'In-progress':'진행중', 'Not Started':'준비중', 'N/A':'해당 없음' },
+        en: { 'Complete':'Complete', 'In-progress':'In-progress', 'Not Started':'Not Started', 'N/A':'N/A' }
+      };
+      const L = LABEL[locale] || LABEL.en;
+      menu.innerHTML = `
+        <button data-value="Complete">${L['Complete']}</button>
+        <button data-value="In-progress">${L['In-progress']}</button>
+        <button data-value="Not Started">${L['Not Started']}</button>
+        <button data-value="N/A">${L['N/A']}</button>
+      `;
+      document.body.appendChild(menu);
+
+      let menuTarget = null;
+
+      document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.wk2-quick-status');
+        if (btn) {
+          e.stopPropagation();
+          const li = btn.closest('.wk2-task');
+          menuTarget = li;
+          const rect = btn.getBoundingClientRect();
+          menu.style.left = rect.left + window.scrollX + 'px';
+          menu.style.top = rect.bottom + window.scrollY + 4 + 'px';
+          menu.classList.add('open');
+          return;
+        }
+
+        if (e.target.closest('.wk2-status-menu')) {
+          const val = e.target.getAttribute('data-value');
+          if (!val || !menuTarget) return;
+          const taskId = menuTarget.getAttribute('data-task-id');
+          try {
+            const res = await fetch(`/api/tasks/${taskId}/status`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ status: val })
+            });
+            if (res.ok) {
+              menuTarget.setAttribute('data-status', val);
+              const chip = menuTarget.querySelector('.meta .chip');
+              if (chip) chip.textContent = L[val] || val;
+              apply();
+            }
+          } catch (err) {
+            console.error(err);
+          }
+          menu.classList.remove('open');
+          menuTarget = null;
+          return;
+        }
+
+        if (menu.classList.contains('open')) {
+          menu.classList.remove('open');
+          menuTarget = null;
+        }
+      });
+    })();
+  </script>
+{% endblock %}

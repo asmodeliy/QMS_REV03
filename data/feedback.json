@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1764147872011,
+    "timestamp": "2025-11-26T18:04:32.011670",
+    "type": "bug",
+    "email": "swlee@ramschip.com",
+    "message": "TEST",
+    "url": "http://192.168.0.110:8000/help",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "ip": "192.168.0.110",
+    "status": "Replied",
+    "admin_reply": "ddd",
+    "replied_at": "2025-12-01T09:57:42.139155"
+  },
+  {
+    "id": 1764214016403,
+    "timestamp": "2025-11-27T12:26:56.403844",
+    "type": "feature",
+    "email": "swlee@ramschip.com",
+    "message": "WW Sheduler에서 \"지연\" 중인 card는 pink color로 container 자체를 Highlight 해 주세요",
+    "url": "https://7tlsmhqg-8000.asse.devtunnels.ms/help",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0",
+    "ip": "125.132.216.97",
+    "status": "Resolved",
+    "admin_reply": null,
+    "replied_at": null
+  },
+  {
+    "id": 1764217051890,
+    "timestamp": "2025-11-27T13:17:31.890259",
+    "type": "bug",
+    "email": "dsfsdfds@fsdfs.com",
+    "message": "dfsdfsfd",
+    "url": "http://192.168.0.110:8000/help",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "ip": "192.168.0.110",
+    "status": "Read",
+    "admin_reply": null,
+    "replied_at": null
+  }
+]
