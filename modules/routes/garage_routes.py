@@ -14,6 +14,7 @@ def set_templates(tmpl: Jinja2Templates):
     global TEMPLATES
     TEMPLATES = tmpl
 
+                                        
 TMP_DIR = BASE_DIR / 'uploads' / '.tmp' / 'garage'
 FINAL_DIR = BASE_DIR / 'uploads' / 'garage'
 TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -23,6 +24,11 @@ CHUNK_LIMIT = 1024 * 1024 * 128
 
 
 def _get_loggers():
+    """Return (garage_logger, app_logger) with graceful fallback to standard logging if core.logger isn't importable.
+
+    The fallback provides a minimal wrapper that implements the methods our code expects
+    (info, debug, warning, log_error, log_file_operation) so code using these.
+    """
     try:
         from core.logger import garage_logger, app_logger
     except Exception:
@@ -259,62 +265,79 @@ async def upload_page(request: Request):
         raise HTTPException(status_code=500, detail='Failed to render upload page')
 
 
-@router.get('/debug')
-async def debug(request: Request):
-                                                           
+# New endpoints: list files and download
+@router.get('/list')
+async def list_page(request: Request):
+    """Render a simple page listing garage uploads."""
+    _require_auth(request)
     garage_logger, _ = _get_loggers()
     try:
-        tpl_path = BASE_DIR / 'templates' / 'garage' / 'upload.html'
-        data = {
-            'templates_set': TEMPLATES is not None,
-            'template_exists': tpl_path.exists(),
-            'template_path': str(tpl_path),
-            'session': bool(getattr(request, 'session', {}).get('is_authenticated'))
-        }
-        garage_logger.debug('debug endpoint', data)
-        return JSONResponse(data)
+        templ = TEMPLATES
+        if templ is None:
+            from fastapi.templating import Jinja2Templates
+            templ = Jinja2Templates(directory=str(BASE_DIR / 'templates'))
+        server_url = str(request.base_url).rstrip('/')
+        tpl_path = BASE_DIR / 'templates' / 'garage' / 'list.html'
+        garage_logger.debug('Rendering garage list page', {'path': str(tpl_path), 'exists': tpl_path.exists()})
+        return templ.TemplateResponse('garage/list.html', {'request': request, 'server_url': server_url})
     except Exception as e:
-        try:
-            garage_logger.log_error('debug_error', 'Debug endpoint failed', {'error': str(e)})
-        except Exception:
-            pass
-        return JSONResponse({'ok': False, 'error': str(e)}, status_code=500)
+        garage_logger.log_error('list_page_error', 'Failed to render list page', {'error': str(e)})
+        raise HTTPException(status_code=500, detail='Failed to render garage list page')
 
 
-@router.post('/upload_whole')
-async def upload_whole(request: Request, file: UploadFile = File(...)):
+@router.post('/download-zip')
+async def download_zip(request: Request):
+    """Create a ZIP of selected garage files and return it as a download.
+
+    Request JSON: {"safe_names": ["<safe_name>", ...]}
+    """
     _require_auth(request)
-                                                                         
-    filename = file.filename or 'upload'
-                               
-    from core.config import GARAGE_MAX_UPLOAD_SIZE, GARAGE_ALLOWED_EXTENSIONS
-                                                                                                              
-    if GARAGE_MAX_UPLOAD_SIZE and request.headers.get('content-length'):
-        try:
-            if int(request.headers.get('content-length')) > GARAGE_MAX_UPLOAD_SIZE:
-                raise HTTPException(status_code=413, detail='File too large')
-        except ValueError:
-            pass
-
-                     
-    ext = Path(filename).suffix.lower()
-    if GARAGE_ALLOWED_EXTENSIONS and ext not in GARAGE_ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail='File type not allowed')
-
-    safe_name = f"{int(time.time())}-{uuid.uuid4().hex[:8]}-{filename}"
-    final_path = FINAL_DIR / safe_name
+    garage_logger, _ = _get_loggers()
     try:
-        with final_path.open('wb') as out:
-            while True:
-                chunk = await file.read(1024 * 1024)
-                if not chunk:
-                    break
-                out.write(chunk)
-        rel = final_path.relative_to(BASE_DIR)
-        garage_logger, _ = _get_loggers()
-        garage_logger.log_file_operation('upload_whole', str(final_path), size=final_path.stat().st_size)
-        return JSONResponse({'ok': True, 'path': str(rel), 'filename': safe_name})
+        data = await request.json()
+        safe_names = data.get('safe_names', []) if isinstance(data, dict) else []
+        if not safe_names:
+            raise HTTPException(status_code=400, detail='safe_names required')
+
+        files = []
+        for sn in safe_names:
+            target = FINAL_DIR / sn
+            if not target.exists() or not target.is_file():
+                raise HTTPException(status_code=404, detail=f'File not found: {sn}')
+            files.append((sn, target))
+
+        import zipfile
+        import tempfile
+        tmp_zip = TMP_DIR / f"garage_zip_{int(time.time())}_{uuid.uuid4().hex[:8]}.zip"
+        try:
+            with zipfile.ZipFile(tmp_zip, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+                for sn, p in files:
+                    arcname = '-'.join(p.name.split('-')[2:]) if len(p.name.split('-')) >= 3 else p.name
+                    zf.write(p, arcname=arcname)
+        except Exception as e:
+            garage_logger.log_error('zip_failed', 'Failed to create zip', {'error': str(e)})
+            raise HTTPException(status_code=500, detail='Failed to create zip')
+
+        garage_logger.info('zip_created', {'zip': str(tmp_zip), 'files': len(files)})
+        return FileResponse(str(tmp_zip), filename='garage_files.zip', media_type='application/zip')
+    except HTTPException:
+        raise
     except Exception as e:
-        garage_logger, _ = _get_loggers()
-        garage_logger.log_error('upload_whole_error', 'Failed to save upload_whole', {'error': str(e)})
-        raise HTTPException(status_code=500, detail='Upload failed')
+        garage_logger.log_error('download_zip_error', 'Failed to process download-zip', {'error': str(e)})
+        raise HTTPException(status_code=500, detail='Failed to create zip')
+    """Download a previously uploaded garage file by its safe name."""
+    _require_auth(request)
+    garage_logger, _ = _get_loggers()
+    try:
+        target = FINAL_DIR / safe_name
+        # prevent path traversal
+        if not target.exists() or not target.is_file():
+            raise HTTPException(status_code=404, detail='File not found')
+        # serve file
+        garage_logger.info('download', {'file': str(target), 'user': getattr(request, 'session', {}).get('email')})
+        return FileResponse(str(target), filename=safe_name, media_type='application/octet-stream')
+    except HTTPException:
+        raise
+    except Exception as e:
+        garage_logger.log_error('download_error', 'Failed to download file', {'error': str(e)})
+        raise HTTPException(status_code=500, detail='Failed to download file')

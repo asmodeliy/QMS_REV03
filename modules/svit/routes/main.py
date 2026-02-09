@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter ,Request ,HTTPException ,Form ,UploadFile ,File 
 from typing import List 
-from fastapi .responses import HTMLResponse ,RedirectResponse 
+from fastapi .responses import HTMLResponse ,RedirectResponse ,JSONResponse 
 from sqlalchemy .orm import Session 
 from pathlib import Path 
 from core.config import BASE_DIR
@@ -19,10 +19,62 @@ from core .logger import svit_logger
 SVIT_DB_PATH = Path(__file__).parent.parent / "svit.db"
 
 def sanitize_filename(filename: str) -> str:
+    """Remove or replace characters that cause issues in URLs"""
     filename = re.sub(r'[#?&=%;]', '_', filename)
     filename = re.sub(r'\s+', '_', filename)
     return filename
 
+
+# Upload helper utilities
+import unicodedata
+import tempfile
+import shutil
+from core.config import SVIT_ALLOWED_ATTACHMENTS, SVIT_MAX_ATTACH_SIZE
+
+
+def save_upload_file(up: UploadFile, upload_dir: Path, issue_id: int) -> Path:
+    """Safely save an UploadFile to upload_dir, enforcing allowed extensions and size limits.
+    Returns a Path relative to project uploads (Path('uploads')/'svit'/filename).
+    Raises ValueError on validation error.
+    """
+    orig_name = Path(up.filename).name
+    norm_name = unicodedata.normalize('NFC', orig_name)
+    ext = norm_name.rsplit('.', 1)[-1].lower() if '.' in norm_name else ''
+
+    if ext not in SVIT_ALLOWED_ATTACHMENTS:
+        raise ValueError(f"disallowed file type: .{ext}")
+
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    tmp = None
+    size = 0
+    try:
+        tmp = tempfile.NamedTemporaryFile(delete=False, dir=str(upload_dir))
+        while True:
+            chunk = up.file.read(64 * 1024)
+            if not chunk:
+                break
+            size += len(chunk)
+            if size > SVIT_MAX_ATTACH_SIZE:
+                raise ValueError('file too large')
+            tmp.write(chunk)
+        tmp.flush()
+        tmp.close()
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        safe = sanitize_filename(norm_name)
+        unique = f"issue_{issue_id}_{timestamp}_{safe}"
+        final_path = upload_dir / unique
+        # atomic replace (same filesystem)
+        os.replace(tmp.name, final_path)
+        return Path('uploads') / 'svit' / unique
+    except Exception:
+        if tmp is not None:
+            try:
+                os.unlink(tmp.name)
+            except Exception:
+                pass
+        raise
 router =APIRouter (tags =["svit"])
 
 templates =None 
@@ -482,7 +534,11 @@ temp :str =Form (default =""),
 input_v :str =Form (default =""),
 frequency :str =Form (default =""),
 pattern :str =Form (default =""),
+expected_from_paste: str = Form(default=""),
+countermeasure_from_paste: str = Form(default=""),
 log_attach :List [UploadFile ]=File (None ),
+expected_root_attach: List[UploadFile] = File(None),
+countermeasure_attach: List[UploadFile] = File(None),
 ):
     auth_check =ensure_authenticated (request )
     if auth_check :
@@ -540,57 +596,127 @@ log_attach :List [UploadFile ]=File (None ),
         db .commit ()
 
 
-        saved_paths =[]
-        if log_attach :
-            upload_dir = BASE_DIR / "uploads" / "svit"
-            upload_dir.mkdir(parents=True, exist_ok=True)
-            svit_logger.info(f"svit upload: {len(log_attach)} file(s) received for issue {issue.id}")
-            for up in log_attach :
+        saved_paths = []
+        saved_expected_paths = []
+        saved_counter_paths = []
+        upload_errors = []
+        upload_expected_errors = []
+        upload_counter_errors = []
+        upload_dir = BASE_DIR / "uploads" / "svit"
+
+        if log_attach:
+            for up in log_attach:
                 try:
-                    if not up or not up .filename :
+                    if not up or not up.filename:
                         svit_logger.info(f"svit upload: skipping empty upload entry for issue {issue.id}")
-                        continue 
-                    timestamp =datetime .now ().strftime ("%Y%m%d_%H%M%S")
-                    safe_name = sanitize_filename(Path (up .filename ).name)
-                    unique_filename =f"issue_{issue .id }_{timestamp }_{safe_name }"
-                    file_path =upload_dir /unique_filename 
-
-                    # read and write with error handling
-                    try:
-                        contents = up.file.read()
-                    except Exception as e:
-                        svit_logger.exception(f"Error reading uploaded file {up.filename} for issue {issue.id}: {e}")
                         continue
-
                     try:
-                        with open (file_path ,"wb")as f :
-                            f .write (contents )
+                        rel_path = save_upload_file(up, upload_dir, issue.id)
+                        svit_logger.info(f"svit upload: saved {rel_path} (orig={up.filename}) for issue {issue.id}")
+                        saved_paths.append(rel_path)
+                    except ValueError as ve:
+                        svit_logger.info(f"svit upload: rejected file {up.filename} for issue {issue.id}: {ve}")
+                        upload_errors.append(str(ve))
                     except Exception as e:
-                        svit_logger.exception(f"Error writing uploaded file to disk {file_path} for issue {issue.id}: {e}")
-                        continue
-
-                    svit_logger.info(f"svit upload: saved {unique_filename} (orig={up.filename}) for issue {issue.id}")
-                    saved_paths .append (Path ("uploads")/"svit"/unique_filename )
+                        svit_logger.exception(f"svit upload: unexpected error saving {up.filename} for issue {issue.id}: {e}")
+                        upload_errors.append('internal_error')
                 except Exception:
                     svit_logger.exception(f"Unexpected error handling uploaded file for issue {issue.id}")
                     continue
 
-        if saved_paths :
+        # expected/root-cause specific attachments
+        if expected_root_attach:
+            for up in expected_root_attach:
+                try:
+                    if not up or not up.filename:
+                        svit_logger.info(f"svit expected upload: skipping empty upload entry for issue {issue.id}")
+                        continue
+                    try:
+                        rel_path = save_upload_file(up, upload_dir, issue.id)
+                        svit_logger.info(f"svit expected upload: saved {rel_path} (orig={up.filename}) for issue {issue.id}")
+                        saved_expected_paths.append(rel_path)
+                    except ValueError as ve:
+                        svit_logger.info(f"svit expected upload: rejected file {up.filename} for issue {issue.id}: {ve}")
+                        upload_expected_errors.append(str(ve))
+                    except Exception as e:
+                        svit_logger.exception(f"svit expected upload: unexpected error saving {up.filename} for issue {issue.id}: {e}")
+                        upload_expected_errors.append('internal_error')
+                except Exception:
+                    svit_logger.exception(f"Unexpected error handling expected upload for issue {issue.id}")
+                    continue
 
-            issue .log_attach =",".join ([p .as_posix ()for p in saved_paths ])
-            db .add (issue )
-            db .commit ()
+        # If paste-origin files were sent but parsed into saved_paths, move them to expected list
+        if expected_from_paste and saved_paths and not saved_expected_paths:
+            svit_logger.info(f"create_issue: moving saved_paths to expected_root_attach due to expected_from_paste for issue {issue.id}: {saved_paths}")
+            saved_expected_paths = saved_paths
+            saved_paths = []
 
+        # countermeasure specific attachments
+        if countermeasure_attach:
+            for up in countermeasure_attach:
+                try:
+                    if not up or not up.filename:
+                        svit_logger.info(f"svit counter upload: skipping empty upload entry for issue {issue.id}")
+                        continue
+                    try:
+                        rel_path = save_upload_file(up, upload_dir, issue.id)
+                        svit_logger.info(f"svit counter upload: saved {rel_path} (orig={up.filename}) for issue {issue.id}")
+                        saved_counter_paths.append(rel_path)
+                    except ValueError as ve:
+                        svit_logger.info(f"svit counter upload: rejected file {up.filename} for issue {issue.id}: {ve}")
+                        upload_counter_errors.append(str(ve))
+                    except Exception as e:
+                        svit_logger.exception(f"svit counter upload: unexpected error saving {up.filename} for issue {issue.id}: {e}")
+                        upload_counter_errors.append('internal_error')
+                except Exception:
+                    svit_logger.exception(f"Unexpected error handling counter upload for issue {issue.id}")
+                    continue
+
+        # If paste-origin files were sent but parsed into saved_paths, move them to countermeasure list
+        if countermeasure_from_paste and saved_paths and not saved_counter_paths:
+            svit_logger.info(f"create_issue: moving saved_paths to countermeasure_attach due to countermeasure_from_paste for issue {issue.id}: {saved_paths}")
+            saved_counter_paths = saved_paths
+            saved_paths = []
+
+        if saved_paths:
+            issue.log_attach = ",".join([p.as_posix() for p in saved_paths])
+            db.add(issue)
+            db.commit()
+
+        if saved_expected_paths:
+            issue.expected_root_attach = ",".join([p.as_posix() for p in saved_expected_paths])
+            db.add(issue)
+            db.commit()
+            svit_logger.info(f"create_issue: expected_root_attach set for issue {issue.id}: {issue.expected_root_attach}")
+
+        if saved_counter_paths:
+            issue.countermeasure_attach = ",".join([p.as_posix() for p in saved_counter_paths])
+            db.add(issue)
+            db.commit()
+            svit_logger.info(f"create_issue: countermeasure_attach set for issue {issue.id}: {issue.countermeasure_attach}")
+
+        # If there were upload errors, log and respond accordingly
+        if upload_errors or upload_expected_errors or upload_counter_errors:
+            svit_logger.info(f"Issue {issue.id} created with upload errors: {upload_errors + upload_expected_errors + upload_counter_errors}")
+            if request.headers.get('x-requested-with','').lower() == 'xmlhttprequest':
+                return JSONResponse({'ok': False, 'upload_error': True})
+            return RedirectResponse(url=f"/svit/?success=false&upload_error=true", status_code=303)
+
+        # Success response
+        if request.headers.get('x-requested-with','').lower() == 'xmlhttprequest':
+            return JSONResponse({'ok': True, 'issue_id': issue.id, 'log_attach': issue.log_attach, 'expected_root_attach': issue.expected_root_attach, 'countermeasure_attach': issue.countermeasure_attach})
         return RedirectResponse (url ="/svit/?success=true",status_code =303 )
 
     except Exception :
+        if request.headers.get('x-requested-with','').lower() == 'xmlhttprequest':
+            return JSONResponse({'ok': False, 'error': True})
         return RedirectResponse (url ="/svit/?error=true",status_code =303 )
     finally :
         db .close ()
 
 
 @router .post ("/issue/update/{issue_id}")
-def update_issue (
+async def update_issue (
 issue_id :int ,
 request :Request ,
 status :str =Form (default ="NEW"),
@@ -600,7 +726,11 @@ frequency :str =Form (default =""),
 pattern :str =Form (default =""),
  expected_root_cause: str = Form(default=""),
  countermeasure: str = Form(default=""),
+ expected_from_paste: str = Form(default=""),
+ countermeasure_from_paste: str = Form(default=""),
 log_attach :List [UploadFile ]=File (None ),
+expected_root_attach: List[UploadFile] = File(None),
+countermeasure_attach: List[UploadFile] = File(None),
 ):
     auth_check =ensure_authenticated (request )
     if auth_check :
@@ -609,6 +739,27 @@ log_attach :List [UploadFile ]=File (None ),
     db =get_svit_db_sync ()
 
     try :
+        # Debug: capture raw FormData keys and attached filenames to diagnose client uploads
+        try:
+            form = await request.form()
+            keys = list(form.keys())
+            details = []
+            for k in keys:
+                values = form.getlist(k) if hasattr(form, 'getlist') else [form[k]]
+                for v in values:
+                    if hasattr(v, 'filename'):
+                        details.append((k, getattr(v, 'filename', None)))
+                    else:
+                        details.append((k, str(v)[:200]))
+            svit_logger.info(f"update_issue: raw form keys for issue {issue_id}: {keys}, details: {details}")
+            try:
+                hdrs = dict(request.headers)
+                svit_logger.info(f"update_issue: request headers for issue {issue_id}: {hdrs}")
+            except Exception:
+                pass
+        except Exception as _e:
+            svit_logger.exception(f"update_issue: error reading raw form for issue {issue_id}: {_e}")
+
         temp_value =float (temp )if temp and temp .strip ()else None 
 
         issue =db .query (Issue ).filter (Issue .id ==issue_id ).first ()
@@ -616,47 +767,132 @@ log_attach :List [UploadFile ]=File (None ),
             raise HTTPException (status_code =404 ,detail ="Issue not found")
 
 
-        new_paths =[]
-        if log_attach :
-            upload_dir = BASE_DIR / "uploads" / "svit"
-            upload_dir.mkdir(parents=True, exist_ok=True)
-            svit_logger.info(f"svit upload (update): {len(log_attach)} file(s) received for issue {issue_id}")
-            for lf in log_attach :
+        new_paths = []
+        new_expected_paths = []
+        new_counter_paths = []
+        upload_errors = []
+        upload_expected_errors = []
+        upload_counter_errors = []
+        upload_dir = BASE_DIR / "uploads" / "svit"
+
+        # Debug: log incoming file fields and filenames to diagnose where pasted images are routed
+        try:
+            la_files = [lf.filename for lf in (log_attach or []) if getattr(lf, 'filename', None)]
+        except Exception:
+            la_files = []
+        try:
+            er_files = [ef.filename for ef in (expected_root_attach or []) if getattr(ef, 'filename', None)]
+        except Exception:
+            er_files = []
+        try:
+            cm_files = [cf.filename for cf in (countermeasure_attach or []) if getattr(cf, 'filename', None)]
+        except Exception:
+            cm_files = []
+        svit_logger.info(f"update_issue: incoming files for issue {issue_id}: log_attach={la_files}, expected_root_attach={er_files}, countermeasure_attach={cm_files}")
+
+        if log_attach:
+            for lf in log_attach:
                 try:
-                    if not lf or not lf .filename :
+                    if not lf or not lf.filename:
                         svit_logger.info(f"svit upload (update): skipping empty upload entry for issue {issue_id}")
-                        continue 
-                    timestamp =datetime .now ().strftime ("%Y%m%d_%H%M%S")
-                    safe_name = sanitize_filename(Path (lf .filename ).name)
-                    unique_filename =f"issue_{issue_id }_{timestamp }_{safe_name }"
-                    file_path =upload_dir /unique_filename 
-
-                    try:
-                        contents = lf.file.read()
-                    except Exception as e:
-                        svit_logger.exception(f"Error reading uploaded file {lf.filename} for issue {issue_id}: {e}")
                         continue
-
                     try:
-                        with open (file_path ,"wb")as f :
-                            f .write (contents )
+                        rel = save_upload_file(lf, upload_dir, issue_id)
+                        svit_logger.info(f"svit upload (update): saved {rel} (orig={lf.filename}) for issue {issue_id}")
+                        new_paths.append(rel.as_posix())
+                    except ValueError as ve:
+                        svit_logger.info(f"svit upload (update): rejected file {lf.filename} for issue {issue_id}: {ve}")
+                        upload_errors.append(str(ve))
                     except Exception as e:
-                        svit_logger.exception(f"Error writing uploaded file to disk {file_path} for issue {issue_id}: {e}")
-                        continue
-
-                    svit_logger.info(f"svit upload (update): saved {unique_filename} (orig={lf.filename}) for issue {issue_id}")
-                    new_paths .append ((Path ("uploads")/"svit"/unique_filename ).as_posix ())
+                        svit_logger.exception(f"svit upload (update): unexpected error saving {lf.filename} for issue {issue_id}: {e}")
+                        upload_errors.append('internal_error')
                 except Exception:
                     svit_logger.exception(f"Unexpected error handling uploaded file for issue {issue_id}")
                     continue
+        # expected/root-cause specific attachments (update)
+        if expected_root_attach:
+            for lf in expected_root_attach:
+                try:
+                    if not lf or not lf.filename:
+                        svit_logger.info(f"svit expected upload (update): skipping empty upload entry for issue {issue_id}")
+                        continue
+                    try:
+                        rel = save_upload_file(lf, upload_dir, issue_id)
+                        svit_logger.info(f"svit expected upload (update): saved {rel} (orig={lf.filename}) for issue {issue_id}")
+                        new_expected_paths.append(rel.as_posix())
+                    except ValueError as ve:
+                        svit_logger.info(f"svit expected upload (update): rejected file {lf.filename} for issue {issue_id}: {ve}")
+                        upload_expected_errors.append(str(ve))
+                    except Exception as e:
+                        svit_logger.exception(f"svit expected upload (update): unexpected error saving {lf.filename} for issue {issue_id}: {e}")
+                        upload_expected_errors.append('internal_error')
+                except Exception:
+                    svit_logger.exception(f"Unexpected error handling expected upload for issue {issue_id}")
+                    continue
 
-        if new_paths :
-            existing =[]
-            if issue .log_attach :
+        # countermeasure specific attachments (update)
+        if countermeasure_attach:
+            for lf in countermeasure_attach:
+                try:
+                    if not lf or not lf.filename:
+                        svit_logger.info(f"svit counter upload (update): skipping empty upload entry for issue {issue_id}")
+                        continue
+                    try:
+                        rel = save_upload_file(lf, upload_dir, issue_id)
+                        svit_logger.info(f"svit counter upload (update): saved {rel} (orig={lf.filename}) for issue {issue_id}")
+                        new_counter_paths.append(rel.as_posix())
+                    except ValueError as ve:
+                        svit_logger.info(f"svit counter upload (update): rejected file {lf.filename} for issue {issue_id}: {ve}")
+                        upload_counter_errors.append(str(ve))
+                    except Exception as e:
+                        svit_logger.exception(f"svit counter upload (update): unexpected error saving {lf.filename} for issue {issue_id}: {e}")
+                        upload_counter_errors.append('internal_error')
+                except Exception:
+                    svit_logger.exception(f"Unexpected error handling counter upload for issue {issue_id}")
+                    continue
 
-                existing =[p .strip ().lstrip ('/').replace ('\\','/')for p in issue .log_attach .split (',')if p .strip ()]
-            combined =existing +new_paths 
-            issue .log_attach =",".join (combined )
+        svit_logger.info(f"update_issue: processed new_paths={new_paths}, new_expected_paths={new_expected_paths}")
+
+        # If paste-origin files were sent but ended up in new_paths, and the client indicated expected_from_paste,
+        # move them into expected_root_attach instead of log_attach.
+        if expected_from_paste and new_paths and not new_expected_paths:
+            svit_logger.info(f"update_issue: moving new_paths to expected_root_attach due to expected_from_paste for issue {issue_id}: {new_paths}")
+            new_expected_paths.extend(new_paths)
+            new_paths = []
+
+        if countermeasure_from_paste and new_paths and not new_counter_paths:
+            svit_logger.info(f"update_issue: moving new_paths to countermeasure_attach due to countermeasure_from_paste for issue {issue_id}: {new_paths}")
+            new_counter_paths.extend(new_paths)
+            new_paths = []
+
+        if new_paths:
+            existing = []
+            if issue.log_attach:
+                existing = [p.strip().lstrip('/').replace('\\','/') for p in issue.log_attach.split(',') if p.strip()]
+            combined = existing + new_paths
+            issue.log_attach = ",".join(combined)
+
+        if upload_errors or upload_expected_errors or upload_counter_errors:
+            svit_logger.info(f"Issue {issue_id} updated with upload errors: {upload_errors + upload_expected_errors + upload_counter_errors}")
+            if request.headers.get('x-requested-with','').lower() == 'xmlhttprequest':
+                return JSONResponse({'ok': False, 'upload_error': True})
+            return RedirectResponse(url=f"/svit/issue/{issue_id}?success=false&upload_error=true", status_code=303)
+
+        if new_expected_paths:
+            existing_expected = []
+            if issue.expected_root_attach:
+                existing_expected = [p.strip().lstrip('/').replace('\\','/') for p in issue.expected_root_attach.split(',') if p.strip()]
+            combined_expected = existing_expected + new_expected_paths
+            issue.expected_root_attach = ",".join(combined_expected)
+            svit_logger.info(f"update_issue: expected_root_attach for issue {issue_id} updated to: {issue.expected_root_attach}")
+
+        if new_counter_paths:
+            existing_counter = []
+            if issue.countermeasure_attach:
+                existing_counter = [p.strip().lstrip('/').replace('\\','/') for p in issue.countermeasure_attach.split(',') if p.strip()]
+            combined_counter = existing_counter + new_counter_paths
+            issue.countermeasure_attach = ",".join(combined_counter)
+            svit_logger.info(f"update_issue: countermeasure_attach for issue {issue_id} updated to: {issue.countermeasure_attach}")
 
         issue .status =status 
         issue .issue_phenomenon =issue_phenomenon or issue .issue_phenomenon 
@@ -667,9 +903,14 @@ log_attach :List [UploadFile ]=File (None ),
         issue .pattern =pattern or issue .pattern 
 
         db .commit ()
+        # Success response
+        if request.headers.get('x-requested-with','').lower() == 'xmlhttprequest':
+            return JSONResponse({'ok': True, 'issue_id': issue_id, 'log_attach': issue.log_attach, 'expected_root_attach': issue.expected_root_attach, 'countermeasure_attach': issue.countermeasure_attach})
         return RedirectResponse (url =f"/svit/issue/{issue_id }?success=true",status_code =303 )
 
     except Exception :
+        if request.headers.get('x-requested-with','').lower() == 'xmlhttprequest':
+            return JSONResponse({'ok': False, 'error': True})
         return RedirectResponse (url =f"/svit/issue/{issue_id }?error=true",status_code =303 )
     finally :
         db .close ()
@@ -687,18 +928,43 @@ def delete_issue_file(issue_id: int, request: Request, path: str = Form(...)):
         raise HTTPException(status_code=404, detail='Issue not found')
 
     p = path.lstrip('/').replace('\\', '/')
-    existing = [s.strip().lstrip('/').replace('\\', '/') for s in (issue.log_attach or '').split(',') if s.strip()]
-    
-    if p not in existing:
+    log_existing = [s.strip().lstrip('/').replace('\\', '/') for s in (issue.log_attach or '').split(',') if s.strip()]
+    expected_existing = [s.strip().lstrip('/').replace('\\', '/') for s in (issue.expected_root_attach or '').split(',') if s.strip()]
+    counter_existing = [s.strip().lstrip('/').replace('\\', '/') for s in (issue.countermeasure_attach or '').split(',') if s.strip()]
+
+    # Determine if the path belongs to log attachments, expected-root attachments, or countermeasure attachments
+    target_column = None
+    if p in log_existing:
+        target_column = 'log'
+    elif p in expected_existing:
+        target_column = 'expected'
+    elif p in counter_existing:
+        target_column = 'counter'
+    else:
+        # try fuzzy matching by suffix
         found = False
-        for existing_path in existing:
+        for existing_path in log_existing:
             if existing_path.endswith(p) or p.endswith(existing_path) or existing_path == p:
                 p = existing_path
+                target_column = 'log'
                 found = True
                 break
-        
         if not found:
-            raise HTTPException(status_code=404, detail=f'File not associated. Looking for: {p}, Available: {existing}')
+            for existing_path in expected_existing:
+                if existing_path.endswith(p) or p.endswith(existing_path) or existing_path == p:
+                    p = existing_path
+                    target_column = 'expected'
+                    found = True
+                    break
+        if not found:
+            for existing_path in counter_existing:
+                if existing_path.endswith(p) or p.endswith(existing_path) or existing_path == p:
+                    p = existing_path
+                    target_column = 'counter'
+                    found = True
+                    break
+        if not found:
+            raise HTTPException(status_code=404, detail=f'File not associated. Looking for: {p}, Available: {log_existing + expected_existing + counter_existing}')
 
     try:
         full = BASE_DIR / p
@@ -721,8 +987,21 @@ def delete_issue_file(issue_id: int, request: Request, path: str = Form(...)):
     except Exception:
         pass
 
-    remaining = [s for s in existing if s != p]
-    issue.log_attach = ','.join(remaining)
-    db.add(issue)
-    db.commit()
-    return {'ok': True, 'remaining': issue.log_attach}
+    if target_column == 'log':
+        remaining = [s for s in log_existing if s != p]
+        issue.log_attach = ','.join(remaining)
+        db.add(issue)
+        db.commit()
+        return {'ok': True, 'remaining': issue.log_attach}
+    elif target_column == 'expected':
+        remaining = [s for s in expected_existing if s != p]
+        issue.expected_root_attach = ','.join(remaining)
+        db.add(issue)
+        db.commit()
+        return {'ok': True, 'remaining': issue.expected_root_attach}
+    else:  # counter
+        remaining = [s for s in counter_existing if s != p]
+        issue.countermeasure_attach = ','.join(remaining)
+        db.add(issue)
+        db.commit()
+        return {'ok': True, 'remaining': issue.countermeasure_attach}

@@ -1,7 +1,8 @@
 ﻿from fastapi import APIRouter, Request, HTTPException, Depends, Query
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import inspect, text
+from sqlalchemy import inspect as sa_inspect, text
+import inspect as pyinspect
 from sqlalchemy.orm import Session
 from pathlib import Path
 from core.config import BASE_DIR
@@ -15,44 +16,117 @@ router = APIRouter(prefix="/db-browser", tags=["db_browser"])
 
 TEMPLATES = Jinja2Templates(directory=str(Path(BASE_DIR) / "templates"))
 
-DATABASES = {
-    "spec_center": {
-        "name": "spec_center",
-        "display_name": "Spec Center",
-        "path": "spec_center.db",
-        "session_factory": SpecSessionLocal,
-        "description": "洹쒓꺽 愿由??곗씠?곕쿋?댁뒪"
-    },
-    "svit": {
-        "name": "svit",
-        "display_name": "SVIT",
-        "path": "svit.db",
-        "session_factory": SvitSessionLocal,
-        "description": "SVIT 臾몄젣 異붿쟻 ?곗씠?곕쿋?댁뒪"
-    },
-    "rpmt": {
-        "name": "rpmt",
-        "display_name": "RPMT",
-        "path": "rpmt.db",
-        "session_factory": RpmtSessionLocal,
-        "description": "RPMT ?꾨줈?앺듃 愿由??곗씠?곕쿋?댁뒪"
-    },
-    "customer_issue": {
-        "name": "customer_issue",
-        "display_name": "Customer Issue",
-        "path": "customer_issue.db",
-        "session_factory": CustomerSessionLocal,
-        "description": "怨좉컼 臾몄젣 異붿쟻 ?곗씠?곕쿋?댁뒪"
-    }
-}
+import importlib
+import pkgutil
+
+
+def _discover_databases():
+    dbs = {}
+    modules_dir = Path(BASE_DIR) / "modules"
+
+    try:
+        for entry in modules_dir.iterdir():
+            if not entry.is_dir():
+                continue
+            db_file = entry / "db.py"
+            if not db_file.exists():
+                continue
+            mod_name = entry.name
+            try:
+                mod = importlib.import_module(f"modules.{mod_name}.db")
+            except Exception:
+                continue
+
+            session_factory = None
+            for attr in dir(mod):
+                if attr.endswith('SessionLocal'):
+                    session_factory = getattr(mod, attr)
+                    break
+
+            path = None
+            if hasattr(mod, 'DB_PATH'):
+                try:
+                    path = str(getattr(mod, 'DB_PATH'))
+                except Exception:
+                    path = None
+            else:
+                for attr in dir(mod):
+                    if 'engine' in attr.lower():
+                        obj = getattr(mod, attr)
+                        if hasattr(obj, 'url'):
+                            try:
+                                path = str(obj.url)
+                                break
+                            except Exception:
+                                continue
+
+            display_name = getattr(mod, 'DISPLAY_NAME', None) or mod_name.replace('_', ' ').title()
+            description = getattr(mod, 'DESCRIPTION', None) or f"{display_name} 데이터베이스"
+
+            if session_factory:
+                dbs[mod_name] = {
+                    'name': mod_name,
+                    'display_name': display_name,
+                    'path': path,
+                    'session_factory': session_factory,
+                    'description': description
+                }
+    except Exception:
+        pass
+
+    try:
+        core_db = importlib.import_module('core.db')
+        core_cfg = importlib.import_module('core.config')
+        session_factory = getattr(core_db, 'SessionLocal', None)
+        path = getattr(core_cfg, 'DB_PATH', None)
+        if session_factory:
+            dbs['rpmt'] = {
+                'name': 'rpmt',
+                'display_name': 'RPMT',
+                'path': str(path) if path else None,
+                'session_factory': session_factory,
+                'description': 'RPMT 메인 데이터베이스'
+            }
+    except Exception:
+        pass
+
+    try:
+        auth_mod = importlib.import_module('core.auth.db')
+        if hasattr(auth_mod, 'AuthSessionLocal'):
+            dbs['auth'] = {
+                'name': 'auth',
+                'display_name': 'Auth',
+                'path': None,
+                'session_factory': getattr(auth_mod, 'AuthSessionLocal'),
+                'description': 'Authentication / users DB'
+            }
+    except Exception:
+        pass
+
+    return dbs
+
 
 
 def get_db_for_name(db_name: str):
-    """Get database session based on database name"""
-    if db_name not in DATABASES:
+    """Get database session based on database name (dynamic discovery)."""
+    dbs = _discover_databases()
+    if db_name not in dbs:
         raise HTTPException(status_code=400, detail=f"Database '{db_name}' not found")
-    
-    return DATABASES[db_name]["session_factory"]()
+
+    sf = dbs[db_name]['session_factory']
+
+    try:
+        if pyinspect.isgeneratorfunction(sf):
+            gen = sf()
+            session = next(gen)
+            return session
+    except Exception:
+        raise HTTPException(status_code=500, detail=f"Cannot construct session from generator for '{db_name}'")
+
+    try:
+        return sf()
+    except Exception:
+        raise HTTPException(status_code=500, detail=f"Cannot create session for database '{db_name}'")
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -63,7 +137,8 @@ def db_browser_page(request: Request):
 
 @router.get("/api/databases")
 def list_databases():
-    """List available databases"""
+    """List available databases (dynamically discovered)"""
+    dbs = _discover_databases()
     return {
         "databases": [
             {
@@ -72,7 +147,7 @@ def list_databases():
                 "path": db["path"],
                 "description": db["description"]
             }
-            for db in DATABASES.values()
+            for db in dbs.values()
         ]
     }
 
@@ -82,7 +157,7 @@ def list_tables(db_name: str = Query("spec_center")):
     """List all tables in the database"""
     db = get_db_for_name(db_name)
     try:
-        inspector = inspect(db.get_bind())
+        inspector = sa_inspect(db.get_bind())
         tables = inspector.get_table_names()
         
         table_info = []
@@ -117,10 +192,9 @@ def get_table_data(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=1000)
 ):
-    """Get paginated table data"""
     db = get_db_for_name(db_name)
     try:
-        inspector = inspect(db.get_bind())
+        inspector = sa_inspect(db.get_bind())
         tables = inspector.get_table_names()
         
         if table_name not in tables:
@@ -162,10 +236,9 @@ def search_table(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=1000)
 ):
-    """Search table data"""
     db = get_db_for_name(db_name)
     try:
-        inspector = inspect(db.get_bind())
+        inspector = sa_inspect(db.get_bind())
         tables = inspector.get_table_names()
         
         if table_name not in tables:
@@ -219,10 +292,9 @@ def delete_row(
     row_id: int,
     db_name: str = Query("spec_center")
 ):
-    """Delete a row from table"""
     db = get_db_for_name(db_name)
     try:
-        inspector = inspect(db.get_bind())
+        inspector = sa_inspect(db.get_bind())
         tables = inspector.get_table_names()
         
         if table_name not in tables:
@@ -244,23 +316,33 @@ def delete_row(
         db.close()
 
 
+def sql_literal(v):
+    if v is None:
+        return 'NULL'
+    if isinstance(v, str):
+        esc = v.replace("'", "''")
+        return f"'{esc}'"
+    if isinstance(v, bool):
+        return '1' if v else '0'
+    return str(v)
+
+
 @router.post("/api/table/{table_name}")
 def insert_row(
     table_name: str,
     data: dict,
     db_name: str = Query("spec_center")
 ):
-    """Insert a new row"""
     db = get_db_for_name(db_name)
     try:
-        inspector = inspect(db.get_bind())
+        inspector = sa_inspect(db.get_bind())
         tables = inspector.get_table_names()
         
         if table_name not in tables:
             raise HTTPException(status_code=404, detail=f"Table '{table_name}' not found")
         
         columns = ", ".join(data.keys())
-        values = ", ".join([f"'{v}'" if isinstance(v, str) else str(v) for v in data.values()])
+        values = ", ".join([sql_literal(v) for v in data.values()])
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
         db.execute(text(query))
         db.commit()
@@ -279,10 +361,9 @@ def update_row(
     data: dict,
     db_name: str = Query("spec_center")
 ):
-    """Update a row"""
     db = get_db_for_name(db_name)
     try:
-        inspector = inspect(db.get_bind())
+        inspector = sa_inspect(db.get_bind())
         tables = inspector.get_table_names()
         
         if table_name not in tables:
@@ -294,7 +375,7 @@ def update_row(
         
         pk_col = pk_cols[0]
         
-        set_clause = ", ".join([f"{k} = '{v}'" if isinstance(v, str) else f"{k} = {v}" for k, v in data.items()])
+        set_clause = ", ".join([f"{k} = {sql_literal(v)}" for k, v in data.items()])
         query = f"UPDATE {table_name} SET {set_clause} WHERE {pk_col} = {row_id}"
         db.execute(text(query))
         db.commit()
@@ -309,7 +390,6 @@ def update_row(
                           
 @router.get("/api/common-info")
 def get_common_data_info():
-    """Get common data summary for display"""
     try:
         from core.db import SessionLocal
         session = SessionLocal()
@@ -330,6 +410,69 @@ def get_common_data_info():
                 "total_configs": total_configs
             }
         }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+from fastapi import APIRouter
+common_api = APIRouter(prefix="/api/common")
+
+@common_api.get('/summary')
+def api_common_summary():
+    try:
+        from core.db import SessionLocal
+        session = SessionLocal()
+        from core.common_data_schema import Product, ProductVariant, ProductConfig
+        total_products = session.query(Product).count()
+        total_variants = session.query(ProductVariant).count()
+        total_configs = session.query(ProductConfig).count()
+        session.close()
+        return {"success": True, "data": {"total_products": total_products, "total_variants": total_variants, "total_configs": total_configs}}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@common_api.get('/products')
+def api_common_products():
+    try:
+        from core.db import SessionLocal
+        session = SessionLocal()
+        from core.common_data_schema import Product
+        products = session.query(Product).order_by(Product.id).all()
+        out = []
+        for p in products:
+            out.append({
+                "id": p.id,
+                "db_name": p.db_name,
+                "product_code": p.product_code,
+                "description": p.description,
+                "is_active": bool(p.is_active)
+            })
+        session.close()
+        return {"success": True, "data": out}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@common_api.get('/ip-info')
+def api_common_ip_info():
+    try:
+        from core.db import SessionLocal
+        session = SessionLocal()
+        from core.common_data_schema import Product, ProductVariant
+        # collect variants with IP info and product name
+        q = session.query(ProductVariant, Product).join(Product, Product.id == ProductVariant.product_id).all()
+        out = []
+        for pv, p in q:
+            out.append({
+                "product_id": p.id,
+                "product_name": p.db_name,
+                "tech": pv.tech,
+                "lane_config": pv.lane_config,
+                "process": pv.process,
+                "ip_name": pv.ip_name,
+                "ip_address": pv.ip_address
+            })
+        session.close()
+        return {"success": True, "data": out}
     except Exception as e:
         return {"success": False, "error": str(e)}
 

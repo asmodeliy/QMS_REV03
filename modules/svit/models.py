@@ -67,7 +67,11 @@ class Issue (Base ):
 
     report_date :Mapped [datetime ]=mapped_column (DateTime ,nullable =True )
     log_attach :Mapped [str ]=mapped_column (String (500 ),nullable =True )
+    # Attachments specifically uploaded for the expected/root-cause field
+    expected_root_attach :Mapped [str ]=mapped_column (String (1000), nullable=True)
     expected_root_cause :Mapped [str ]=mapped_column (Text ,nullable =True )
+    # Attachments specifically uploaded for the countermeasure field
+    countermeasure_attach :Mapped [str ]=mapped_column (String (1000), nullable=True)
     countermeasure :Mapped [str ]=mapped_column (Text ,nullable =True )
     update_note :Mapped [str ]=mapped_column (Text ,nullable =True )
     resolved_note :Mapped [str ]=mapped_column (Text ,nullable =True )

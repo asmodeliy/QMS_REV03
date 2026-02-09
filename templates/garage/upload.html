@@ -17,6 +17,13 @@
       <button id="start-btn" class="btn">Start Upload</button>
     </div>
   </div>
+
+  {% if is_admin %}
+  <div class="garage-admin" style="margin-top:18px; max-width:680px; margin-left:auto; margin-right:auto;">
+    <h3>Available Garage Files (Admin)</h3>
+    <ul id="files-list" style="padding-left:18px;"></ul>
+  </div>
+  {% endif %}
 </div>
 
 <script>
@@ -24,6 +31,27 @@ const serverUrl = '{{ server_url }}';
 const maxSize = {{ max_size }};
 const chunkSize = 10 * 1024 * 1024; // 10MB
 let file = null;
+
+{% if is_admin %}
+// Admin: fetch garage files and populate list
+(async function(){
+  try{
+    const resp = await fetch(serverUrl + '/api/garage/files');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (!data.ok) return;
+    const ul = document.getElementById('files-list');
+    data.files.forEach(f => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = serverUrl + '/api/garage/download/' + encodeURIComponent(f.filename);
+      a.innerText = `${f.filename} (${Math.round(f.size/1024)} KB)`;
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+  }catch(e){}
+})();
+{% endif %}
 
 const fileInput = document.getElementById('file-input');
 const dropArea = document.getElementById('drop-area');

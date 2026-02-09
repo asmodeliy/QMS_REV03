@@ -41,6 +41,35 @@
           <p>{{ issue.expected_root_cause or '—' }}</p>
         </div>
         <textarea id="expectedRootEdit" class="editable-textarea hidden">{{ issue.expected_root_cause or '' }}</textarea>
+        <div class="expected-attachments">
+          <label>{{ t("svit.expected_attachments") }}</label>
+          <div class="expected-list">
+            {% if issue.expected_root_attach %}
+              {% set files = issue.expected_root_attach.split(',') if ',' in issue.expected_root_attach else [issue.expected_root_attach] %}
+              <div class="log-list">
+                {% for f in files %}
+                  {% set ff = f.strip().replace('\\','/') %}
+                  {% if ff %}
+                    {% set fname = ff.split('/')[-1].lower() %}
+                    {% if fname.endswith('.png') or fname.endswith('.jpg') or fname.endswith('.jpeg') or fname.endswith('.gif') or fname.endswith('.webp') %}
+                      <a href="/{{ ff.lstrip('/') }}" target="_blank" class="expected-file-item expected-image" data-path="{{ ff }}">
+                        <img src="/{{ ff.lstrip('/') }}" class="attach-thumb" alt="{{ fname }}" />
+                      </a>
+                    {% else %}
+                      <div class="expected-file-item">
+                        <span class="file-icon">📎</span>
+                        <a href="/{{ ff.lstrip('/') }}" target="_blank" class="link-file">{{ ff.split('/')[-1] }}</a>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="no-file">—</span>
+            {% endif %}
+            <div id="expectedPendingPreview" class="expected-pending-preview"></div>
+          </div>
+        </div>
       </section>
 
       <section class="detail-section">
@@ -49,6 +78,35 @@
           <p>{{ issue.countermeasure or '—' }}</p>
         </div>
         <textarea id="countermeasureEdit" class="editable-textarea hidden">{{ issue.countermeasure or '' }}</textarea>
+        <div class="countermeasure-attachments">
+          <label>{{ t("svit.countermeasure_attachments") if t else 'Countermeasure Attachments' }}</label>
+          <div class="countermeasure-list">
+            {% if issue.countermeasure_attach %}
+              {% set files = issue.countermeasure_attach.split(',') if ',' in issue.countermeasure_attach else [issue.countermeasure_attach] %}
+              <div class="log-list">
+                {% for f in files %}
+                  {% set ff = f.strip().replace('\\','/') %}
+                  {% if ff %}
+                    {% set fname = ff.split('/')[-1].lower() %}
+                    {% if fname.endswith('.png') or fname.endswith('.jpg') or fname.endswith('.jpeg') or fname.endswith('.gif') or fname.endswith('.webp') %}
+                      <a href="/{{ ff.lstrip('/') }}" target="_blank" class="countermeasure-file-item countermeasure-image" data-path="{{ ff }}">
+                        <img src="/{{ ff.lstrip('/') }}" class="attach-thumb" alt="{{ fname }}" />
+                      </a>
+                    {% else %}
+                      <div class="countermeasure-file-item">
+                        <span class="file-icon">📎</span>
+                        <a href="/{{ ff.lstrip('/') }}" target="_blank" class="link-file">{{ ff.split('/')[-1] }}</a>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="no-file">—</span>
+            {% endif %}
+            <div id="countermeasurePendingPreview" class="countermeasure-pending-preview"></div>
+          </div>
+        </div>
       </section>
 
 
@@ -260,26 +318,56 @@ document.addEventListener('paste', async function(e){
       if(!file) continue;
       if(!file.name) file.name = `clipboard_${Date.now()}.png`;
       const fd = new FormData();
-      fd.append('log_attach', file, file.name);
+      // choose correct key based on where user pasted (expected root, countermeasure, or general)
+      const activeId = (document.activeElement && document.activeElement.id) ? document.activeElement.id : '';
+      const isExpected = (activeId === 'expectedRootEdit' || activeId === 'expectedRootDisplay');
+      const isCounter = (activeId === 'countermeasureEdit' || activeId === 'countermeasureDisplay');
+      const key = isExpected ? 'expected_root_attach' : (isCounter ? 'countermeasure_attach' : 'log_attach');
+      fd.append(key, file, file.name);
+      if(isExpected){ fd.append('expected_from_paste', '1'); }
+      if(isCounter){ fd.append('countermeasure_from_paste', '1'); }
       // determine issue id from hidden input or url fallback
       const issueId = document.getElementById('issue-id')?.value || (location.pathname.match(/\/(?:issue|phenomenon)\/(\d+)/)||[])[1] || '';
       try{
-        const res = await fetch(`/svit/issue/update/${issueId}`, {method:'POST', body: fd});
-        if(!res.ok){ console.error('paste upload failed', res.status); alert('파일 업로드 실패'); return; }
-        // after upload, reload so server-provided paths render
-        // show a quick local preview then reload
-        const reader = new FileReader();
-        reader.onload = function(){
-          const desc = document.getElementById('phenDisplay');
-          if(desc){
+        const res = await fetch(`/svit/issue/update/${issueId}`, {method:'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}, redirect: 'manual', body: fd});
+        if(res.redirected || res.status === 303 || res.type === 'opaqueredirect'){
+          // success without navigation
+          // show quick preview and then request updated attachment lists
+          const reader = new FileReader();
+          reader.onload = function(){
+            // place quick preview into the pending preview area to avoid creating a permanent duplicate in the main display
+            const pendingTarget = isExpected ? document.getElementById('expectedPendingPreview') : (isCounter ? document.getElementById('countermeasurePendingPreview') : null);
+            const mainTarget = isExpected ? document.getElementById('expectedRootDisplay') : (isCounter ? document.getElementById('countermeasureDisplay') : document.getElementById('phenDisplay'));
             const wrap = document.createElement('div');
-            wrap.className = 'inline-attach';
+            wrap.className = 'inline-attach pending';
+            wrap.setAttribute('data-pending','1');
             wrap.innerHTML = `<div class="attach-wrap"><div class="resizable"><img src="${reader.result}" alt="${file.name}"/></div></div>`;
-            desc.appendChild(wrap);
-          }
-          setTimeout(()=> location.reload(), 800);
-        };
-        reader.readAsDataURL(file);
+            if(pendingTarget){
+              pendingTarget.appendChild(wrap);
+            } else if(mainTarget){
+              mainTarget.appendChild(wrap);
+            }
+            // fetch server attachment lists via update call to get real paths
+            fetch(`/svit/issue/update/${issueId}`, {method:'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}, body: new FormData()})
+              .then(r=>r.json()).then(json=>{ if(typeof updateAttachmentLists === 'function'){ updateAttachmentLists(json); } else { console.warn('updateAttachmentLists not defined on fetch response', json); }
+                // server responded successfully: remove any pending markers (rendering is done by updateAttachmentLists)
+                try{ if(wrap && wrap.parentNode && wrap.dataset && wrap.dataset.pending){ wrap.remove(); } }catch(e){}
+              }).catch(()=>{
+                // fallback: if server update did not provide JSON or failed, remove pending preview after a short delay
+                setTimeout(()=>{ try{ if(wrap && wrap.parentNode){ wrap.remove(); } }catch(e){} }, 2000);
+              });
+          };
+          reader.readAsDataURL(file);
+          continue;
+        }
+        if(!res.ok){ console.error('paste upload failed', res.status); alert('파일 업로드 실패'); return; }
+        const json = await res.json();
+        // update attachments
+        if(typeof updateAttachmentLists === 'function'){
+          updateAttachmentLists(json);
+        } else {
+          console.warn('updateAttachmentLists not defined on paste success', json);
+        }
       }catch(err){
         console.error('paste upload error', err);
         alert('업로드 중 오류가 발생했습니다.');
@@ -419,13 +507,58 @@ function saveAllChanges(issueId) {
   formData.append('severity', document.getElementById('severitySelect')?.value || 'Medium');
   formData.append('expected_root_cause', document.getElementById('expectedRootEdit')?.value || '');
   formData.append('countermeasure', document.getElementById('countermeasureEdit')?.value || '');
-  
+  // include any files pasted into expected root edit
+  if (typeof pendingExpectedFiles !== 'undefined' && pendingExpectedFiles.length) {
+    for (let i = 0; i < pendingExpectedFiles.length; i++) {
+      formData.append('expected_root_attach', pendingExpectedFiles[i]);
+    }
+    // hint to server that these files originated from a paste into expected-root
+    formData.append('expected_from_paste', '1');
+  }
+
+  // include any files pasted into countermeasure edit
+  if (typeof pendingCounterFiles !== 'undefined' && pendingCounterFiles.length) {
+    for (let i = 0; i < pendingCounterFiles.length; i++) {
+      formData.append('countermeasure_attach', pendingCounterFiles[i]);
+    }
+    // hint to server that these files originated from a paste into countermeasure
+    formData.append('countermeasure_from_paste', '1');
+  }
+
+  // Debug: inspect FormData prior to sending
+  try{
+    const fdEntries = [];
+    for(const pair of formData.entries()){
+      if(pair[1] instanceof File){
+        fdEntries.push({key: pair[0], name: pair[1].name, type: pair[1].type, size: pair[1].size});
+      } else {
+        fdEntries.push({key: pair[0], value: String(pair[1]).slice(0,100)});
+      }
+    }
+    console.debug('saveAllChanges: FormData contents', fdEntries);
+  }catch(e){console.error('FormData inspect error', e)}
+
   fetch(`/svit/issue/update/${issueId}`, {
     method: 'POST',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    redirect: 'manual',
     body: formData
   })
-  .then(response => {
-    if (response.ok) {
+  .then(async response => {
+    // treat redirect or opaque redirect as success and avoid navigation
+    if(response.redirected || response.status === 303 || response.type === 'opaqueredirect'){
+      return { ok: true };
+    }
+    const ct = response.headers.get('content-type') || '';
+    if(ct.includes('application/json')){
+      return response.json();
+    }
+    // non-JSON, non-redirect response: try to parse text and assume success for 2xx
+    if(response.ok) return { ok: true };
+    try{ const txt = await response.text(); return { ok: false, _text: txt }; }catch(e){ return { ok: false } }
+  })
+  .then(json => {
+    if (json && json.ok) {
       const phenText = document.getElementById('phenEdit').value;
       const tempVal = document.getElementById('tempEdit').value;
       const freqVal = document.getElementById('freqEdit').value;
@@ -439,12 +572,22 @@ function saveAllChanges(issueId) {
       // update expected root cause and countermeasure displays
       document.getElementById('expectedRootDisplay').innerHTML = `<p>${document.getElementById('expectedRootEdit').value || '—'}</p>`;
       document.getElementById('countermeasureDisplay').innerHTML = `<p>${document.getElementById('countermeasureEdit').value || '—'}</p>`;
-      
+
       isEditMode = true;
       toggleEditMode();
-      
+
+      // update attachments UI from server response
+      updateAttachmentLists(json);
+      // clear pending pasted files
+      pendingExpectedFiles = [];
+      renderPendingExpected();
+      pendingCounterFiles = [];
+      renderPendingCounter();
+
+      console.debug('saveAllChanges: server response', json);
       alert('Changes saved successfully!');
     } else {
+      console.debug('saveAllChanges: server response error', json);
       alert('Failed to save changes');
     }
   })
@@ -461,13 +604,11 @@ function updateStatus(issueId, status) {
   
   fetch(`/svit/issue/update/${issueId}`, {
     method: 'POST',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
     body: formData
   })
-  .then(response => {
-    if (!response.ok) {
-      alert('Failed to update status');
-    }
-  })
+  .then(res => res.json())
+  .then(json => { if (!json || !json.ok) alert('Failed to update status'); })
   .catch(error => {
     console.error('Error:', error);
     alert('Error updating status');
@@ -481,13 +622,11 @@ function updateSeverity(issueId, severity) {
   
   fetch(`/svit/issue/update/${issueId}`, {
     method: 'POST',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
     body: formData
   })
-  .then(response => {
-    if (!response.ok) {
-      alert('Failed to update severity');
-    }
-  })
+  .then(res => res.json())
+  .then(json => { if (!json || !json.ok) alert('Failed to update severity'); })
   .catch(error => {
     console.error('Error:', error);
     alert('Error updating severity');
@@ -518,12 +657,27 @@ function uploadFile(issueId) {
 
   fetch(`/svit/issue/update/${issueId}`, {
     method: 'POST',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    redirect: 'manual',
     body: formData
   })
-  .then(response => {
-    if (response.ok) {
-      window.location.reload();
+  .then(async res => {
+    if(res.redirected || res.status === 303 || res.type === 'opaqueredirect'){
+      return { ok: true };
+    }
+    const ct = res.headers.get('content-type') || '';
+    if(ct.includes('application/json')) return res.json();
+    if(res.ok) return { ok: true };
+    try{ const txt = await res.text(); return { ok: false, _text: txt }; }catch(e){ return { ok: false } }
+  })
+  .then(json => {
+    if(json && json.ok){
+      console.debug('uploadFile: server response', json);
+      // Resync inline attachments to reflect newly uploaded files without full reload
+      syncInlineAttachments();
+      alert('파일 업로드 성공');
     } else {
+      console.debug('uploadFile: server response error', json);
       alert('Failed to upload file');
     }
   })
@@ -532,47 +686,348 @@ function uploadFile(issueId) {
     alert('Error uploading file');
   });
 }
+
+// uploadExpectedFiles removed: expected attachments are added via paste into the expected root edit field.
 </script>
 
 <script>
 // Render server-side attachments inline in the description area and attach delete handlers
+function handleExpectedPaste(ev){
+  try{
+    const clipboard = ev.clipboardData || (window.clipboardData && window.clipboardData);
+    if(!clipboard || !clipboard.items) return;
+    let added = false;
+    for(let i=0;i<clipboard.items.length;i++){
+      const item = clipboard.items[i];
+      if(item.kind === 'file' && item.type && item.type.startsWith('image/')){
+        const file = item.getAsFile ? item.getAsFile() : null;
+        if(file){
+          const ext = (file.type.split('/')[1] || 'png');
+          const name = `expected_paste_${Date.now()}.${ext}`;
+          const f = new File([file], name, { type: file.type });
+          pendingExpectedFiles.push(f);
+          added = true;
+        }
+      } else if(item.kind === 'string' && item.type === 'text/html'){
+        item.getAsString(function(str){
+          try{
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(str, 'text/html');
+            const img = doc.querySelector('img');
+            if(img && img.src && img.src.startsWith('data:')){
+              fetch(img.src).then(res=>res.blob()).then(blob=>{
+                const ext = (blob.type.split('/')[1]||'png');
+                const name = `expected_paste_${Date.now()}.${ext}`;
+                pendingExpectedFiles.push(new File([blob], name, { type: blob.type }));
+                renderPendingExpected();
+              }).catch(e=>console.error(e));
+            }
+          }catch(e){ console.error('parse pasted html', e) }
+        });
+      }
+    }
+    if(added){
+      ev.preventDefault();
+      renderPendingExpected();
+    }
+    // Debug: show collected pending files
+    try{
+      console.debug('handleExpectedPaste: pendingExpectedFiles', pendingExpectedFiles.map(f => ({name: f.name, type: f.type, size: f.size})));
+    }catch(e){/*ignore*/}
+  }catch(e){console.error('handleExpectedPaste', e)}
+}
+
+function renderPendingExpected(){
+  const container = document.getElementById('expectedPendingPreview');
+  if(!container) return;
+  container.innerHTML = '';
+  pendingExpectedFiles.forEach((f, idx)=>{
+    const wrap = document.createElement('div'); wrap.className='inline-attach pending';
+    const inner = document.createElement('div'); inner.className='attach-wrap';
+    const resz = document.createElement('div'); resz.className='resizable';
+    if(f.type && f.type.startsWith('image/')){
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.onload = ()=> URL.revokeObjectURL(img.src);
+      resz.appendChild(img);
+    } else {
+      const span = document.createElement('span'); span.textContent = f.name; resz.appendChild(span);
+    }
+    inner.appendChild(resz);
+    const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+    del.addEventListener('click', (ev)=>{ ev.stopPropagation(); pendingExpectedFiles.splice(idx,1); renderPendingExpected(); });
+    inner.appendChild(del);
+    wrap.appendChild(inner);
+    container.appendChild(wrap);
+  });
+}
+
+let pendingExpectedFiles = [];
+
+function updateAttachmentLists(json){
+  try{
+    // Expected attachments
+    if(json && json.expected_root_attach !== undefined){
+      const container = document.querySelector('.expected-attachments .expected-list');
+      if(container){
+        const files = json.expected_root_attach ? (json.expected_root_attach.includes(',') ? json.expected_root_attach.split(',') : [json.expected_root_attach]) : [];
+        let inner = '';
+        if(files.length){
+          inner += '<div class="log-list">';
+          files.forEach(f=>{
+            const ff = f.trim().replace(/\\/g,'/');
+            const fname = ff.split('/').pop().toLowerCase();
+            if(fname.endsWith('.png')||fname.endsWith('.jpg')||fname.endsWith('.jpeg')||fname.endsWith('.gif')||fname.endsWith('.webp')){
+              inner += `<a href="/${ff.replace(/^\//,'')}" target="_blank" class="expected-file-item expected-image" data-path="${ff}"><img src="/${ff.replace(/^\//,'')}" class="attach-thumb" alt="${fname}" /></a>`;
+            } else {
+              inner += `<div class="expected-file-item"><span class="file-icon">📎</span><a href="/${ff.replace(/^\//,'')}" target="_blank" class="link-file">${ff.split('/').pop()}</a></div>`;
+            }
+          });
+          inner += '</div>';
+        } else {
+          inner = '<span class="no-file">—</span>';
+        }
+        container.innerHTML = inner + '<div id="expectedPendingPreview" class="expected-pending-preview"></div>';
+      }
+    }
+
+    // Countermeasure attachments
+    if(json && json.countermeasure_attach !== undefined){
+      const containerC = document.querySelector('.countermeasure-attachments .countermeasure-list');
+      if(containerC){
+        const filesC = json.countermeasure_attach ? (json.countermeasure_attach.includes(',') ? json.countermeasure_attach.split(',') : [json.countermeasure_attach]) : [];
+        let innerC = '';
+        if(filesC.length){
+          innerC += '<div class="log-list">';
+          filesC.forEach(f=>{
+            const ff = f.trim().replace(/\\/g,'/');
+            const fname = ff.split('/').pop().toLowerCase();
+            if(fname.endsWith('.png')||fname.endsWith('.jpg')||fname.endsWith('.jpeg')||fname.endsWith('.gif')||fname.endsWith('.webp')){
+              innerC += `<a href="/${ff.replace(/^\//,'')}" target="_blank" class="countermeasure-file-item countermeasure-image" data-path="${ff}"><img src="/${ff.replace(/^\//,'')}" class="attach-thumb" alt="${fname}" /></a>`;
+            } else {
+              innerC += `<div class="countermeasure-file-item"><span class="file-icon">📎</span><a href="/${ff.replace(/^\//,'')}" target="_blank" class="link-file">${ff.split('/').pop()}</a></div>`;
+            }
+          });
+          innerC += '</div>';
+        } else {
+          innerC = '<span class="no-file">—</span>';
+        }
+        containerC.innerHTML = innerC + '<div id="countermeasurePendingPreview" class="countermeasure-pending-preview"></div>';
+      }
+    }
+
+    // Log attachments
+    if(json && json.log_attach !== undefined){
+      const container = document.querySelector('.log-attachment');
+      if(container){
+        const files = json.log_attach ? (json.log_attach.includes(',') ? json.log_attach.split(',') : [json.log_attach]) : [];
+        let inner = '';
+        if(files.length){
+          inner += '<div class="log-list">';
+          files.forEach(f=>{
+            const ff = f.trim().replace(/\\/g,'/');
+            const fname = ff.split('/').pop().toLowerCase();
+            if(fname.endsWith('.png')||fname.endsWith('.jpg')||fname.endsWith('.jpeg')||fname.endsWith('.gif')||fname.endsWith('.webp')){
+              inner += `<a href="/${ff.replace(/^\//,'')}" target="_blank" class="log-file-item log-image" data-path="${ff}"><img src="/${ff.replace(/^\//,'')}" class="attach-thumb" alt="${fname}" /></a>`;
+            } else {
+              inner += `<div class="log-file-item"><span class="file-icon">📎</span><a href="/${ff.replace(/^\//,'')}" target="_blank" class="link-file">${ff.split('/').pop()}</a></div>`;
+            }
+          });
+          inner += '</div>';
+        } else {
+          inner = '<span class="no-file">—</span>';
+        }
+        // replace existing log-list
+        const existing = container.querySelector('.log-list');
+        if(existing) existing.remove();
+        container.insertAdjacentHTML('afterbegin', inner);
+      }
+    }
+
+    // re-sync inline renders and delete buttons
+    syncInlineAttachments();
+  }catch(e){console.error('updateAttachmentLists', e)}
+}
+
 function syncInlineAttachments(){
   try{
+    // Phenomenon / log attachments
     const desc = document.getElementById('phenDisplay');
-    if(!desc) return;
-    const logList = document.querySelectorAll('.log-list .log-image');
-    logList.forEach(a => {
-      try{
-        const href = a.getAttribute('href');
-        const path = a.getAttribute('data-path') || (href? href.replace(/^\//,'') : '');
-        // avoid duplicating
-        if(desc.querySelector(`img[src="${href}"]`)) return;
-        const wrap = document.createElement('div');
-        wrap.className = 'inline-attach';
-        const inner = document.createElement('div'); inner.className='attach-wrap';
-        const resz = document.createElement('div'); resz.className='resizable';
-        const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
-        resz.appendChild(img);
-        inner.appendChild(resz);
-        // delete button
-        const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
-        del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path, wrap); });
-        inner.appendChild(del);
-        wrap.appendChild(inner);
-        desc.appendChild(wrap);
-      }catch(e){/*ignore per-item*/}
-    });
-    // attach delete to non-image files in log-list
-    document.querySelectorAll('.log-list .log-file-item .link-file').forEach(link=>{
-      const parent = link.closest('.log-file-item');
-      if(parent && !parent.querySelector('.delete-btn')){
-        const fn = parent.querySelector('.link-file')?.getAttribute('href')?.replace(/^\//,'') || '';
-        const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
-        del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, fn, parent); });
-        parent.appendChild(del);
-      }
-    });
+    if(desc){
+      const logList = document.querySelectorAll('.log-list .log-image');
+      logList.forEach(a => {
+        try{
+          const href = a.getAttribute('href');
+          const path = a.getAttribute('data-path') || (href? href.replace(/^\//,'') : '');
+          // avoid duplicating
+          if(desc.querySelector(`img[src="${href}"]`)) return;
+          const wrap = document.createElement('div');
+          wrap.className = 'inline-attach';
+          const inner = document.createElement('div'); inner.className='attach-wrap';
+          const resz = document.createElement('div'); resz.className='resizable';
+          const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
+          resz.appendChild(img);
+          inner.appendChild(resz);
+          // delete button
+          const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+          del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path, wrap); });
+          inner.appendChild(del);
+          wrap.appendChild(inner);
+          desc.appendChild(wrap);
+        }catch(e){/*ignore per-item*/}
+      });
+      // attach delete to non-image files in log-list
+      document.querySelectorAll('.log-list .log-file-item .link-file').forEach(link=>{
+        const parent = link.closest('.log-file-item');
+        if(parent && !parent.querySelector('.delete-btn')){
+          const fn = parent.querySelector('.link-file')?.getAttribute('href')?.replace(/^\//,'') || '';
+          const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+          del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, fn, parent); });
+          parent.appendChild(del);
+        }
+      });
+    }
+
+    // Expected root attachments (render into expectedRootDisplay)
+    const expectedDesc = document.getElementById('expectedRootDisplay');
+    if(expectedDesc){
+      const expectedList = document.querySelectorAll('.expected-list .expected-image');
+      expectedList.forEach(a => {
+        try{
+          const href = a.getAttribute('href');
+          const path = a.getAttribute('data-path') || (href? href.replace(/^\//,'') : '');
+          if(expectedDesc.querySelector(`img[src="${href}"]`)) return;
+          const wrap = document.createElement('div');
+          wrap.className = 'inline-attach';
+          const inner = document.createElement('div'); inner.className='attach-wrap';
+          const resz = document.createElement('div'); resz.className='resizable';
+          const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
+          resz.appendChild(img);
+          inner.appendChild(resz);
+          const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+          del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path, wrap); });
+          inner.appendChild(del);
+          wrap.appendChild(inner);
+          expectedDesc.appendChild(wrap);
+        }catch(e){/*ignore per-item*/}
+      });
+      // attach delete to non-image expected files
+      document.querySelectorAll('.expected-list .expected-file-item .link-file').forEach(link=>{
+        const parent = link.closest('.expected-file-item');
+        if(parent && !parent.querySelector('.delete-btn')){
+          const fn = parent.querySelector('.link-file')?.getAttribute('href')?.replace(/^\//,'') || '';
+          const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+          del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, fn, parent); });
+          parent.appendChild(del);
+        }
+      });
+    }
+
+    // Countermeasure attachments (render into countermeasureDisplay)
+    const counterDesc = document.getElementById('countermeasureDisplay');
+    if(counterDesc){
+      const counterList = document.querySelectorAll('.countermeasure-list .countermeasure-image');
+      counterList.forEach(a => {
+        try{
+          const href = a.getAttribute('href');
+          const path = a.getAttribute('data-path') || (href? href.replace(/^\//,'') : '');
+          if(counterDesc.querySelector(`img[src="${href}"]`)) return;
+          const wrap = document.createElement('div');
+          wrap.className = 'inline-attach';
+          const inner = document.createElement('div'); inner.className='attach-wrap';
+          const resz = document.createElement('div'); resz.className='resizable';
+          const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
+          resz.appendChild(img);
+          inner.appendChild(resz);
+          const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+          del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path, wrap); });
+          inner.appendChild(del);
+          wrap.appendChild(inner);
+          counterDesc.appendChild(wrap);
+        }catch(e){/*ignore per-item*/}
+      });
+      // attach delete to non-image countermeasure files
+      document.querySelectorAll('.countermeasure-list .countermeasure-file-item .link-file').forEach(link=>{
+        const parent = link.closest('.countermeasure-file-item');
+        if(parent && !parent.querySelector('.delete-btn')){
+          const fn = parent.querySelector('.link-file')?.getAttribute('href')?.replace(/^\//,'') || '';
+          const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+          del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, fn, parent); });
+          parent.appendChild(del);
+        }
+      });
+    }
   }catch(e){console.error('syncInlineAttachments', e)}
+}
+
+// sanity check: confirm script parsed
+try{ console.debug('svit script loaded OK'); }catch(e){/*ignore*/}
+
+// Countermeasure pending files and handlers
+let pendingCounterFiles = [];
+
+function renderPendingCounter(){
+  const container = document.getElementById('countermeasurePendingPreview');
+  if(!container) return;
+  container.innerHTML = '';
+  pendingCounterFiles.forEach((f, idx)=>{
+    const wrap = document.createElement('div'); wrap.className='inline-attach pending';
+    const inner = document.createElement('div'); inner.className='attach-wrap';
+    const resz = document.createElement('div'); resz.className='resizable';
+    if(f.type && f.type.startsWith('image/')){
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.onload = ()=> URL.revokeObjectURL(img.src);
+      resz.appendChild(img);
+    } else {
+      const span = document.createElement('span'); span.textContent = f.name; resz.appendChild(span);
+    }
+    inner.appendChild(resz);
+    const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
+    del.addEventListener('click', (ev)=>{ ev.stopPropagation(); pendingCounterFiles.splice(idx,1); renderPendingCounter(); });
+    inner.appendChild(del);
+    wrap.appendChild(inner);
+    container.appendChild(wrap);
+  });
+}
+
+function handleCounterPaste(ev){
+  try{
+    const clipboard = ev.clipboardData || (window.clipboardData && window.clipboardData);
+    if(!clipboard || !clipboard.items) return;
+    let added = false;
+    for(let i=0;i<clipboard.items.length;i++){
+      const item = clipboard.items[i];
+      if(item.kind === 'file' && item.type && item.type.startsWith('image/')){
+        const file = item.getAsFile ? item.getAsFile() : null;
+        if(file){
+          const ext = (file.type.split('/')[1] || 'png');
+          const name = `counter_paste_${Date.now()}.${ext}`;
+          const f = new File([file], name, { type: file.type });
+          pendingCounterFiles.push(f);
+          added = true;
+        }
+      } else if(item.kind === 'string' && item.type === 'text/html'){
+        item.getAsString(function(str){
+          try{
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(str, 'text/html');
+            const img = doc.querySelector('img');
+            if(img && img.src && img.src.startsWith('data:')){
+              fetch(img.src).then(res=>res.blob()).then(blob=>{
+                const ext = (blob.type.split('/')[1]||'png');
+                const name = `counter_paste_${Date.now()}.${ext}`;
+                pendingCounterFiles.push(new File([blob], name, { type: blob.type }));
+                renderPendingCounter();
+              }).catch(e=>console.error(e));
+            }
+          }catch(e){ console.error('parse pasted html', e) }
+        });
+      }
+    }
+    if(added){ ev.preventDefault(); renderPendingCounter(); }
+    try{ console.debug('handleCounterPaste: pendingCounterFiles', pendingCounterFiles.map(f => ({name: f.name, type: f.type, size: f.size}))); }catch(e){/*ignore*/}
+  }catch(e){console.error('handleCounterPaste', e)}
 }
 
 async function deleteAttachment(issueId, filePath, el){
@@ -592,11 +1047,20 @@ async function deleteAttachment(issueId, filePath, el){
   try{
     const res = await fetch(`/svit/issue/${issueId}/file-delete`, {
       method: 'POST',
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      redirect: 'manual',
       body: fd
     });
     
-    console.log('Delete response status:', res.status); // Debug
+    console.log('Delete response status:', res.status, 'redirected:', res.redirected, 'type:', res.type); // Debug
     
+    if(res.redirected || res.status === 303 || res.type === 'opaqueredirect'){
+      // treat redirect as success without navigating
+      el.remove();
+      alert('파일이 삭제되었습니다.');
+      return;
+    }
+
     if(res.ok){
       const data = await res.json();
       console.log('Delete success:', data); // Debug
@@ -613,7 +1077,45 @@ async function deleteAttachment(issueId, filePath, el){
   }
 }
 
-document.addEventListener('DOMContentLoaded', syncInlineAttachments);
+document.addEventListener('DOMContentLoaded', function(){
+  syncInlineAttachments();
+  const expectedEdit = document.getElementById('expectedRootEdit');
+  const expectedDisplay = document.getElementById('expectedRootDisplay');
+  const counterEdit = document.getElementById('countermeasureEdit');
+  const counterDisplay = document.getElementById('countermeasureDisplay');
+  if(expectedEdit){
+    expectedEdit.addEventListener('paste', function(ev){ ev.preventDefault(); ev.stopPropagation(); handleExpectedPaste(ev); });
+  }
+  if(expectedDisplay){
+    // If user pastes directly into the display area (not in edit mode), capture it too
+    expectedDisplay.addEventListener('paste', function(ev){
+      // Prevent default behavior so pasted image does not insert into view unintentionally
+      ev.preventDefault();
+      ev.stopPropagation();
+      handleExpectedPaste(ev);
+    });
+  }
+  if(counterEdit){
+    counterEdit.addEventListener('paste', function(ev){ ev.preventDefault(); ev.stopPropagation(); handleCounterPaste(ev); });
+  }
+  if(counterDisplay){
+    counterDisplay.addEventListener('paste', function(ev){ ev.preventDefault(); ev.stopPropagation(); handleCounterPaste(ev); });
+  }
+
+  // As a fallback, capture paste events globally and forward to handler if focus is on expected/counter fields
+  document.addEventListener('paste', function(ev){
+    const ae = document.activeElement;
+    if(ae && (ae.id === 'expectedRootEdit' || ae.id === 'expectedRootDisplay')){
+      handleExpectedPaste(ev);
+      return;
+    }
+    if(ae && (ae.id === 'countermeasureEdit' || ae.id === 'countermeasureDisplay')){
+      handleCounterPaste(ev);
+      return;
+    }
+  });
+
+});
 </script>
 
 {% endblock %}

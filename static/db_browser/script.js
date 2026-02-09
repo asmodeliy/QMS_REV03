@@ -24,9 +24,18 @@ async function loadDatabases() {
         result.databases.forEach(db => {
             const option = document.createElement('option');
             option.value = db.name;
-            option.textContent = `${db.display_name} - ${db.description}`;
+            option.textContent = `${db.display_name}`;
+            option.dataset.description = db.description || '';
             dbSelect.appendChild(option);
         });
+        const descEl = document.getElementById('dbDescription');
+        dbSelect.addEventListener('change', function(){
+            const opt = dbSelect.selectedOptions[0];
+            descEl.textContent = opt ? opt.dataset.description || '' : '';
+            loadTables();
+        });
+        const initOpt = dbSelect.selectedOptions[0];
+        if(initOpt){ document.getElementById('dbDescription').textContent = initOpt.dataset.description || ''; }
         
         await loadTables();
     } catch (err) {
@@ -227,7 +236,8 @@ async function saveRow() {
     currentTableColumns.forEach(col => {
         const input = document.getElementById(`field_${col}`);
         if (input) {
-            data[col] = input.value;
+            // treat empty input as SQL NULL
+            data[col] = (input.value === '') ? null : input.value;
         }
     });
     

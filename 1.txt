@@ -1,0 +1,57 @@
+.
+├── backups
+├── build
+│   └── qms-desktop
+├── core
+│   ├── auth
+│   └── __pycache__
+├── data
+│   └── __pycache__
+├── dist
+├── docs
+├── func
+│   ├── __pycache__
+│   └── services
+├── img
+├── locales
+├── logs
+├── modules
+│   ├── cits
+│   ├── db_browser
+│   ├── llm
+│   ├── product_info
+│   ├── routes
+│   ├── rpmt
+│   ├── spec_center
+│   ├── svit
+│   └── uploads
+├── __pycache__
+├── scripts
+│   └── upx
+├── services
+├── static
+│   ├── db_browser
+│   ├── downloads
+│   ├── icons
+│   ├── img
+│   ├── llm
+│   └── modules
+├── templates
+│   ├── auth
+│   ├── db_browser
+│   ├── downloads
+│   ├── garage
+│   ├── _includes
+│   ├── modules
+│   └── shared
+├── tests
+├── tools
+└── uploads
+    ├── cits
+    ├── garage
+    ├── rpmt
+    ├── spec_center
+    ├── svit
+    └── tbd
+
+54 directories

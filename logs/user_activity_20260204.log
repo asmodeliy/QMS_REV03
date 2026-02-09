@@ -1,0 +1,12 @@
+2026-02-04 13:22:03 | INFO | {"timestamp": "2026-02-04T13:22:03.526697", "user": "dnkim@ramschip.com", "action": "login", "module": "auth", "success": false, "ip": "125.132.216.97"}
+2026-02-04 13:22:13 | INFO | {"timestamp": "2026-02-04T13:22:13.314895", "user": "dnkim@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-02-04 13:22:37 | INFO | {"timestamp": "2026-02-04T13:22:37.589086", "user": "cshin@ramschip.com", "action": "login", "module": "auth", "success": false, "ip": "183.99.77.134"}
+2026-02-04 13:22:46 | INFO | {"timestamp": "2026-02-04T13:22:46.576808", "user": "cshin@ramschip.com", "action": "login", "module": "auth", "success": false, "ip": "183.99.77.134"}
+2026-02-04 13:22:54 | INFO | {"timestamp": "2026-02-04T13:22:54.717000", "user": "cshin@ramschip.com", "action": "login", "module": "auth", "success": false, "ip": "183.99.77.134"}
+2026-02-04 13:23:01 | INFO | {"timestamp": "2026-02-04T13:23:01.890369", "user": "cshin@ramschip.com", "action": "login", "module": "auth", "success": false, "ip": "183.99.77.134"}
+2026-02-04 13:23:35 | INFO | {"timestamp": "2026-02-04T13:23:35.968136", "user": "cshin@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "183.99.77.134"}
+2026-02-04 13:34:40 | INFO | {"timestamp": "2026-02-04T13:34:40.845106", "user": "dnkim@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-02-04 14:35:14 | INFO | {"timestamp": "2026-02-04T14:35:14.478958", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-02-04 14:56:35 | INFO | {"timestamp": "2026-02-04T14:56:35.056842", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-02-04 15:36:33 | INFO | {"timestamp": "2026-02-04T15:36:33.277146", "user": "dnkim@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-02-04 16:10:22 | INFO | {"timestamp": "2026-02-04T16:10:22.284290", "user": "admin@localhost", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}

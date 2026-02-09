@@ -1,8 +1,4 @@
 
-"""
-공통 인증 DB 연결 관리 (auth_db.db)
-"""
-
 from sqlalchemy import create_engine 
 from sqlalchemy .orm import sessionmaker ,Session 
 from pathlib import Path 
@@ -21,7 +17,6 @@ Base .metadata .create_all (auth_engine )
 
 
 def get_auth_db ()->Session :
-    """공통 인증 DB 세션 생성 (의존성 주입용)"""
     db =AuthSessionLocal ()
     try :
         yield db 
@@ -30,6 +25,5 @@ def get_auth_db ()->Session :
 
 
 def get_auth_db_sync ()->Session :
-    """동기 코드에서 사용할 인증 DB 세션"""
     db =AuthSessionLocal ()
     return db 

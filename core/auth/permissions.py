@@ -1,8 +1,4 @@
 
-"""
-모듈별 권한 관리
-"""
-
 from typing import Optional ,Tuple 
 from fastapi import Request ,HTTPException 
 from sqlalchemy import select 
@@ -12,7 +8,6 @@ from core .auth .db import get_auth_db_sync
 
 
 def get_module_role (user_id :int ,module_name :str ,db :Session )->Optional [str ]:
-    """사용자의 특정 모듈에서의 역할 조회"""
     perm =db .execute (
     select (ModulePermission ).where (
     (ModulePermission .user_id ==user_id )&
@@ -25,11 +20,7 @@ def get_module_role (user_id :int ,module_name :str ,db :Session )->Optional [st
 
 
 def check_module_access (request :Request ,module_name :str )->Tuple [bool ,Optional [str ]]:
-    """사용자가 특정 모듈에 접근 가능한지 확인
-    
-    Returns:
-        Tuple[bool, Optional[str]]: (접근 가능 여부, 역할)
-    """
+
     if not request .session .get ("is_authenticated"):
         return False ,None 
 
@@ -46,7 +37,6 @@ def check_module_access (request :Request ,module_name :str )->Tuple [bool ,Opti
 
 
 def require_module_access (module_name :str ):
-    """모듈 접근 권한 확인 데코레이터"""
     def decorator (func ):
         async def wrapper (request :Request ,*args ,**kwargs ):
             can_access ,role =check_module_access (request ,module_name )
@@ -60,7 +50,6 @@ def require_module_access (module_name :str ):
 
 
 def require_module_role (module_name :str ,required_role :str ):
-    """특정 역할을 요구하는 데코레이터"""
     def decorator (func ):
         async def wrapper (request :Request ,*args ,**kwargs ):
             can_access ,role =check_module_access (request ,module_name )

@@ -51,7 +51,6 @@ from core.logger import auth_logger
 
 @router.post('/profile/change-password')
 async def change_password(request: Request, db: Session = Depends(get_auth_db)):
-    """Change current user's password (expects form data: current_password, new_password, confirm_password)."""
     auth_check = ensure_authenticated(request)
     if auth_check:
         return auth_check

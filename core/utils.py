@@ -19,7 +19,6 @@ def build_groups_keep_order (tasks :List [Task ])->List [Tuple [str ,List [Task 
 
 
 def get_client_ip (request :Request )->str :
-    """클라이언트 IP 주소 추출 (프록시 고려)"""
     if forwarded :=request .headers .get ("x-forwarded-for"):
         return forwarded .split (",")[0 ].strip ()
     if remote_addr :=request .client :
@@ -28,14 +27,12 @@ def get_client_ip (request :Request )->str :
 
 
 def get_current_user_email (request :Request )->Optional [str ]:
-    """현재 로그인한 사용자 이메일 반환"""
     if hasattr(request, "session") and request.session:
         return request.session.get("user_email")
     return None
 
 
 def get_user_info (request :Request )->Dict [str ,Optional [str ]]:
-    """사용자 정보 및 IP 추출"""
     return {
         "email": get_current_user_email(request),
         "ip": get_client_ip(request)

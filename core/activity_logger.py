@@ -1,8 +1,3 @@
-"""
-사용자 활동 로깅 시스템
-- 50명의 사용자를 위한 상세 로깅
-- 누가 (user), 언제 (timestamp), 무엇을 (action) 했는지 추적
-"""
 
 import logging
 from datetime import datetime
@@ -18,7 +13,6 @@ LOGS_DIR.mkdir(exist_ok=True)
 
           
 class ActionType:
-    """사용자 액션 타입 상수"""
         
     LOGIN = "login"
     LOGOUT = "logout"
@@ -61,7 +55,6 @@ class ActionType:
 
 
 class UserActivityLogger:
-    """사용자 활동 로거"""
     
     def __init__(self):
                      
@@ -96,9 +89,7 @@ class UserActivityLogger:
         ip_address: Optional[str] = None,
         success: bool = True
     ):
-        """
-        사용자 활동 로그 기록
-        
+        """        
         Args:
             user_email: 사용자 이메일
             action: 액션 타입 (ActionType 상수 사용)
@@ -123,7 +114,6 @@ class UserActivityLogger:
         self.logger.info(json.dumps(log_entry, ensure_ascii=False))
     
     def log_login(self, user_email: str, ip_address: str, success: bool = True):
-        """로그인 로그"""
         self.log_action(
             user_email=user_email,
             action=ActionType.LOGIN,
@@ -133,7 +123,6 @@ class UserActivityLogger:
         )
     
     def log_logout(self, user_email: str, ip_address: str):
-        """로그아웃 로그"""
         self.log_action(
             user_email=user_email,
             action=ActionType.LOGOUT,
@@ -149,7 +138,6 @@ class UserActivityLogger:
         project_name: Optional[str] = None,
         ip_address: Optional[str] = None
     ):
-        """RPMT 프로젝트 액션 로그"""
         details = {}
         if project_id:
             details["project_id"] = project_id
@@ -173,7 +161,6 @@ class UserActivityLogger:
         project_id: Optional[int] = None,
         ip_address: Optional[str] = None
     ):
-        """RPMT 작업 액션 로그"""
         details = {}
         if task_id:
             details["task_id"] = task_id
@@ -199,7 +186,6 @@ class UserActivityLogger:
         file_size: Optional[int] = None,
         ip_address: Optional[str] = None
     ):
-        """파일 업로드/삭제 로그"""
         details = {"filename": filename}
         if file_size:
             details["file_size_bytes"] = file_size
@@ -220,7 +206,6 @@ class UserActivityLogger:
         details: Optional[dict] = None,
         ip_address: Optional[str] = None
     ):
-        """관리자 액션 로그"""
         action_details = details or {}
         if target_user:
             action_details["target_user"] = target_user
@@ -238,7 +223,6 @@ class UserActivityLogger:
 _activity_logger = None
 
 def get_activity_logger() -> UserActivityLogger:
-    """활동 로거 인스턴스 반환"""
     global _activity_logger
     if _activity_logger is None:
         _activity_logger = UserActivityLogger()

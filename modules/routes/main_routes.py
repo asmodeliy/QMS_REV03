@@ -81,6 +81,12 @@ def redirect_main_api(rest: str, request: Request):
     app_logger.info(f"Redirect: {request.method} /main/api/{rest} -> {target}", {"path": request.url.path})
     return RedirectResponse(url=target, status_code=307)
 
+@router.api_route("/main/auth/api/{rest:path}", methods=["GET","POST","PUT","DELETE","PATCH"])
+def redirect_main_auth_api(rest: str, request: Request):
+    target = f"/auth/api/{rest}"
+    app_logger.info(f"Redirect: {request.method} /main/auth/api/{rest} -> {target}", {"path": request.url.path})
+    return RedirectResponse(url=target, status_code=307)
+
 @router .get ("/download", response_class=HTMLResponse)
 def download_page(request: Request):
     locale = get_locale(request)

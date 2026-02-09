@@ -1,7 +1,3 @@
-"""
-Common Product Data Schema
-모든 모듈에서 공유하는 제품 기본 정보 데이터베이스 스키마
-"""
 
 from sqlalchemy import (
     Column, Integer, String, Float, DateTime, Boolean,
@@ -15,9 +11,6 @@ Base = declarative_base()
 
 
 class Product(Base):
-    """
-    제품 (6310, 5410, 5380, 3300, 3200, 2001, 1003 등)
-    """
     __tablename__ = "products"
     
     id = Column(Integer, primary_key=True)
@@ -36,10 +29,6 @@ class Product(Base):
 
 
 class ProductVariant(Base):
-    """
-    제품 변형 (RS, SF 등)
-    각 Product는 여러 Tech variant를 가질 수 있음
-    """
     __tablename__ = "product_variants"
     
     id = Column(Integer, primary_key=True)
@@ -66,10 +55,6 @@ class ProductVariant(Base):
 
 
 class ProductConfig(Base):
-    """
-    제품 구성 정보 (Metal, PDK Version, DRC Version, Calibre 등)
-    각 Variant는 여러 Configuration을 가질 수 있음 (예: metal 옵션 여러 개)
-    """
     __tablename__ = "product_configs"
     
     id = Column(Integer, primary_key=True)
@@ -110,9 +95,6 @@ class ProductConfig(Base):
 
 
 class CommonDataLog(Base):
-    """
-    공통 데이터 변경 로그
-    """
     __tablename__ = "common_data_logs"
     
     id = Column(Integer, primary_key=True)

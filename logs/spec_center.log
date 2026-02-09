@@ -740,3 +740,626 @@
 {"timestamp": "2026-01-28 16:58:16", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
 {"timestamp": "2026-01-28 17:12:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
 {"timestamp": "2026-01-28 17:12:37", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 16:11:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 16:11:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 16:11:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 16:11:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 16:11:58", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 16:11:58", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 16:13:55", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 16:13:55", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 16:17:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 16:17:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 18:31:36", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_105716_RS-COP-01 (Development process).pdf client=125.132.216.97 preview=False method=HEAD"}
+{"timestamp": "2026-01-29 18:31:36", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_105716_RS-COP-01 (Development process).pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-01-29 18:32:13", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_150826_Ramschip_ IR Checklist_HDMI DP TX_LN08LPU.xlsx client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:25", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110904_ISO-26262-1-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:25", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_111000_ISO-26262-10-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:26", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_111006_ISO-26262-11-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:26", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_111012_ISO-26262-12-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:27", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110910_ISO-26262-2-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:27", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110916_ISO-26262-3-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:28", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110922_ISO-26262-4-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:29", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110928_ISO-26262-5-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:29", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110934_ISO-26262-6-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:30", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110941_ISO-26262-7-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:31", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110947_ISO-26262-8-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:31", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110954_ISO-26262-9-2018.pdf client=125.132.216.97 preview=False method=GET"}
+{"timestamp": "2026-01-29 18:32:35", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110904_ISO-26262-1-2018.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-01-29 18:32:40", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110916_ISO-26262-3-2018.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-01-29 18:32:51", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_105953_(주)랩쉽 서브 라이선스 Pin name 부여규칙.pdf client=125.132.216.97 preview=False method=HEAD"}
+{"timestamp": "2026-01-29 18:32:51", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_105953_(주)랩쉽 서브 라이선스 Pin name 부여규칙.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-01-29 18:33:23", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163530_(주)램쉽 Environment policy.pdf client=125.132.216.97 preview=False method=HEAD"}
+{"timestamp": "2026-01-29 18:33:23", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163530_(주)램쉽 Environment policy.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-01-29 18:33:32", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163452_(주)램쉽 Quality policy.pdf client=125.132.216.97 preview=False method=HEAD"}
+{"timestamp": "2026-01-29 18:33:32", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163452_(주)램쉽 Quality policy.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-01-29 18:43:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 18:43:18", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 18:43:33", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 18:43:33", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 18:43:56", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 18:43:56", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-29 18:44:47", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-29 18:44:47", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 09:45:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 09:45:28", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 11:16:46", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 11:16:46", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 11:16:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 11:16:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 11:16:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 11:16:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 11:17:26", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 11:17:26", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 11:17:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 11:17:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 11:17:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 11:17:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 11:18:06", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 11:18:06", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:35:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:35:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:35:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:35:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:35:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:35:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:35:58", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:35:58", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:36:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:36:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:36:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:36:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:36:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:36:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:36:13", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:36:13", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:36:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:36:15", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 12:37:45", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 12:37:45", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 16:07:59", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 16:07:59", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-01-30 16:15:14", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-01-30 16:15:14", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-02 09:13:23", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-02 09:13:23", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-02 09:13:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-02 09:13:32", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-02 15:44:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-02 15:44:17", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:51:19", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:51:19", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:53:43", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:53:43", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:53:44", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:53:44", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:53:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:53:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:54:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:54:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:54:05", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:54:05", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:55:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:55:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:55:51", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:55:51", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:56:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:56:41", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:56:42", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:56:42", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:56:59", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:56:59", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:57:02", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:57:02", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:57:38", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:57:38", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:58:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:58:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:58:13", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:58:13", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 10:58:56", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 10:58:56", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:00:25", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:00:25", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:00:34", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:00:34", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:00:38", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:00:38", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:00:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:00:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:02:02", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:02:02", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:03:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:03:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:03:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:03:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:05:14", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:05:14", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:05:45", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:05:45", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:06:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:06:00", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:06:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:06:35", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:07:14", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:07:14", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:07:29", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:07:29", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:07:42", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:07:42", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:07:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:07:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:08:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:08:08", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:08:09", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:08:09", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:08:16", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:08:16", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:08:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:08:37", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:08:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:08:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:08:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:08:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:13:07", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:13:07", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:13:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:13:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:13:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:13:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:19:27", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:19:27", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:19:30", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:19:30", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:19:51", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:19:51", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:19:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:19:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:19:57", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:19:57", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:20:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:20:00", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:20:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:20:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:28:51", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:28:51", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 11:29:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 11:29:31", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:21:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:21:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:22:23", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:22:23", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:24:38", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:24:38", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:24:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:24:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:25:34", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:25:34", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:25:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:25:37", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:25:51", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:25:51", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:25:58", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:25:58", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:29:50", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:29:50", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:29:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:29:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:33:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:33:32", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:40:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:40:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:40:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:40:08", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:41:36", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:41:36", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:41:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:41:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:42:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:42:18", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:42:20", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:42:20", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:42:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:42:35", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:47:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:47:18", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:47:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:47:31", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:49:07", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:49:07", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:49:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:49:15", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:49:34", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:49:34", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:49:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:49:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:49:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:49:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:50:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:50:00", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:50:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:50:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:50:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:50:08", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:50:09", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:50:09", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:50:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:50:31", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:51:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:51:31", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:51:45", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:51:45", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:52:44", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:52:44", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:53:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:53:00", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 12:53:51", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 12:53:51", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:12:50", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:12:50", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:15:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:15:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:16:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:16:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:16:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:16:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:20:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:20:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:22:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:22:35", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:22:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:22:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:34:16", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:34:16", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:45:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:45:28", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:50:02", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:50:02", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:51:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:51:28", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:52:30", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:52:30", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:54:24", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:54:24", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:55:42", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:55:42", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:57:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:57:08", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 13:59:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 13:59:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 14:00:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 14:00:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 14:05:19", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 14:05:19", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 14:07:09", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 14:07:09", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 14:07:27", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 14:07:27", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:09:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:09:35", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:12:21", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:12:21", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:13:25", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:13:25", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:14:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:14:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:18:51", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:18:51", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:22:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:22:00", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:25:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:25:37", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:54:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:54:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 15:58:50", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 15:58:50", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:01:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:01:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:02:51", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:02:51", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:03:57", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:03:57", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:10:29", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_110928_ISO-26262-5-2018.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-02-04 16:10:33", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_111006_ISO-26262-11-2018.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-02-04 16:14:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:14:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:17:59", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:17:59", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:18:07", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:18:07", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:22:12", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:22:12", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:26:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:26:17", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:27:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:27:32", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:27:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:27:41", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:28:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:28:35", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-04 16:38:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-04 16:38:15", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 12:42:38", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 12:42:38", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:39:23", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:39:23", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:39:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:39:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:40:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:40:11", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:40:42", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:40:42", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:42:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:42:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:42:46", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:42:46", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:43:12", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:43:12", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:43:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:43:18", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 13:43:58", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 13:43:58", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 14:15:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 14:15:41", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 17:53:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 17:53:15", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 17:53:42", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 17:53:42", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 17:55:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 17:55:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 17:57:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 17:57:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 17:57:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 17:57:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:00:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:00:18", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:00:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:00:18", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:00:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:00:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:15:12", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:15:12", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:15:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:15:22", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:19:33", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:19:33", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:23:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:23:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-05 18:26:21", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-05 18:26:21", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:02:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:02:17", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:05:09", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:05:09", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:05:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:05:11", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:07:13", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:07:13", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:10:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:10:37", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:12:23", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:12:23", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:13:47", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:13:47", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:15:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:15:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:41:57", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:41:57", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:48:03", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:48:03", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:50:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:50:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:52:06", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:52:06", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:57:21", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:57:21", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 09:59:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 09:59:41", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:00:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:00:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:05:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:05:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:06:03", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:06:03", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:06:12", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:06:12", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:34:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:34:37", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:34:43", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:34:43", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:37:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:37:17", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:41:56", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_105716_RS-COP-01 (Development process).pdf client=210.117.32.72 preview=False method=HEAD"}
+{"timestamp": "2026-02-06 10:41:56", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_105716_RS-COP-01 (Development process).pdf client=210.117.32.72 preview=True method=GET"}
+{"timestamp": "2026-02-06 10:47:26", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:47:26", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 10:47:33", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-06 10:47:33", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-06 13:07:57", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163530_(주)램쉽 Environment policy.pdf client=125.132.216.97 preview=False method=HEAD"}
+{"timestamp": "2026-02-06 13:07:57", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163530_(주)램쉽 Environment policy.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-02-06 13:08:06", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163452_(주)램쉽 Quality policy.pdf client=125.132.216.97 preview=False method=HEAD"}
+{"timestamp": "2026-02-06 13:08:06", "level": "INFO", "module": "spec_center", "message": "serve_file request file=20260112_163452_(주)램쉽 Quality policy.pdf client=125.132.216.97 preview=True method=GET"}
+{"timestamp": "2026-02-09 10:06:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 10:06:35", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:01:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:01:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:01:21", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:01:21", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:01:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:01:28", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:01:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:01:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:01:50", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:01:50", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:02:33", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:02:33", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:00", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:22", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:24", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:24", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:27", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:27", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:31", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:34", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:34", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:03:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:03:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:04:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:04:00", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:04:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:04:22", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:04:29", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:04:29", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:04:34", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:04:34", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:04:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:04:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:05:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:05:11", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:05:14", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:05:14", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:05:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:05:15", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:05:26", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:05:26", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:07:02", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:07:02", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:07:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:07:32", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:07:42", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:07:42", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:08:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:08:41", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:08:44", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:08:44", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:09:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:09:08", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:09:36", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:09:36", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:09:48", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:09:48", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:10:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:10:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:10:14", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:10:14", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:10:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:10:28", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:11:02", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:11:02", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:11:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:11:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:11:47", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:11:47", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:12:05", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:12:05", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:12:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:12:08", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:12:12", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:12:12", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 11:12:25", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 11:12:25", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:12:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:12:22", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:12:23", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:12:23", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:14:24", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:14:24", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:14:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:14:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:14:58", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:14:58", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:15:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:15:32", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:16:26", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:16:26", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:36:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:36:01", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:41:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:41:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:44:14", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:44:14", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:50:30", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:50:30", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:51:29", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:51:29", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:52:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:52:18", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:56:06", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:56:06", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:56:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:56:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:57:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:57:28", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:57:46", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:57:46", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:57:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:57:54", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 13:59:20", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 13:59:20", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:01:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:01:40", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:01:56", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:01:56", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:02:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:02:22", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:02:33", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:02:33", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:02:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:02:37", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:02:38", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:02:38", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:02:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:02:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:04:59", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:04:59", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:07:05", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:07:05", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:08:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:08:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:08:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:08:52", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:08:59", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:08:59", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:09:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:09:04", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:09:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:09:31", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:11:39", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:11:39", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:12:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:12:15", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:12:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:12:41", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:21:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:21:31", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:21:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:21:32", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:21:42", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:21:42", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:22:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:22:10", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:22:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:22:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:24:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:24:53", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:25:47", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:25:47", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:26:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:26:15", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:35:43", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:35:43", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:57:21", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:57:21", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:57:25", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:57:25", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 14:59:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 14:59:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 15:00:03", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
+{"timestamp": "2026-02-09 15:00:03", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}

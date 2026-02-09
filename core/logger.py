@@ -6,7 +6,6 @@ from enum import Enum
 from typing import Optional, Dict, Any
 
 class LogLevel(str, Enum):
-    """Log level enumeration"""
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
@@ -14,15 +13,8 @@ class LogLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 class Logger:
-    """Structured logging system for the application"""
     
     def __init__(self, module_name: str = "app"):
-        """
-        Initialize logger for a specific module
-        
-        Args:
-            module_name: Name of the module (e.g., 'auth', 'rpmt', 'svit')
-        """
         self.module_name = module_name
         self.logger = logging.getLogger(module_name)
         
@@ -34,9 +26,7 @@ class Logger:
         if not self.logger.handlers:
             self._configure_logger(log_dir)
     
-    def _configure_logger(self, log_dir: Path):
-        """Configure logger with file and console handlers"""
-                           
+    def _configure_logger(self, log_dir: Path):                           
         json_formatter = logging.Formatter(
             '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "module": "%(name)s", "message": "%(message)s"}',
             datefmt='%Y-%m-%d %H:%M:%S'
@@ -63,35 +53,28 @@ class Logger:
         self.logger.addHandler(console_handler)
     
     def _format_message(self, message: str, context: Optional[Dict[str, Any]] = None) -> str:
-        """Format log message with optional context"""
         if context:
             context_str = json.dumps(context, ensure_ascii=False)
             return f"{message} | {context_str}"
         return message
     
     def debug(self, message: str, context: Optional[Dict[str, Any]] = None):
-        """Log debug message"""
         self.logger.debug(self._format_message(message, context))
     
     def info(self, message: str, context: Optional[Dict[str, Any]] = None):
-        """Log info message"""
         self.logger.info(self._format_message(message, context))
     
     def warning(self, message: str, context: Optional[Dict[str, Any]] = None):
-        """Log warning message"""
         self.logger.warning(self._format_message(message, context))
     
     def error(self, message: str, context: Optional[Dict[str, Any]] = None, exc_info: bool = False):
-        """Log error message"""
         self.logger.error(self._format_message(message, context), exc_info=exc_info)
     
     def critical(self, message: str, context: Optional[Dict[str, Any]] = None, exc_info: bool = False):
-        """Log critical message"""
         self.logger.critical(self._format_message(message, context), exc_info=exc_info)
     
                                                      
     def log_request(self, method: str, path: str, user: Optional[str] = None):
-        """Log incoming request"""
         context = {
             "type": "request",
             "method": method,
@@ -101,7 +84,6 @@ class Logger:
         self.debug(f"Request received", context)
     
     def log_response(self, status_code: int, message: str = "Success"):
-        """Log response"""
         context = {
             "type": "response",
             "status_code": status_code,
@@ -110,7 +92,6 @@ class Logger:
         getattr(self, level)(f"Response: {message}", context)
     
     def log_database_operation(self, operation: str, table: str, details: Optional[Dict] = None):
-        """Log database operation"""
         context = {
             "type": "database",
             "operation": operation,
@@ -121,7 +102,6 @@ class Logger:
         self.debug(f"Database operation: {operation} on {table}", context)
     
     def log_error(self, error_type: str, message: str, details: Optional[Dict] = None):
-        """Log error with structured data"""
         context = {
             "type": "error",
             "error_type": error_type,
@@ -132,7 +112,6 @@ class Logger:
         self.error(message, context, exc_info=True)
     
     def log_authentication(self, event: str, user_id: Optional[str] = None, success: bool = True):
-        """Log authentication events"""
         context = {
             "type": "authentication",
             "event": event,
@@ -144,7 +123,6 @@ class Logger:
         getattr(self, level)(f"Auth event: {event}", context)
     
     def log_authorization(self, action: str, resource: str, user_id: str, allowed: bool):
-        """Log authorization decision"""
         context = {
             "type": "authorization",
             "action": action,
@@ -157,7 +135,6 @@ class Logger:
         getattr(self, level)(f"Authorization: {action} on {resource}", context)
     
     def log_file_operation(self, operation: str, file_path: str, size: Optional[int] = None):
-        """Log file operation"""
         context = {
             "type": "file",
             "operation": operation,

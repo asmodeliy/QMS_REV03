@@ -16,12 +16,6 @@ cache_store ={}
 
 
 def cache_result (seconds :int =300 ):
-    """Simple in-memory cache decorator.
-
-    Note: SQLAlchemy Session objects are *excluded* from the cache key so that
-    different Session instances with the same logical arguments share cache.
-    """
-
     def decorator (func ):
         def wrapper (*args ,**kwargs ):
             key_args =[]

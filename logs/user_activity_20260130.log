@@ -1,0 +1,7 @@
+2026-01-30 12:27:55 | INFO | {"timestamp": "2026-01-30T12:27:55.953102", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-01-30 15:36:47 | INFO | {"timestamp": "2026-01-30T15:36:47.036926", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-01-30 16:00:38 | INFO | {"timestamp": "2026-01-30T16:00:38.247917", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-01-30 16:17:48 | INFO | {"timestamp": "2026-01-30T16:17:48.268403", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-01-30 17:16:58 | INFO | {"timestamp": "2026-01-30T17:16:58.371610", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-01-30 17:49:12 | INFO | {"timestamp": "2026-01-30T17:49:12.155313", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-01-30 17:55:31 | INFO | {"timestamp": "2026-01-30T17:55:31.096186", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
