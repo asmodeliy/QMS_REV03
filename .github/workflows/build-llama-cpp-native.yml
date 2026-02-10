@@ -26,7 +26,10 @@ jobs:
       - name: Install dependencies
         run: |
           dnf groupinstall "Development Tools" -y
-          dnf install -y cmake git python3-pip python3-devel ccache
+          dnf install -y cmake git python3-pip python3-devel
+          
+          # ccache 설치 시도 (실패해도 계속 진행)
+          dnf install -y epel-release && dnf install -y ccache || echo "ccache not available, continuing without cache"
           
           # Python 3.11 설치 (서버 환경에 맞춤)
           dnf install -y python3.11 python3.11-devel python3.11-pip
