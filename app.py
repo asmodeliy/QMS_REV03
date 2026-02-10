@@ -145,6 +145,23 @@ except Exception:
     from modules.mcp.gpt4all_routes import router as gpt4all_router
     from modules.product_info import router as product_info_router, set_templates as set_product_info_templates
 
+# Initialize RAG auto-updater
+_rag_updater = None
+
+try:
+    from modules.mcp.rag_auto_updater import RAGAutoUpdater
+    _rag_updater = RAGAutoUpdater(
+        project_root=".",
+        interval_seconds=300,  # Check every 5 minutes
+        full_index_interval_hours=12  # Full reindex every 12 hours
+    )
+    # Index spec-center documents on startup
+    _rag_updater.index_spec_center_documents()
+    _rag_updater.start()
+    app_logger.info("RAG auto-updater started", {"interval_seconds": 300})
+except Exception as e:
+    app_logger.info("RAG auto-updater initialization failed", {"error": str(e)})
+
 set_auth_templates(templates)
 set_main_templates(templates)
 set_help_templates(templates)
@@ -195,20 +212,39 @@ app.include_router(gpt4all_router, tags=["gpt4all"])
 @app.get("/ai-chat")
 def ai_chat_page(request: Request):
     """Serve the GPT4All chat interface (admin-only)"""
-    # Require admin role or be in GARAGE_ADMIN_EMAILS
     sess = getattr(request, 'session', None)
+    
+    # Check authentication
     if not sess or not sess.get('is_authenticated'):
         return RedirectResponse(url='/auth/login?next=/ai-chat', status_code=303)
-    email = sess.get('email', '')
-    role = sess.get('role', '')
-    try:
-        from .core.config import GARAGE_ADMIN_EMAILS
-        if not ((role and role.lower() == 'admin') or (email and email.lower() in GARAGE_ADMIN_EMAILS)):
-            return RedirectResponse(url='/main', status_code=303)
-    except Exception:
+    
+    # Get user info
+    email = sess.get('email', '').lower()
+    role = (sess.get('role', '') or '').lower()
+    
+    # Simple check: Admin role or specific email
+    if role != 'admin' and email not in ['swlee@ramschip.com']:
+        app_logger.warning(f"AI-Chat access denied for {email} (role: {role})")
         return RedirectResponse(url='/main', status_code=303)
+    
+    app_logger.info(f"AI-Chat accessed by {email} (role: {role})")
+    return templates.TemplateResponse("ai_chat.html", {"request": request})
 
-    return templates.TemplateResponse("gpt4all_chat.html", {"request": request})
+@app.get("/debug/session")
+def debug_session(request: Request):
+    """Debug endpoint - show current session (admin only for security)"""
+    sess = getattr(request, 'session', None)
+    if not sess or not sess.get('is_authenticated'):
+        return {"error": "Not authenticated"}
+    
+    return {
+        "authenticated": sess.get('is_authenticated'),
+        "email": sess.get('email', ''),
+        "role": sess.get('role', ''),
+        "user_id": sess.get('user_id', ''),
+        "department": sess.get('department', ''),
+        "all_keys": list(sess.keys())
+    }
 
 @app.get("/favicon.ico")
 def get_favicon():

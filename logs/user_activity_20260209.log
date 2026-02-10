@@ -4,3 +4,4 @@
 2026-02-09 14:42:35 | INFO | {"timestamp": "2026-02-09T14:42:35.424673", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
 2026-02-09 14:45:39 | INFO | {"timestamp": "2026-02-09T14:45:39.859930", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
 2026-02-09 14:57:44 | INFO | {"timestamp": "2026-02-09T14:57:44.789863", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "125.132.216.97"}
+2026-02-09 15:25:07 | INFO | {"timestamp": "2026-02-09T15:25:07.108053", "user": "swlee@ramschip.com", "action": "login", "module": "auth", "success": true, "ip": "127.0.0.1"}

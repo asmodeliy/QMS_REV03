@@ -1,0 +1,910 @@
+{
+  "BGA Qualification.pdf": {
+    "file_path": "uploads\\spec_center\\20260106_165216_BGA Qualification.pdf",
+    "file_name": "BGA Qualification.pdf",
+    "file_size": 224554,
+    "content_preview": "[Page 1]\nJEDEC \nPUBLICATION   \n Stress-Test-Driven Qualification of and Failure Mechanisms Associated with Assembled Solid State Surface-Mount Components   JEP150  \n \n     \nMAY 2005 \n \n \n \nJEDEC SOLID...",
+    "keywords": []
+  },
+  "CALCULATION OF SEMICONDUCTOR FAILURE RATES.pdf": {
+    "file_path": "uploads\\spec_center\\20260106_165323_CALCULATION OF SEMICONDUCTOR FAILURE RATES.pdf",
+    "file_name": "CALCULATION OF SEMICONDUCTOR FAILURE RATES.pdf",
+    "file_size": 16384,
+    "content_preview": "[Page 1]\nCalculation of Semiconductor Failure Rates\nWilliam J. Vigrass\nOne of the fundamentals of understanding a product’s reliability requires an understanding\nof the calculation of the failure rate...",
+    "keywords": []
+  },
+  "DRY PACKING_jstd033b.pdf": {
+    "file_path": "uploads\\spec_center\\20260106_165354_DRY PACKING_jstd033b.pdf",
+    "file_name": "DRY PACKING_jstd033b.pdf",
+    "file_size": 120233,
+    "content_preview": "[Page 1]\nJOINT\nINDUSTRY\nSTANDARD\nHandling, Packing,\nShipping and Use of\nMoisture/Reﬂow\nSensitive Surface\nMount DevicesIPC/JEDEC J-STD-033B\nOctober 2005\nSupersedes IPC/JEDEC J-STD-033A\nJuly 2002\n\n[Page...",
+    "keywords": []
+  },
+  "DVS QUALIFICATION.pdf": {
+    "file_path": "uploads\\spec_center\\20260106_165502_DVS QUALIFICATION.pdf",
+    "file_name": "DVS QUALIFICATION.pdf",
+    "file_size": 40291,
+    "content_preview": "[Page 1]\nJEDEC\nSTANDARD\nInformation Requirements for the\nQualification of Silicon Devices\nJESD69\nAPRIL 2000\nJEDEC Solid State Technology Association\nA sector of the \n\n\n[Page 2]\nNOTICE\nJEDEC standards ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "ELFR.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104206_ELFR.pdf",
+    "file_name": "ELFR.pdf",
+    "file_size": 307698,
+    "content_preview": "[Page 1]\nJEDEC \nSTANDARD    \n \n \nEarly Life Failure Rate Calculation \nProcedure for Semiconductor Components  \n  \n \nJESD74A \n(Revision of JESD74, April 2000) \n \n \n  \nFEBRUARY 2007 \n \n  \nJEDEC Solid St...",
+    "keywords": []
+  },
+  "ESD HBM.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104217_ESD HBM.pdf",
+    "file_name": "ESD HBM.pdf",
+    "file_size": 105977,
+    "content_preview": "[Page 1]\nJEDEC\nSTANDARD\nElectrostatic Discharge (ESD)\nSensitivity Testing Human BodyModel (HBM)\nJESD22-A114-B\n(Revision of JESD22-A114-A)\nJUNE 2000\nJEDEC SOLID STATE TECHNOLOGY ASSOCIATION\n\n\n[Page 2]\n...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "ESD MM.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104225_ESD MM.pdf",
+    "file_name": "ESD MM.pdf",
+    "file_size": 158988,
+    "content_preview": "[Page 2]\nNOTICE\nEIA/JEDEC   Standards and Publications contain material that has been prepared, progressively\nreviewed,  and  approved   through the JEDEC Council level and subsequently reviewed and\na...",
+    "keywords": []
+  },
+  "FMEA.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104233_FMEA.pdf",
+    "file_name": "FMEA.pdf",
+    "file_size": 129053,
+    "content_preview": "[Page 1]\nJEDEC \nPUBLICATION   \n  Potential Failure Mode and Effects Analysis (FMEA)    JEP131A  \n(Revision of JEP131, February 1998) \n     \nMAY 2005 \n \n \n \nJEDEC SOLID STATE TECHNOLOGY ASSOCIATION \n \n...",
+    "keywords": []
+  },
+  "HAST.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104250_HAST.pdf",
+    "file_name": "HAST.pdf",
+    "file_size": 63258,
+    "content_preview": "[Page 1]\nEIA/JEDEC\nSTANDARD\nTest Method A110-B\nHighly-Accelerated Temperature and\nHumidity Stress Test (HAST)\nJESD22-A110-B(Revision of Test Method A110-A)\nFEBRUARY 1999\nELECTRONIC INDUSTRIES ALLIANCE...",
+    "keywords": []
+  },
+  "HTOL.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104257_HTOL.pdf",
+    "file_name": "HTOL.pdf",
+    "file_size": 80575,
+    "content_preview": "[Page 1]\nJEDEC \nSTANDARD \n \n   \n \nTemperature, Bias, and Operating Life    \n \nJESD22-A108C \n(Revision of JESD22-A108-B) \n     \nJUNE 2005 \n  \n \nJEDEC SOLID STATE TECHNOLOGY ASSOCIATION \n \n \n \n  \n\n[Page...",
+    "keywords": []
+  },
+  "HTST.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104306_HTST.pdf",
+    "file_name": "HTST.pdf",
+    "file_size": 78542,
+    "content_preview": "[Page 1]\nJEDEC  \nSTANDARD  \n \n   \n \nHigh Temperature Storage Life  \n \n \n \n   \nJESD22 -A103C  (Revision of JESD22 -A103 -B)  \n \n \n \n   \nNOVEMBER 2004  \n \n \n \nJEDEC SOLID STATE TECHNOLOGY ASSOCIATION  \n...",
+    "keywords": []
+  },
+  "HUMIDITY SOAK & IR-REFLOW.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104315_HUMIDITY SOAK & IR-REFLOW.pdf",
+    "file_name": "HUMIDITY SOAK & IR-REFLOW.pdf",
+    "file_size": 104267,
+    "content_preview": "[Page 1]\nJOINT\nINDUSTRY\nSTANDARD\nMoisture/Reﬂow\nSensitivity Classiﬁcation\nfor Nonhermetic\nSolid State Surface\nMount DevicesIPC/JEDEC J-STD-020C\nJuly 2004\nSupersedes IPC/JEDEC J-STD-020B\nJuly 2002\n\n[Pa...",
+    "keywords": []
+  },
+  "JESD22 C101_C(FI_CDM).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104325_JESD22 C101_C(FI_CDM).pdf",
+    "file_name": "JESD22 C101_C(FI_CDM).pdf",
+    "file_size": 262458,
+    "content_preview": "[Page 1]\nJEDEC  \nSTANDARD  \n \n   \n \nField -Induced Charged -Device Model \nTest Method for Electrostatic -\nDischarge -Withstand Thresholds of \nMicroelectronic Components  \n   \nJESD22 -C101C  (Revision ...",
+    "keywords": []
+  },
+  "JESD625a.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104333_JESD625a.pdf",
+    "file_name": "JESD625a.pdf",
+    "file_size": 155489,
+    "content_preview": "[Page 1]\nJEDEC\nSTANDARD\nRequirements for Handling\nElectrostatic-Discharge-Sensitive(ESDS) Devices\nJESD625-A\n(Revision of EIA-625)\nDECEMBER 1999\nELECTRONIC INDUSTRIES ALLIANCE\nJEDEC Solid State Technol...",
+    "keywords": []
+  },
+  "Latch-up.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104342_Latch-up.pdf",
+    "file_name": "Latch-up.pdf",
+    "file_size": 141440,
+    "content_preview": "[Page 1]\nJEDEC \nSTANDARD \n \n \n \n \nIC Latch-Up Test \n \n \n JESD78A  \n(Revision of JESD78, March 1997) \n   \n \n \nFEBRUARY 2006 \n \n \n \nJEDEC SOLID STATE TECHNOLOGY ASSOCIATION \n \n \n   \n  \n\n[Page 2]\nNOTICE ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "LEAD FATIGUE.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_104351_LEAD FATIGUE.pdf",
+    "file_name": "LEAD FATIGUE.pdf",
+    "file_size": 318518,
+    "content_preview": "[Page 1]\n \nJEDEC \nSTANDARD \n \n   \nLead Integrity \n \n   JESD22-B105-C \n(Revision of Test Method B105-B) \n    MAY 2003   \n \nJEDEC SOLID STATE TECHNOLOGY ASSOCIATION \n \n   \n \n   \n\n[Page 2]\nNOTICE \n \nJEDE...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "RS-COP-01 (Development process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105716_RS-COP-01 (Development process).docx",
+    "file_name": "RS-COP-01 (Development process).docx",
+    "file_size": 33287151,
+    "content_preview": "PRODUCT(IP/IC) \nDEVELOPMENT PROCESS\nDoc #: RS-COP-01\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622.7790\nRS-C...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-01 (Development process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105716_RS-COP-01 (Development process).pdf",
+    "file_name": "RS-COP-01 (Development process).pdf",
+    "file_size": 1727873,
+    "content_preview": "[Page 1]\nPRODUCT(IP/IC) \nDEVELOPMENT PROCESS\nDoc #: RS-COP-01\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622....",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-02 (Product qualification process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105726_RS-COP-02 (Product qualification process).docx",
+    "file_name": "RS-COP-02 (Product qualification process).docx",
+    "file_size": 29550814,
+    "content_preview": "PRODUCT(IP/IC) \nQUALIFICAITON PROCESS \nDoc #: RS-COP-02\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622.7790\nR...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-02 (Product qualification process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105726_RS-COP-02 (Product qualification process).pdf",
+    "file_name": "RS-COP-02 (Product qualification process).pdf",
+    "file_size": 1412566,
+    "content_preview": "[Page 1]\nPRODUCT(IP/IC) \nQUALIFICAITON PROCESS \nDoc #: RS-COP-02\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.6...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-02-I-01 (Product (IP_IC) Code generation rule).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105733_RS-COP-02-I-01 (Product (IP_IC) Code generation rule).docx",
+    "file_name": "RS-COP-02-I-01 (Product (IP_IC) Code generation rule).docx",
+    "file_size": 992874,
+    "content_preview": "Product (IP/IC) Code generation rule\nDoc #: RS-COP-02-I-01\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622.779...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-02-I-01 (Product (IP_IC) Code generation rule).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105733_RS-COP-02-I-01 (Product (IP_IC) Code generation rule).pdf",
+    "file_name": "RS-COP-02-I-01 (Product (IP_IC) Code generation rule).pdf",
+    "file_size": 294107,
+    "content_preview": "[Page 1]\nProduct (IP/IC) Code generation rule\nDoc #: RS-COP-02-I-01\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.3...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-02-I-02 (Netlist Generation rule).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105740_RS-COP-02-I-02 (Netlist Generation rule).docx",
+    "file_name": "RS-COP-02-I-02 (Netlist Generation rule).docx",
+    "file_size": 990595,
+    "content_preview": "Package netlist generation rule\nDoc #: RS-COP-02-I-02\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622.7790\nRS-...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-02-I-02 (Netlist Generation rule).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105740_RS-COP-02-I-02 (Netlist Generation rule).pdf",
+    "file_name": "RS-COP-02-I-02 (Netlist Generation rule).pdf",
+    "file_size": 289970,
+    "content_preview": "[Page 1]\nPackage netlist generation rule\nDoc #: RS-COP-02-I-02\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-03 (Change control process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105747_RS-COP-03 (Change control process).docx",
+    "file_name": "RS-COP-03 (Change control process).docx",
+    "file_size": 1067198,
+    "content_preview": "CHANGE CONTROL PROCESS\nDoc #: RS-COP-03\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622.7790\nRS-COP-03 Revisio...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-03 (Change control process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105747_RS-COP-03 (Change control process).pdf",
+    "file_name": "RS-COP-03 (Change control process).pdf",
+    "file_size": 468188,
+    "content_preview": "[Page 1]\nCHANGE CONTROL PROCESS\nDoc #: RS-COP-03\nRamschip, Inc.\nQuality management Div. \n5F 506.43, Changeop-ro, Sujeong-gu, Seongnam-si, Gyeonggi-do, South Korea (13449)\nTel. +82.31.622.7790\n\n\n[Page ...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-06 (Customer satisfaction survey process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105802_RS-COP-06 (Customer satisfaction survey process).docx",
+    "file_name": "RS-COP-06 (Customer satisfaction survey process).docx",
+    "file_size": 142177,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \n      The purpose of this procedure is to investigate the satisfaction of customers on quality, delivery time, and service, and customer satisfaction is achie...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-06 (Customer satisfaction survey process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105802_RS-COP-06 (Customer satisfaction survey process).pdf",
+    "file_name": "RS-COP-06 (Customer satisfaction survey process).pdf",
+    "file_size": 440602,
+    "content_preview": "[Page 1]\nCustomer satisfaction survey process\nDocument no RS-COP-06Written by Mark.KimRev no 001\nRev. date  2022.10.05 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-07 (Customer complaint process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105808_RS-COP-07 (Customer complaint process).docx",
+    "file_name": "RS-COP-07 (Customer complaint process).docx",
+    "file_size": 237425,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \n      The purpose of this procedure is to handle for customer complaint when is issued complaint point a view of quality & environment from customer. This pro...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-COP-07 (Customer complaint process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105808_RS-COP-07 (Customer complaint process).pdf",
+    "file_name": "RS-COP-07 (Customer complaint process).pdf",
+    "file_size": 410464,
+    "content_preview": "[Page 1]\nCustomer complaint process\nDocument no RS-COP-07Written by Mark.KimRev no 001\nRev. date  2022.10.04 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE\nAgreement...",
+    "keywords": [
+      "Quality",
+      "Process",
+      "Development"
+    ]
+  },
+  "RS-EM-01 (Environment manual).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105814_RS-EM-01 (Environment manual).docx",
+    "file_name": "RS-EM-01 (Environment manual).docx",
+    "file_size": 227905,
+    "content_preview": "[Revision history]\nDefinition of terms \nEnvironment\n       Everything around us related with human life\nEnvironment aspects\n      Elements of an organization’s activities, products, or services that i...",
+    "keywords": [
+      "Process",
+      "Environment"
+    ]
+  },
+  "RS-EM-01 (Environment manual).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105814_RS-EM-01 (Environment manual).pdf",
+    "file_name": "RS-EM-01 (Environment manual).pdf",
+    "file_size": 546785,
+    "content_preview": "[Page 1]\nEnvironment manual\nDocument no RS-EM-01Written by Mark.KimRev no 001\nRev. date  2022.10.20 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE\nAgreementQMR&D\nRS-...",
+    "keywords": [
+      "Environment"
+    ]
+  },
+  "RS-EP-01 (Environment material management process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105822_RS-EP-01 (Environment material management process).docx",
+    "file_name": "RS-EP-01 (Environment material management process).docx",
+    "file_size": 626560,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \n     This process defines the items and procedures to be managed in order to comply with international hazardous substances environment standards for product ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "RS-EP-01 (Environment material management process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105822_RS-EP-01 (Environment material management process).pdf",
+    "file_name": "RS-EP-01 (Environment material management process).pdf",
+    "file_size": 524479,
+    "content_preview": "[Page 1]\nEnvironment material management\nprocess\nDocument no RS-EP-01Written by Mark.KimRev no 001\nRev. date  2022.10.26 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "RS-MP-02 (Management review process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105829_RS-MP-02 (Management review process).docx",
+    "file_name": "RS-MP-02 (Management review process).docx",
+    "file_size": 125396,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \nThis regulation is a process to monitor whether ramship's quality management system is maintained normally and to review whether the operation status of the q...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-MP-02 (Management review process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105829_RS-MP-02 (Management review process).pdf",
+    "file_name": "RS-MP-02 (Management review process).pdf",
+    "file_size": 197654,
+    "content_preview": "[Page 1]\nManagement review process\nDocument no RS-MP-02Written by Mark.KimRev no 001\nRev. date  2022.10.17 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE\nAgreementQM...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-MP-04 (Internal audit process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105837_RS-MP-04 (Internal audit process).docx",
+    "file_name": "RS-MP-04 (Internal audit process).docx",
+    "file_size": 123069,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \n     The purpose of this process is to improve & maintain the quality/environment management\nsystem through internal audit. \n2. Apply scope  \n     ramschip’s ...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-MP-04 (Internal audit process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105837_RS-MP-04 (Internal audit process).pdf",
+    "file_name": "RS-MP-04 (Internal audit process).pdf",
+    "file_size": 312400,
+    "content_preview": "[Page 1]\nInternal audit process\nDocument no RS-MP-04Written by Mark.KimRev no 001\nRev. date  2022.09.27 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE\nAgreementQMR&D...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-MP-05 (Data analysis & continuous improvement process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105844_RS-MP-05 (Data analysis & continuous improvement process).docx",
+    "file_name": "RS-MP-05 (Data analysis & continuous improvement process).docx",
+    "file_size": 121118,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \n      The purpose of this procedure is to determine, collect, and analyze the date generated from all processes in our company using various quality technique...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-MP-05 (Data analysis & continuous improvement process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105844_RS-MP-05 (Data analysis & continuous improvement process).pdf",
+    "file_name": "RS-MP-05 (Data analysis & continuous improvement process).pdf",
+    "file_size": 216798,
+    "content_preview": "[Page 1]\nData analysis & \ncontinuous improvement process\nDocument no RS-MP-05Written by Mark.KimRev no 001\nRev. date  2022.10.05 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items A...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-MP-06-I-01 (ESD_Latch-up_Guide).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105852_RS-MP-06-I-01 (ESD_Latch-up_Guide).pdf",
+    "file_name": "RS-MP-06-I-01 (ESD_Latch-up_Guide).pdf",
+    "file_size": 7606180,
+    "content_preview": "[Page 1]\nCONFIDENTIAL\nESD & Latch-up Test Guide\n1Date – 2025.05.25\nAuthor – ASH\nConfidential( G1)\nDoc code: RS-MP-06-I-01 (ESD_Latch-up_Guide)\n\n[Page 2]\nCONFIDENTIALOverview\n2•What is ESD ?\n\n\n[Pag...",
+    "keywords": []
+  },
+  "RS-QM-01 (Quality manual).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105859_RS-QM-01 (Quality manual).docx",
+    "file_name": "RS-QM-01 (Quality manual).docx",
+    "file_size": 529591,
+    "content_preview": "Phase #Ⅰ\n[Revision history]\nPhase #Ⅱ \n[Index]\nPhase #Ⅲ \n[Company organization]\nPhase #Ⅳ \n[Applied scope]\n  1. Scope\n     This QMS standard specifies requirements for a quality management system where ...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-QM-01 (Quality manual).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105859_RS-QM-01 (Quality manual).pdf",
+    "file_name": "RS-QM-01 (Quality manual).pdf",
+    "file_size": 899430,
+    "content_preview": "[Page 1]\nQuality management system manual \nDocument no RS-QM-01Written by Mark.KimRev no 001\nRev. date  2022.09.14 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE\nAgr...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-SP-01 (Document management process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105906_RS-SP-01 (Document management process).docx",
+    "file_name": "RS-SP-01 (Document management process).docx",
+    "file_size": 192781,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \n      This regulation is for the definition of documents established by ramschip and efficient document management.\n2. Apply scope  \n      Applies to all docu...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-SP-01 (Document management process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105906_RS-SP-01 (Document management process).pdf",
+    "file_name": "RS-SP-01 (Document management process).pdf",
+    "file_size": 265822,
+    "content_preview": "[Page 1]\nDocument management process\nDocument no RS-SP-01Written by Mark.KimRev no 001\nRev. date  2022.09.22 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE\nAgreement...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-SP-11 (Nonconformity management process).docx": {
+    "file_path": "uploads\\spec_center\\20260112_105912_RS-SP-11 (Nonconformity management process).docx",
+    "file_name": "RS-SP-11 (Nonconformity management process).docx",
+    "file_size": 148598,
+    "content_preview": "[Revision history]\n1. Purpose and scope  \n      This process is issued to prevent shipment to the customers in advance in case of nonconformity that does not satisfy the required quality in the produc...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "RS-SP-11 (Nonconformity management process).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105912_RS-SP-11 (Nonconformity management process).pdf",
+    "file_name": "RS-SP-11 (Nonconformity management process).pdf",
+    "file_size": 308600,
+    "content_preview": "[Page 1]\nNonconformity management process\nDocument no RS-SP-11Written by Mark.KimRev no 001\nRev. date  2022.09.26 Department  QM\nRevised contents DriftReviewApproval\n///\nRevised Items AS IS TO BE\nAgre...",
+    "keywords": [
+      "Quality",
+      "Process"
+    ]
+  },
+  "(주)랩쉽 서브 라이선스 Pin name 부여규칙.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_105953_(주)랩쉽 서브 라이선스 Pin name 부여규칙.pdf",
+    "file_name": "(주)랩쉽 서브 라이선스 Pin name 부여규칙.pdf",
+    "file_size": 126624,
+    "content_preview": "[Page 1]\nConfidential\nConfidential서브라이선스 IP Pin name 부여 규칙\nDoc #: RS-QM-LSW-\n240201\nDoc grade: G1\n\n[Page 2]\nConfidential\nConfidential1. 서브라이선스 IP _ Pin name 부여규칙\n변경상황 예시 부여규칙 부여규칙 설명\nMaster / Slave\n l...",
+    "keywords": []
+  },
+  "Analog design check_ver1.0.1.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110148_Analog design check_ver1.0.1.pdf",
+    "file_name": "Analog design check_ver1.0.1.pdf",
+    "file_size": 2931803,
+    "content_preview": "[Page 1]\n0.  Revision history\ndate Ver. Modified by\n10/27/2022 1.0.0 DN Kim\n11/1/2022 1.0.1 DN Kim\n\n[Page 2]\nModified Tap\nALL TAP\n0-1\n0-2\n\n[Page 3]\nmodification item\nNew (Prepared based on Samsung fou...",
+    "keywords": []
+  },
+  "Analog design check_ver1.0.1.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_110148_Analog design check_ver1.0.1.xlsx",
+    "file_name": "Analog design check_ver1.0.1.xlsx",
+    "file_size": 5018130,
+    "content_preview": "[Sheet: 0.Revision history]\n | 0.  Revision history |  |  |  | \n | date | Ver. | Modified by | Modified Tap | modification item\n | 2022-10-27 00:00:00 | 1.0.0 | DN Kim | ALL TAP | New (Prepared based ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Digital design check_ver1.0.0.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110154_Digital design check_ver1.0.0.pdf",
+    "file_name": "Digital design check_ver1.0.0.pdf",
+    "file_size": 152877,
+    "content_preview": "[Page 1]\n0.  Revision history\ndate Ver. Modified by\n11/3/2022 1.0.0 DN Kim\n\n[Page 2]\nModified Tap\nALL TAP\n\n[Page 3]\nmodification item\nNew (Prepared based on Samsung foundy's ZECH\") _Digital\n\n[Page 4]\n...",
+    "keywords": []
+  },
+  "Digital design check_ver1.0.0.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_110154_Digital design check_ver1.0.0.xlsx",
+    "file_name": "Digital design check_ver1.0.0.xlsx",
+    "file_size": 54971,
+    "content_preview": "[Sheet: 0.Revision history]\n | 0.  Revision history |  |  |  | \n | date | Ver. | Modified by | Modified Tap | modification item\n | 2022-11-03 00:00:00 | 1.0.0 | DN Kim | ALL TAP | New (Prepared based ...",
+    "keywords": []
+  },
+  "AEC_Q100_Rev_H_Base_Document.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110516_AEC_Q100_Rev_H_Base_Document.pdf",
+    "file_name": "AEC_Q100_Rev_H_Base_Document.pdf",
+    "file_size": 854832,
+    "content_preview": "[Page 1]\n  \nAEC - Q100 - Rev-H \nSeptember 11, 2014 \n \n \n \n \n \n \n \n \n \nFAILURE MECHANISM BASED \nSTRESS TEST QUALIFICATION \nFOR \nINTEGRATED CIRCUITS \n \n \n \n \n \n \n \n \n \n \n \n \n  \nComponent Technical Commi...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-001C_Wire bond shear test.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110559_AEC_Q100-001C_Wire bond shear test.pdf",
+    "file_name": "AEC_Q100-001C_Wire bond shear test.pdf",
+    "file_size": 112773,
+    "content_preview": "[Page 1]\nAEC - Q100-001 - REV-C\nOctober 8, 1998\nComponent Technical CommitteeAutomotive Electronics Council\nATTACHMENT 1\nAEC - Q100-001 REV-C\nWIRE BOND SHEAR TEST\n\n[Page 2]\n \nAEC - Q100 -001 - REV -C ...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-002E_Human body model(HBM) eletrostatic discharge test.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110615_AEC_Q100-002E_Human body model(HBM) eletrostatic discharge test.pdf",
+    "file_name": "AEC_Q100-002E_Human body model(HBM) eletrostatic discharge test.pdf",
+    "file_size": 135770,
+    "content_preview": "[Page 1]\n \nAEC - Q100-002 - REV-E \nAugust 20, 2013 \n \n Component Technical CommitteeAutomotive Electronics Council\n \n \n  \n \n  \n \n  \n \n \nATTACHMENT 2 \n \nAEC - Q100-002 REV-E \n \nHUMAN BODY MODEL ELECTR ...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-004D_IC Latch up test.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110621_AEC_Q100-004D_IC Latch up test.pdf",
+    "file_name": "AEC_Q100-004D_IC Latch up test.pdf",
+    "file_size": 51922,
+    "content_preview": "[Page 1]\n \nAEC - Q100 -004 - REV-D \nAugust 7, 2012  \n  Component Technical CommitteeAutomotive Electronics Council\n \n \n \n \n \n \n \n \n \n \n \n \nATTACHMENT 4  \n \nAEC - Q100 -004 REV -D \n \nIC LATCH -UP TEST ...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-004D_IC Latch up test-PC-Q-RONNIE.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110628_AEC_Q100-004D_IC Latch up test-PC-Q-RONNIE.pdf",
+    "file_name": "AEC_Q100-004D_IC Latch up test-PC-Q-RONNIE.pdf",
+    "file_size": 51922,
+    "content_preview": "[Page 1]\n \nAEC - Q100 -004 - REV-D \nAugust 7, 2012  \n  Component Technical CommitteeAutomotive Electronics Council\n \n \n \n \n \n \n \n \n \n \n \n \nATTACHMENT 4  \n \nAEC - Q100 -004 REV -D \n \nIC LATCH -UP TEST ...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-005D1_Non-volatile memory program erase endurance Data retention and operation life test.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110634_AEC_Q100-005D1_Non-volatile memory program erase endurance Data retention and operation life test.pdf",
+    "file_name": "AEC_Q100-005D1_Non-volatile memory program erase endurance Data retention and operation life test.pdf",
+    "file_size": 182707,
+    "content_preview": "[Page 1]\n \nAEC - Q100-005 - REV-D1 \nJanuary 9, 2012 \nComponent Technical CommitteeAutomotive Electronics Council\n \n \n            \nATTACHMENT 5 \n \nAEC - Q100-005 - REV-D1 \n \nNON-VOLATILE MEMORY PROGRAM...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-007B_Fault simulation and test grading.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110647_AEC_Q100-007B_Fault simulation and test grading.pdf",
+    "file_name": "AEC_Q100-007B_Fault simulation and test grading.pdf",
+    "file_size": 121305,
+    "content_preview": "[Page 1]\n \nAEC - Q100 -007 Rev -B \nSeptember 18, 2007  \nComponent Technical CommitteeAutomotive Electronics Council\n  \n \n \n \n \n \n \n \n \n \n \n \n \nATTACHMENT 7  \n \nAEC - Q100 -007 Rev -B \n \nFAULT SIMULATI...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-008A_Early life failure rate(EFLR).pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110653_AEC_Q100-008A_Early life failure rate(EFLR).pdf",
+    "file_name": "AEC_Q100-008A_Early life failure rate(EFLR).pdf",
+    "file_size": 34836,
+    "content_preview": "[Page 1]\n \nAEC - Q100 -008 - REV -A \nJuly 18, 2003  \nComponent Technical CommitteeAutomotive Electronics Council\n  \n \n \n \n \n \n \n \n \n \n \n \n \nATTACHMENT 8  \n \nAEC - Q100 -008 REV -A \n \nEARLY LIFE FAILUR...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-009B_Eletrical distribution assessment.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110700_AEC_Q100-009B_Eletrical distribution assessment.pdf",
+    "file_name": "AEC_Q100-009B_Eletrical distribution assessment.pdf",
+    "file_size": 46839,
+    "content_preview": "[Page 1]\n \nAEC - Q100 -009 - REV -B \nAugust 27, 2007  \nComponent Technical CommitteeAutomotive Electronics Council\n  \n \n \n \n \n \n \n \n \n \n \n \n \nATTACHMENT 9  \n \nAEC - Q100 -009 REV -B \n \nELECTRICAL DIST...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-011D_Charged device model(CDM) eletrostatic discharge test.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110706_AEC_Q100-011D_Charged device model(CDM) eletrostatic discharge test.pdf",
+    "file_name": "AEC_Q100-011D_Charged device model(CDM) eletrostatic discharge test.pdf",
+    "file_size": 130216,
+    "content_preview": "[Page 1]\n \nAEC - Q100-011 Rev-D \nJanuary 29, 2019 \n \n Component Technical Committee Automotive Electronics Council \n \n \n \n \n \n \n \n \n \n \n \n \nATTACHMENT 11 \n \nAEC - Q100-011 Rev-D \n \nCHARGED DEVICE MODE...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC_Q100-012_Short circuit reliability characterization of smart power devices for 12V system.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110712_AEC_Q100-012_Short circuit reliability characterization of smart power devices for 12V system.pdf",
+    "file_name": "AEC_Q100-012_Short circuit reliability characterization of smart power devices for 12V system.pdf",
+    "file_size": 134209,
+    "content_preview": "[Page 1]\n \n  AEC - Q100 -012 - REV- \nSeptember  14, 2006  \nComponent Technical CommitteeAutomotive Electronics Council\n  \n \n \n \n \n \n \n \n \n \n \n \n \nATTACHMENT 12  \n \nAEC - Q100 -012 - REV - \n \nSHORT CIR...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC-Q100.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110718_AEC-Q100.pdf",
+    "file_name": "AEC-Q100.pdf",
+    "file_size": 127474,
+    "content_preview": "[Page 1]\nAEC Q-100\nNo.ABV Test mode\nA1PCPrecondition\nA2THBTemperature, Humidity-Bias\nHASTBiased HAST\nA3ACAutoclave (without bias)\nUHASTUnbiased HAST (without Bias)\nTHTemperature-Humidity (without Bias...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "AEC-Q100.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_110718_AEC-Q100.xlsx",
+    "file_name": "AEC-Q100.xlsx",
+    "file_size": 32929,
+    "content_preview": "[Sheet: AEC Q-100 Rev.G]\n | AEC Q-100 |  |  |  |  |  |  |  |  |  |  |  |  | \n | No. | ABV | Test mode | Data type | Test condition | Reference standard | Test time | unit | Sample size | Number of lot...",
+    "keywords": [
+      "Automotive",
+      "AEC-Q100"
+    ]
+  },
+  "ISO-26262-1-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110904_ISO-26262-1-2018.pdf",
+    "file_name": "ISO-26262-1-2018.pdf",
+    "file_size": 1614797,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  1: \nVocabulary\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  1: VocabulaireINTERNATIONAL \nSTANDARDISO\n26262-1\nSecond edition\n20...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-2-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110910_ISO-26262-2-2018.pdf",
+    "file_name": "ISO-26262-2-2018.pdf",
+    "file_size": 1339474,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  2: \nManagement of functional safety\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  2: Gestion de la sécurité fonctionnelleINTERN...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-3-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110916_ISO-26262-3-2018.pdf",
+    "file_name": "ISO-26262-3-2018.pdf",
+    "file_size": 1095606,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  3: \nConcept phase\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  3: Phase de projetINTERNATIONAL \nSTANDARDISO\n26262-3\nSecond edi...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-4-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110922_ISO-26262-4-2018.pdf",
+    "file_name": "ISO-26262-4-2018.pdf",
+    "file_size": 1313823,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  4: \nProduct development at the system \nlevel\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  4: Développement du produit au nivea...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-5-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110928_ISO-26262-5-2018.pdf",
+    "file_name": "ISO-26262-5-2018.pdf",
+    "file_size": 2673904,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  5: \nProduct development at the \nhardware level\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  5: Développement du produit au niv...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-6-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110934_ISO-26262-6-2018.pdf",
+    "file_name": "ISO-26262-6-2018.pdf",
+    "file_size": 1841436,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  6: \nProduct development at the software \nlevel\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  6: Développement du produit au niv...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-7-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110941_ISO-26262-7-2018.pdf",
+    "file_name": "ISO-26262-7-2018.pdf",
+    "file_size": 859230,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  7: \nProduction, operation, service and \ndecommissioning\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  7: Production, utilisatio...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-8-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110947_ISO-26262-8-2018.pdf",
+    "file_name": "ISO-26262-8-2018.pdf",
+    "file_size": 1745186,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  8: \nSupporting processes\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  8: Processus d'appuiINTERNATIONAL \nSTANDARDISO\n26262-8\nS...",
+    "keywords": [
+      "Functional Safety",
+      "Process",
+      "ISO",
+      "Safety",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-9-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_110954_ISO-26262-9-2018.pdf",
+    "file_name": "ISO-26262-9-2018.pdf",
+    "file_size": 1321263,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  9: \nAutomotive safety integrity level \n(ASIL)-oriented and safety-oriented analyses\nVéhicules routiers  — Sécurité fonctionnelle  —\nParti...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-10-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_111000_ISO-26262-10-2018.pdf",
+    "file_name": "ISO-26262-10-2018.pdf",
+    "file_size": 5743755,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  10: \nGuidelines on ISO 26262\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  10: Ligne\ns directrices relatives à l'ISO 26262INTER...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-11-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_111006_ISO-26262-11-2018.pdf",
+    "file_name": "ISO-26262-11-2018.pdf",
+    "file_size": 7500222,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  11: \nGuidelines on application of ISO \n26262 to semiconductors\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  11: Lignes directr...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "ISO-26262-12-2018.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_111012_ISO-26262-12-2018.pdf",
+    "file_name": "ISO-26262-12-2018.pdf",
+    "file_size": 1635361,
+    "content_preview": "[Page 1]\n© ISO 2018Road vehicles  — Functional safety  —\nPart  12: \nAdaptation of ISO 26262 for \nmot\norcycles\nVéhicules routiers  — Sécurité fonctionnelle  —\nPartie  12: Adapt\nation de l'ISO 26262 pou...",
+    "keywords": [
+      "Functional Safety",
+      "Safety",
+      "ISO",
+      "ISO26262"
+    ]
+  },
+  "Ramschip_ IR Checklist_Voyager_4nm LPP_VER1.0.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_150416_Ramschip_ IR Checklist_Voyager_4nm LPP_VER1.0.pdf",
+    "file_name": "Ramschip_ IR Checklist_Voyager_4nm LPP_VER1.0.pdf",
+    "file_size": 733614,
+    "content_preview": "[Page 1]\nIP DESIGN CHECKLIST\nRamschip,Inc Confidential \n1. BASIC INFORMATION\nProcess SF 4nm LPP\nProject name Voyager (ramschip internal title)\nCustomer SEC S.LSI\nApplication Display TX\nProject manager...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_Voyager_4nm LPP_VER1.0.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_150416_Ramschip_ IR Checklist_Voyager_4nm LPP_VER1.0.xlsx",
+    "file_name": "Ramschip_ IR Checklist_Voyager_4nm LPP_VER1.0.xlsx",
+    "file_size": 1258263,
+    "content_preview": "[Sheet: IR checklist]\n | IP DESIGN CHECKLIST |  |  |  |  |  |  |  |  | \n | Ramschip,Inc Confidential  |  |  |  |  |  |  |  |  | \n | 1. BASIC INFORMATION |  |  | COLOR DESCRIPTION (ITEM) |  | SCORE |  ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_dcphy3300_ln08lpu.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_150445_Ramschip_ IR Checklist_dcphy3300_ln08lpu.pdf",
+    "file_name": "Ramschip_ IR Checklist_dcphy3300_ln08lpu.pdf",
+    "file_size": 146806,
+    "content_preview": "[Page 1]\nIR CHECKLIST\n1. BASIC INFORMATION\nProcess\nProject name\nCustomer\nApplication\nProduct manager\nIP designer\nQA manager\nIntegration review date\nMTO Schedule\n2. DESIGN CHECK SHEET\nRecommendation : ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_dcphy3300_ln08lpu.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_150445_Ramschip_ IR Checklist_dcphy3300_ln08lpu.xlsx",
+    "file_name": "Ramschip_ IR Checklist_dcphy3300_ln08lpu.xlsx",
+    "file_size": 85830,
+    "content_preview": "[Sheet: IR checklist]\n | IR CHECKLIST |  |  |  |  |  |  |  |  |  |  |  | \n | 1. BASIC INFORMATION |  |  | COLOR DESCRIPTION (ITEM) |  |  | SCORE |  |  |  |  |  | \n | Process |  |  | Item |  |  | PASS ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_dphy3200_ln08lpu.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_150456_Ramschip_ IR Checklist_dphy3200_ln08lpu.pdf",
+    "file_name": "Ramschip_ IR Checklist_dphy3200_ln08lpu.pdf",
+    "file_size": 206837,
+    "content_preview": "[Page 1]\nIR CHECKLIST\n1. BASIC INFORMATION\nProcess\nProject name\nCustomer\nApplication\nProduct manager\nIP designer\nQA manager\nIntegration review date\nMTO Schedule\n2. DESIGN CHECK SHEET\nRecommendation : ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_dphy3200_ln08lpu.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_150456_Ramschip_ IR Checklist_dphy3200_ln08lpu.xlsx",
+    "file_name": "Ramschip_ IR Checklist_dphy3200_ln08lpu.xlsx",
+    "file_size": 157568,
+    "content_preview": "[Sheet: IR checklist]\n | IR CHECKLIST |  |  |  |  |  |  |  |  |  |  |  | \n | 1. BASIC INFORMATION |  |  | COLOR DESCRIPTION (ITEM) |  |  | SCORE |  |  |  |  |  | \n | Process |  |  | Item |  |  | PASS ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_Ethership_5nm LPE_VER1.0.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_150743_Ramschip_ IR Checklist_Ethership_5nm LPE_VER1.0.pdf",
+    "file_name": "Ramschip_ IR Checklist_Ethership_5nm LPE_VER1.0.pdf",
+    "file_size": 238870,
+    "content_preview": "[Page 1]\nIR CHECKLIST\nRamschip,Inc Confidential \n1. BASIC INFORMATION\nProcess SF 5nm LPE\nProject name Dolphin 7\nCustomer Telechips\nApplication\nProject manager\nIP design classificaiton\nQA manager\nTarge...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_Ethership_5nm LPE_VER1.0.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_150743_Ramschip_ IR Checklist_Ethership_5nm LPE_VER1.0.xlsx",
+    "file_name": "Ramschip_ IR Checklist_Ethership_5nm LPE_VER1.0.xlsx",
+    "file_size": 292324,
+    "content_preview": "[Sheet: IR checklist]\n | IR CHECKLIST |  |  |  |  |  |  |  |  |  |  | \n | Ramschip,Inc Confidential  |  |  |  |  |  |  |  |  |  |  | \n | 1. BASIC INFORMATION |  |  | COLOR DESCRIPTION (ITEM) |  |  | S...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_HDMI DP TX_LN08LPU.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_150826_Ramschip_ IR Checklist_HDMI DP TX_LN08LPU.pdf",
+    "file_name": "Ramschip_ IR Checklist_HDMI DP TX_LN08LPU.pdf",
+    "file_size": 209587,
+    "content_preview": "[Page 1]\nIR CHECKLIST\n1. BASIC INFORMATION\nProcess Samsung ln08lpu\nProject name Heron\nCustomer Rockhip\nApplication\nProduct manager\nIP designer\nQA manager\nIntegration review date\nMTO Schedule\n2. DESIGN...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_HDMI DP TX_LN08LPU.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_150826_Ramschip_ IR Checklist_HDMI DP TX_LN08LPU.xlsx",
+    "file_name": "Ramschip_ IR Checklist_HDMI DP TX_LN08LPU.xlsx",
+    "file_size": 200772,
+    "content_preview": "[Sheet: IR checklist]\n | IR CHECKLIST |  |  |  |  |  |  |  |  |  |  |  | \n | 1. BASIC INFORMATION |  |  | COLOR DESCRIPTION (ITEM) |  |  | SCORE |  |  |  |  |  | \n | Process | Samsung ln08lpu |  | Ite...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_HSSTP TX_Ramschip.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_150937_Ramschip_ IR Checklist_HSSTP TX_Ramschip.pdf",
+    "file_name": "Ramschip_ IR Checklist_HSSTP TX_Ramschip.pdf",
+    "file_size": 3562153,
+    "content_preview": "[Page 1]\nIR CHECKLIST\n1. BASIC INFORMATION\nProcess\nProject name\nCustomer\nApplication\nProduct manager\nIP designer\nQA manager\nIntegration review date\nMTO Schedule\n2. DESIGN CHECK SHEET\nRecommendation : ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_HSSTP TX_Ramschip.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_150937_Ramschip_ IR Checklist_HSSTP TX_Ramschip.xlsx",
+    "file_name": "Ramschip_ IR Checklist_HSSTP TX_Ramschip.xlsx",
+    "file_size": 4219441,
+    "content_preview": "[Sheet: IR checklist]\n | IR CHECKLIST |  |  |  |  |  |  |  |  |  |  |  | \n | 1. BASIC INFORMATION |  |  | COLOR DESCRIPTION (ITEM) |  |  | SCORE |  |  |  |  |  | \n | Process |  |  | Item |  |  | PASS ...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_USB DP_LN08LPU.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_151010_Ramschip_ IR Checklist_USB DP_LN08LPU.pdf",
+    "file_name": "Ramschip_ IR Checklist_USB DP_LN08LPU.pdf",
+    "file_size": 192100,
+    "content_preview": "[Page 1]\nIR CHECKLIST\n1. BASIC INFORMATION\nProcess Samsung ln08lpu\nProject name Heron\nCustomer Rockhip\nApplication\nProduct manager\nIP designer\nQA manager\nIntegration review date\nMTO Schedule\n2. DESIGN...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "Ramschip_ IR Checklist_USB DP_LN08LPU.xlsx": {
+    "file_path": "uploads\\spec_center\\20260112_151010_Ramschip_ IR Checklist_USB DP_LN08LPU.xlsx",
+    "file_name": "Ramschip_ IR Checklist_USB DP_LN08LPU.xlsx",
+    "file_size": 179890,
+    "content_preview": "[Sheet: IR checklist]\n | IR CHECKLIST |  |  |  |  |  |  |  |  |  |  |  | \n | 1. BASIC INFORMATION |  |  | COLOR DESCRIPTION (ITEM) |  |  | SCORE |  |  |  |  |  | \n | Process | Samsung ln08lpu |  | Ite...",
+    "keywords": [
+      "Process"
+    ]
+  },
+  "(주)램쉽 Quality policy.docx": {
+    "file_path": "uploads\\spec_center\\20260112_163452_(주)램쉽 Quality policy.docx",
+    "file_name": "(주)램쉽 Quality policy.docx",
+    "file_size": 45777,
+    "content_preview": "[TABLE]\n\n\n㈜램쉽 품질 방침\n\n\n(RAMSCHIP QUALITY MANAGEMENT POLICY)\n\n\n\n ㈜ 램쉽은 효율적인 품질경영시스템을 바탕으로 시장 선도적인 혁신적인 제품을 \n개발하고, 생산성의 확보 및 지속적인 개선으로 신뢰성이 확보된 시장(고객) \n지향적 제품을 안정적으로 적기에 공급 함으로서 당사의 이익을 극대화 하고, \n고객 및 주주의...",
+    "keywords": [
+      "Quality"
+    ]
+  },
+  "(주)램쉽 Quality policy.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_163452_(주)램쉽 Quality policy.pdf",
+    "file_name": "(주)램쉽 Quality policy.pdf",
+    "file_size": 55491,
+    "content_preview": "[Page 1]\n㈜램쉽 품질 방침\n(RAMSCHIP QUALITY MANAGEMENT POLICY)\n ㈜ 램쉽은 효율적인 품질경영시스템을 바탕으로 시장 선도적인 혁신적인 제품을 \n개발하고, 생산성의 확보 및 지속적인 개선으로 신뢰성이 확보된 시장 (고객) \n지향적 제품을 안정적으로 적기에 공급 함으로서 당사의 이익을 극대화 하고 , \n고객 및 주주의 가치를...",
+    "keywords": [
+      "Quality"
+    ]
+  },
+  "(주)램쉽 Environment policy.docx": {
+    "file_path": "uploads\\spec_center\\20260112_163530_(주)램쉽 Environment policy.docx",
+    "file_name": "(주)램쉽 Environment policy.docx",
+    "file_size": 48366,
+    "content_preview": "[TABLE]\n\n\n\n㈜램쉽 환경 방침\n\n\n\n(RAMSCHIP ENVIRONMENT MANAGEMENT POLICY)\n\n\n\n\n\n ㈜ 램쉽은 지속적인 기업발전과 사회적 책임의 완수를 위하여 환경보전을 \n    기업경영의 고유가치로 인정하고 기업경영 전반에 걸쳐 환경경영을 \n    실시한다.\n\n\n당사는 환경을 고려한 설계와 연구를 통하여 환경친화적 제품을 개발한...",
+    "keywords": []
+  },
+  "(주)램쉽 Environment policy.pdf": {
+    "file_path": "uploads\\spec_center\\20260112_163530_(주)램쉽 Environment policy.pdf",
+    "file_name": "(주)램쉽 Environment policy.pdf",
+    "file_size": 54472,
+    "content_preview": "[Page 1]\n㈜램쉽 환경 방침\n(RAMSCHIP ENVIRONMENT MANAGEMENT POLICY)\n ㈜ 램쉽은 지속적인 기업발전과 사회적 책임의 완수를 위하여 환경보전을 \n    기업경영의 고유가치로 인정하고 기업경영 전반에 걸쳐 환경경영을 \n    실시한다.\n당사는 환경을 고려한 설계와 연구를 통하여 환경친화적 제품을 개발한다 .\n당사는 환경...",
+    "keywords": []
+  }
+}

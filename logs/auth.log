@@ -1014,3 +1014,6 @@ WHERE users.email = ?]
 {"timestamp": "2026-02-09 14:45:39", "level": "INFO", "module": "auth", "message": "API login successful: swlee@ramschip.com | {"user_id": 8, "ip": "125.132.216.97"}"}
 {"timestamp": "2026-02-09 14:57:44", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/api/login", "user": "swlee@ramschip.com"}"}
 {"timestamp": "2026-02-09 14:57:44", "level": "INFO", "module": "auth", "message": "API login successful: swlee@ramschip.com | {"user_id": 8, "ip": "125.132.216.97"}"}
+{"timestamp": "2026-02-09 15:25:07", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "swlee@ramschip.com"}"}
+{"timestamp": "2026-02-09 15:25:07", "level": "DEBUG", "module": "auth", "message": "Login attempt for swlee@ramschip.com | {"ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-09 15:25:07", "level": "INFO", "module": "auth", "message": "User swlee@ramschip.com logged in successfully | {"user_id": 8, "ip": "127.0.0.1"}"}

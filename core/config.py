@@ -1,20 +1,20 @@
-import os 
-from pathlib import Path 
-from dotenv import load_dotenv 
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
-load_dotenv ()
+load_dotenv()
 
-BASE_DIR =Path (__file__ ).resolve ().parent .parent 
-DB_PATH =(BASE_DIR /"rpmt.db").resolve ()
+BASE_DIR = Path(__file__).resolve().parent.parent
+DB_PATH = (BASE_DIR / "rpmt.db").resolve()
 PRODUCT_INFO_DB_PATH = (BASE_DIR / "product_info.db").resolve()
 
-SESSION_SECRET =os .environ .get ("SESSION_SECRET","rps-secret")
-ADMIN_USER =os .environ .get ("ADMIN_USER","admin")
-ADMIN_PASS =os .environ .get ("ADMIN_PASS","ramschip")
+SESSION_SECRET = os.environ.get("SESSION_SECRET", "rps-secret")
+ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
+ADMIN_PASS = os.environ.get("ADMIN_PASS", "ramschip")
 
-OUTLOOK_EMAIL =os .environ .get ("OUTLOOK_EMAIL","")
-OUTLOOK_PASSWORD =os .environ .get ("OUTLOOK_PASSWORD","")
-ADMIN_NOTIFICATION_EMAIL =os .environ .get ("ADMIN_EMAIL","admin@ramschip.com")
+OUTLOOK_EMAIL = os.environ.get("OUTLOOK_EMAIL", "")
+OUTLOOK_PASSWORD = os.environ.get("OUTLOOK_PASSWORD", "")
+ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@ramschip.com")
 
 GARAGE_MAX_UPLOAD_SIZE = int(os.environ.get('GARAGE_MAX_UPLOAD_SIZE', 10 * 1024 * 1024 * 1024))
 _allowed = os.environ.get('GARAGE_ALLOWED_EXTENSIONS', '')
@@ -30,11 +30,11 @@ SVIT_ALLOWED_ATTACHMENTS = [ext.strip().lower() for ext in _sv_allowed.split(','
 # -------------------------
 LLM_BACKEND = os.environ.get('LLM_BACKEND', 'gpt4all')
 LLM_MODEL_PATH = os.environ.get('LLM_MODEL_PATH', '')
-# Prefer a larger default context for modern models (e.g., Falcon variants)
-LLM_N_CTX = int(os.environ.get('LLM_N_CTX', '2048'))
+# Prefer a larger default context for modern models (Llama-3 supports up to 8192)
+LLM_N_CTX = int(os.environ.get('LLM_N_CTX', '4096'))
 
 # Optional dedicated LLM folder (can be overridden by env LLM_DIR)
-LLM_DIR = Path(os.environ.get('LLM_DIR', '/home/ronnie/llm')).resolve()
+LLM_DIR = Path(os.environ.get('LLM_DIR', r'C:\Users\이상원\Downloads\Models')).resolve()
 
 # If no explicit model path is configured, try to find a .gguf model in a few
 # sensible locations inside the project and LLM_DIR (common build outputs).

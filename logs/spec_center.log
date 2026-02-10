@@ -1363,3 +1363,215 @@
 {"timestamp": "2026-02-09 14:59:49", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
 {"timestamp": "2026-02-09 15:00:03", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: /home/ronnie/QMS_Server/uploads/spec_center"}
 {"timestamp": "2026-02-09 15:00:03", "level": "INFO", "module": "spec_center", "message": "soffice=True mammoth=False"}
+{"timestamp": "2026-02-09 15:24:29", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:24:29", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:25:02", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:25:02", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:26:13", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:26:13", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:28:26", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:28:26", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:28:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:28:35", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:31:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:31:49", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:31:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:31:54", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:43:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:43:10", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:46:24", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:46:24", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:46:30", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:46:30", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:48:58", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:48:58", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:49:15", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:49:15", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 15:51:27", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 15:51:27", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:01:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:01:41", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:01:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:01:54", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:02:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:02:00", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:03:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:03:00", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:07:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:07:32", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:08:06", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:08:06", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:08:12", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:08:12", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:08:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:08:17", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:08:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:08:22", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:09:02", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:09:02", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:11:25", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:11:25", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:11:31", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:11:31", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:18:07", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:18:07", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:18:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:18:11", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:18:27", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:18:27", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:19:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:19:08", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:19:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:19:22", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:20:45", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:20:45", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:21:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:21:40", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:27:44", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:27:44", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:28:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:28:01", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:28:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:28:11", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:28:16", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:28:16", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 16:28:46", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 16:28:46", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:09:04", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:09:04", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:09:34", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:09:34", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:10:45", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:10:45", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:14:19", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:14:19", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:17:05", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:17:05", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:17:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:17:10", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:17:18", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:17:18", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:19:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:19:28", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:19:55", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:19:55", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:20:03", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:20:03", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:20:14", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:20:14", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:20:33", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:20:33", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:20:59", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:20:59", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:21:32", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:21:32", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:21:38", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:21:38", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:21:56", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:21:56", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:22:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:22:11", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:26:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:26:52", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:32:13", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:32:13", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:32:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:32:17", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:33:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:33:17", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:33:23", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:33:23", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:33:29", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:33:29", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:33:40", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:33:40", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:33:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:33:52", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:34:26", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:34:26", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:36:30", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:36:30", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:38:01", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:38:01", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:38:07", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:38:07", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:38:29,860	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:38:29,863	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:39:03", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:39:03", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:39:24,405	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:39:24,409	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:39:56", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:39:56", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:40:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:40:52", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:41:52", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:41:52", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:41:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:41:54", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:42:42,127	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:42:42,136	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:42:53", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:42:53", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:42:59,138	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:42:59,142	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:43:49", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:43:49", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:44:41", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:44:41", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:48:35", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:48:35", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:49:05,651	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:49:05,658	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:49:50", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:49:50", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:50:58", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:50:58", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:51:16,181	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:51:16,184	INFO	soffice=False mammoth=False
+2026-02-09 17:51:39,401	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:51:39,405	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:52:54", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:52:54", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:54:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:54:11", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:54:23", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:54:23", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:55:22", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:55:22", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:55:37,415	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:55:37,420	INFO	soffice=False mammoth=False
+2026-02-09 17:55:57,699	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:55:57,703	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:56:30", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:56:30", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+2026-02-09 17:56:35,868	INFO	Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center
+2026-02-09 17:56:35,873	INFO	soffice=False mammoth=False
+{"timestamp": "2026-02-09 17:57:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:57:28", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 17:58:21", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 17:58:21", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 18:02:12", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 18:02:12", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 18:03:13", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 18:03:13", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 18:04:10", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 18:04:10", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 18:05:08", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 18:05:08", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-09 18:06:03", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-09 18:06:03", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-10 09:02:28", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-10 09:02:28", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-10 09:02:29", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-10 09:02:29", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-10 09:15:37", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-10 09:15:37", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-10 09:18:09", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-10 09:18:09", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-10 09:19:11", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-10 09:19:11", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-10 09:20:07", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-10 09:20:07", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-02-10 09:21:00", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
+{"timestamp": "2026-02-10 09:21:00", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}

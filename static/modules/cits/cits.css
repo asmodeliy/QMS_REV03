@@ -870,6 +870,8 @@
   min-height: 120px;
   max-height: 400px;
   overflow-y: auto;
+  white-space: normal;
+  text-indent: 0;
 }
 
 .cits-root .conv-content-inquiry:hover {
@@ -886,6 +888,8 @@
   min-height: 120px;
   max-height: 400px;
   overflow-y: auto;
+  white-space: normal;
+  text-indent: 0;
 }
 
 .cits-root .conv-content-reply:hover {

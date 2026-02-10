@@ -322,16 +322,23 @@ def my_focus (request :Request ,db :Session =Depends (get_db )):
     "horizon":horizon ,
     "today_items":today_items ,
     "upcoming_items":upcoming_items ,
-    "overdue_items":overdue_items ,
+    "overdue_items": overdue_items,
     },
     )
 
 
-
-@router.get("/help",response_class =HTMLResponse )
-def help_page (request :Request ):
-    auth_check =ensure_authenticated (request )
-    if auth_check :
-        return auth_check 
-    locale =get_locale (request )
-    return templates .TemplateResponse ("shared/help.html",{"request":request ,"locale":locale })
+@router.get("/help", response_class=HTMLResponse)
+def help_page(request: Request):
+    """Display help page"""
+    auth_check = ensure_authenticated(request)
+    if auth_check:
+        return auth_check
+    
+    locale = get_locale(request)
+    return templates.TemplateResponse(
+        "shared/help.html",
+        {
+            "request": request,
+            "locale": locale
+        }
+    )

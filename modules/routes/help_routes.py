@@ -1,128 +1,210 @@
-from fastapi import APIRouter ,Request 
-from fastapi .responses import HTMLResponse ,JSONResponse 
-from core .config import BASE_DIR ,OUTLOOK_EMAIL ,OUTLOOK_PASSWORD ,ADMIN_NOTIFICATION_EMAIL 
-from pathlib import Path 
-from datetime import datetime 
-import time 
-import json 
-import smtplib 
-from email .mime .text import MIMEText 
-from email .mime .multipart import MIMEMultipart 
-from core .i18n import get_locale 
+"""
+Help and Feedback Routes
 
-router =APIRouter ()
+Provides help documentation, FAQ, and feedback submission system.
+"""
 
-templates =None 
+import json
+import smtplib
+import time
+from datetime import datetime
+from pathlib import Path
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-def set_templates (tmpl ):
-    global templates 
-    templates =tmpl 
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 
-FEEDBACK_DIR =BASE_DIR /"data"
-FEEDBACK_DIR .mkdir (parents =True ,exist_ok =True )
-FEEDBACK_FILE =FEEDBACK_DIR /"feedback.json"
+from core.config import BASE_DIR, OUTLOOK_EMAIL, OUTLOOK_PASSWORD, ADMIN_NOTIFICATION_EMAIL
+from core.i18n import get_locale, t
 
-def load_feedbacks ():
-    if not FEEDBACK_FILE .exists ():
+router = APIRouter()
+
+templates = None
+
+
+def set_templates(tmpl):
+    """Set Jinja2 templates engine"""
+    global templates
+    templates = tmpl
+
+
+# Feedback file configuration
+FEEDBACK_DIR = BASE_DIR / "data"
+FEEDBACK_DIR.mkdir(parents=True, exist_ok=True)
+FEEDBACK_FILE = FEEDBACK_DIR / "feedback.json"
+
+
+def load_feedbacks() -> list:
+    """Load all feedbacks from JSON file"""
+    if not FEEDBACK_FILE.exists():
         return []
-    try :
-        return json .loads (FEEDBACK_FILE .read_text (encoding ="utf-8"))
-    except :
+    try:
+        content = FEEDBACK_FILE.read_text(encoding="utf-8")
+        return json.loads(content) if content else []
+    except Exception:
         return []
 
-def save_feedbacks (feedbacks ):
-    FEEDBACK_FILE .write_text (json .dumps (feedbacks ,ensure_ascii =False ,indent =2 ),encoding ="utf-8")
 
-def send_admin_notification (feedback ):
-    if not OUTLOOK_EMAIL or not OUTLOOK_PASSWORD :
-        return 
+def save_feedbacks(feedbacks: list) -> None:
+    """Save feedbacks to JSON file"""
+    try:
+        content = json.dumps(feedbacks, ensure_ascii=False, indent=2)
+        FEEDBACK_FILE.write_text(content, encoding="utf-8")
+    except Exception as e:
+        print(f"[ERROR] Failed to save feedbacks: {e}")
 
-    try :
-        msg =MIMEMultipart ()
-        msg ['From']=OUTLOOK_EMAIL 
-        msg ['To']=ADMIN_NOTIFICATION_EMAIL 
-        msg ['Subject']=f"[RPMT] 새 피드백: {feedback .get ('type','Other')}"
 
-        body =f"새로운 피드백이 도착했습니다.\n\n유형: {feedback .get ('type','Other')}\n발신자: {feedback .get ('email')or '(익명)'}\n내용: {feedback .get ('message','')}\nURL: {feedback .get ('url')or '(없음)'}\n시간: {feedback .get ('timestamp','')}\n\n확인하기: http://localhost:8000/admin/feedback"
+def send_admin_notification(feedback: dict) -> None:
+    """Send admin notification email about new feedback"""
+    if not OUTLOOK_EMAIL or not OUTLOOK_PASSWORD:
+        return
 
-        msg .attach (MIMEText (body ,'plain','utf-8'))
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = OUTLOOK_EMAIL
+        msg['To'] = ADMIN_NOTIFICATION_EMAIL
+        msg['Subject'] = f"[QMS] New Feedback: {feedback.get('type', 'Other')}"
 
-        with smtplib .SMTP ('smtp.office365.com',587 )as server :
-            server .starttls ()
-            server .login (OUTLOOK_EMAIL ,OUTLOOK_PASSWORD )
-            server .send_message (msg )
-    except Exception as e :
-        pass 
+        body = (
+            f"New feedback received.\n\n"
+            f"Type: {feedback.get('type', 'Other')}\n"
+            f"From: {feedback.get('email') or '(Anonymous)'}\n"
+            f"Message: {feedback.get('message', '')}\n"
+            f"Page: {feedback.get('url') or '(Unknown)'}\n"
+            f"Time: {feedback.get('timestamp', '')}\n\n"
+            f"Review: http://localhost:8000/admin/feedback"
+        )
 
-def send_reply_email (feedback_id ,reply_message ):
-    feedbacks =load_feedbacks ()
-    feedback =next ((f for f in feedbacks if f .get ('id')==feedback_id ),None )
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
 
-    if not feedback or not feedback .get ('email'):
-        return 
+        with smtplib.SMTP('smtp.office365.com', 587) as server:
+            server.starttls()
+            server.login(OUTLOOK_EMAIL, OUTLOOK_PASSWORD)
+            server.send_message(msg)
+    except Exception as e:
+        print(f"[ERROR] Failed to send admin notification: {e}")
 
-    if not OUTLOOK_EMAIL or not OUTLOOK_PASSWORD :
-        return 
 
-    try :
-        msg =MIMEMultipart ()
-        msg ['From']=OUTLOOK_EMAIL 
-        msg ['To']=feedback ['email']
-        msg ['Subject']='[RPMT] 피드백 답변'
+def send_reply_email(feedback_id: int, reply_message: str) -> None:
+    """Send reply email to feedback submitter"""
+    feedbacks = load_feedbacks()
+    feedback = next((f for f in feedbacks if f.get('id') == feedback_id), None)
 
-        body =f"안녕하세요,\n\n보내주신 피드백에 대한 답변입니다:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n원본 메시지:\n{feedback .get ('message','')}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n답변:\n{reply_message }\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n감사합니다.\nRAMSCHIP RPMT 팀"
+    if not feedback or not feedback.get('email'):
+        return
 
-        msg .attach (MIMEText (body ,'plain','utf-8'))
+    if not OUTLOOK_EMAIL or not OUTLOOK_PASSWORD:
+        return
 
-        with smtplib .SMTP ('smtp.office365.com',587 )as server :
-            server .starttls ()
-            server .login (OUTLOOK_EMAIL ,OUTLOOK_PASSWORD )
-            server .send_message (msg )
-    except Exception as e :
-        pass 
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = OUTLOOK_EMAIL
+        msg['To'] = feedback['email']
+        msg['Subject'] = '[QMS] Feedback Response'
 
-@router .get ("/help",response_class =HTMLResponse )
-def help_page (request :Request ):
-    locale =get_locale (request )
-    return templates .TemplateResponse ("shared/help.html",{"request":request ,"locale":locale })
+        body = (
+            f"Hello,\n\n"
+            f"Thank you for your feedback.\n\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"Your message:\n{feedback.get('message', '')}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"Our response:\n{reply_message}\n\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"Thank you.\nQMS Support Team"
+        )
 
-@router .post ("/help/feedback")
-def submit_feedback (request :Request ):
-    try :
-        feedbacks =load_feedbacks ()
-        feedback ={
-        "id":int (time .time ()*1000 ),
-        "type":request .form .get ("type","Bug"),
-        "email":request .form .get ("email",""),
-        "message":request .form .get ("message",""),
-        "url":request .url .path ,
-        "timestamp":datetime .now ().isoformat (),
-        "status":"Unread"
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
+
+        with smtplib.SMTP('smtp.office365.com', 587) as server:
+            server.starttls()
+            server.login(OUTLOOK_EMAIL, OUTLOOK_PASSWORD)
+            server.send_message(msg)
+    except Exception as e:
+        print(f"[ERROR] Failed to send reply email: {e}")
+
+
+# ============================================================================
+# ROUTES
+# ============================================================================
+
+@router.get("/help", response_class=HTMLResponse)
+def help_page(request: Request):
+    """Display help page with documentation"""
+    locale = get_locale(request)
+    return templates.TemplateResponse(
+        "shared/help.html",
+        {
+            "request": request,
+            "locale": locale,
+            "page_title": t("common.help", locale)
         }
-        feedbacks .append (feedback )
-        save_feedbacks (feedbacks )
-        send_admin_notification (feedback )
-        return JSONResponse ({"success":True })
-    except Exception as e :
-        return JSONResponse ({"success":False ,"error":str (e )},status_code =500 )
+    )
 
-@router .get ("/help/feedback")
-def get_feedbacks (request :Request ):
-    feedbacks =load_feedbacks ()
-    return feedbacks 
 
-@router .post ("/help/feedback/{feedback_id}/reply")
-def reply_feedback (feedback_id :int ,request :Request ):
-    try :
-        reply_message =request .form .get ("reply_message","")
-        feedbacks =load_feedbacks ()
-        feedback =next ((f for f in feedbacks if f .get ('id')==feedback_id ),None )
+@router.post("/api/help/feedback")
+def submit_feedback(request: Request):
+    """Submit new feedback"""
+    try:
+        form_data = dict(request.form)
+        new_feedback = {
+            "id": int(time.time() * 1000),
+            "type": form_data.get("type", "Bug"),
+            "email": form_data.get("email", ""),
+            "message": form_data.get("message", ""),
+            "url": str(request.url.path),
+            "timestamp": datetime.now().isoformat(),
+            "status": "Unread"
+        }
 
-        if feedback :
-            feedback ['status']='Resolved'
-            save_feedbacks (feedbacks )
-            send_reply_email (feedback_id ,reply_message )
+        feedbacks = load_feedbacks()
+        feedbacks.append(new_feedback)
+        save_feedbacks(feedbacks)
+        send_admin_notification(new_feedback)
 
-        return JSONResponse ({"success":True })
-    except Exception as e :
-        return JSONResponse ({"success":False },status_code =500 )
+        return JSONResponse({"success": True, "id": new_feedback["id"]})
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "error": str(e)},
+            status_code=500
+        )
+
+
+@router.get("/api/help/feedback")
+def get_feedbacks(request: Request):
+    """Get all feedbacks (admin only)"""
+    session = getattr(request, 'session', {})
+    if not session.get('is_authenticated') or session.get('role') != 'admin':
+        return JSONResponse({"error": "Unauthorized"}, status_code=403)
+
+    return JSONResponse(load_feedbacks())
+
+
+@router.post("/api/help/feedback/{feedback_id}/reply")
+def reply_feedback(feedback_id: int, request: Request):
+    """Reply to a feedback (admin only)"""
+    session = getattr(request, 'session', {})
+    if not session.get('is_authenticated') or session.get('role') != 'admin':
+        return JSONResponse({"error": "Unauthorized"}, status_code=403)
+
+    try:
+        form_data = dict(request.form)
+        reply_message = form_data.get("reply_message", "")
+
+        feedbacks = load_feedbacks()
+        feedback = next((f for f in feedbacks if f.get('id') == feedback_id), None)
+
+        if feedback:
+            feedback['status'] = 'Resolved'
+            feedback['reply'] = reply_message
+            feedback['reply_date'] = datetime.now().isoformat()
+            save_feedbacks(feedbacks)
+            send_reply_email(feedback_id, reply_message)
+            return JSONResponse({"success": True})
+
+        return JSONResponse({"error": "Feedback not found"}, status_code=404)
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "error": str(e)},
+            status_code=500
+        )

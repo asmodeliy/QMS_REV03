@@ -298,36 +298,37 @@ def issue_detail (issue_id :int ,request :Request ):
         "t":t ,
         "issue":issue ,
         })
-    finally :
-        db .close ()
+    finally:
+        db.close()
 
 
-@router .get ("/help",response_class =HTMLResponse )
-def svit_help (request :Request ):
-    auth_check =ensure_authenticated (request )
-    if auth_check :
-        return auth_check 
+@router.get("/help", response_class=HTMLResponse)
+def svit_help(request: Request):
+    """Display SVIT help page"""
+    auth_check = ensure_authenticated(request)
+    if auth_check:
+        return auth_check
 
-    if templates is None :
-        return HTMLResponse ("<h1>Error: Templates not initialized</h1>")
+    if templates is None:
+        return HTMLResponse("<h1>Error: Templates not initialized</h1>")
 
-    locale =get_locale (request )
+    locale = get_locale(request)
 
-    def t (key :str ,*args ,**kwargs ):
-        return i18n_t (key ,locale ,**kwargs )
+    def t(key: str, *args, **kwargs):
+        return i18n_t(key, locale, **kwargs)
 
-    return templates .TemplateResponse ("modules/svit/help.html",{
-    "request":request ,
-    "locale":locale ,
-    "t":t ,
+    return templates.TemplateResponse("modules/svit/help.html", {
+        "request": request,
+        "locale": locale,
+        "t": t,
     })
 
 
-def ensure_admin (request :Request ):
-    if not request .session .get ("is_authenticated"):
-        return RedirectResponse (url ="/auth/login",status_code =303 )
-    if request .session .get ("role")!="Admin":
-        return RedirectResponse (url ="/main",status_code =303 )
+def ensure_admin(request: Request):
+    if not request.session.get("is_authenticated"):
+        return RedirectResponse(url="/auth/login", status_code=303)
+    if request.session.get("role") != "Admin":
+        return RedirectResponse(url="/main", status_code=303)
     return None 
 
 

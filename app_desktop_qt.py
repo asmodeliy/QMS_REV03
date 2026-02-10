@@ -509,15 +509,22 @@ class QMSDesktopClient(QMainWindow):
             menu_bar = self.menuBar()
 
                                                                                
-            file_menu = menu_bar.addMenu('File')
+            # store file_menu so we can update it later after login
+            self.file_menu = menu_bar.addMenu('File')
+            # Garage files: available to authenticated users (download)
             try:
+                garage_action = QAction('Garage files', self)
+                garage_action.triggered.connect(self.show_garage_files)
+                self.file_menu.addAction(garage_action)
+            except Exception:
+                logger.debug('Failed to add Garage files action', exc_info=True)
                 user_email = self.current_user.get('email') if self.current_user else None
                 try:
                     from core.config import GARAGE_ADMIN_EMAILS
                     if user_email and user_email.lower() in GARAGE_ADMIN_EMAILS:
                         upload_action = QAction('Upload to Garage', self)
                         upload_action.triggered.connect(self.upload_to_garage)
-                        file_menu.addAction(upload_action)
+                        self.file_menu.addAction(upload_action)
                 except Exception:
                     logger.debug('Failed to check GARAGE_ADMIN_EMAILS', exc_info=True)
             except Exception:
@@ -530,6 +537,13 @@ class QMSDesktopClient(QMainWindow):
         except Exception:
             logger.debug('Menu bar not available', exc_info=True)
         
+        # Ensure admin actions (garage) are added if user present
+        try:
+            if self.current_user:
+                self._maybe_add_garage_action()
+        except Exception:
+            logger.debug('Failed to apply garage admin actions on init', exc_info=True)
+
         if self.current_user:
             self.show_main_ui()
             QTimer.singleShot(1000, self.show_notification_popups)
@@ -561,17 +575,26 @@ class QMSDesktopClient(QMainWindow):
                 logger.warning('Unauthorized upload attempt by %s', user_email)
                 return
 
+            # Quick server session check to ensure server recognizes our login
+            debug_resp = self.api_request('/api/garage/debug', silent=True)
+            if not debug_resp or not debug_resp.get('session'):
+                # fallback to global /api/me or /auth/api/me
+                debug_resp = self.api_request('/api/me', silent=True) or self.api_request('/auth/api/me', silent=True)
+            if not debug_resp or not (debug_resp.get('session') or debug_resp.get('authenticated')):
+                QMessageBox.warning(self, 'Not authenticated on server', 'Your desktop session is not authenticated on the server. Please login (swlee@ramschip.com) via the desktop client or web interface and try again.')
+                logger.warning('Attempted garage upload without server session: %s', debug_resp)
+                return
+
             path, _ = QFileDialog.getOpenFileName(self, "Upload to Garage")
             if not path:
                 return
 
-                                         
+            # gather file meta
             filename = os.path.basename(path)
             total_size = os.path.getsize(path)
-                                         
             desired_chunk = 10 * 1024 * 1024
 
-                                                              
+            # resume support records
             records_path = self.root_dir / '.garage_uploads.json'
             existing_records = {}
             try:
@@ -580,8 +603,293 @@ class QMSDesktopClient(QMainWindow):
             except Exception:
                 existing_records = {}
 
-                                                                  
             file_key = f"{os.path.abspath(path)}:{total_size}:{int(os.path.getmtime(path))}"
+            resume = False
+            resume_upload_id = None
+            if file_key in existing_records:
+                resume_upload_id = existing_records[file_key].get('upload_id')
+                choice = QMessageBox.question(self, 'Resume upload', 'A previous upload for this file was detected. Resume?')
+                if choice == QMessageBox.StandardButton.Yes:
+                    resume = True
+
+            if resume and resume_upload_id:
+                upload_id = resume_upload_id
+                chunk_size = desired_chunk
+            else:
+                init_resp = self.api_request('/api/garage/init', method='POST', data={
+                    'filename': filename,
+                    'chunk_size': desired_chunk,
+                    'total_size': total_size
+                }, silent=True)
+
+                if not init_resp or 'upload_id' not in init_resp:
+                    logger.warning('Garage init failed: %s', init_resp)
+                    msg = 'Failed to start upload session'
+                    if isinstance(init_resp, dict) and init_resp.get('detail'):
+                        msg = f"Failed to start upload session: {init_resp.get('detail')}"
+                    QMessageBox.critical(self, 'Upload Failed', msg)
+                    return
+
+                upload_id = init_resp['upload_id']
+                chunk_size = init_resp.get('chunk_size', desired_chunk)
+                try:
+                    existing_records[file_key] = {'upload_id': upload_id, 'filename': filename, 'size': total_size}
+                    records_path.write_text(json.dumps(existing_records))
+                except Exception:
+                    logger.debug('Failed to persist upload record', exc_info=True)
+
+            threading.Thread(target=self._perform_chunked_upload, args=(path, upload_id, chunk_size), daemon=True).start()
+            QMessageBox.information(self, 'Upload Started', 'Upload started in background. You will be notified when it completes.')
+        except Exception:
+            logger.exception('Failed to start upload')
+
+    def show_garage_files(self):
+        """Open a dialog listing Garage files and allow downloading selected file."""
+        try:
+            from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog, QMessageBox, QHBoxLayout
+            dlg = QDialog(self)
+            dlg.setWindowTitle('Garage files')
+            dlg.setMinimumSize(700, 400)
+
+            layout = QVBoxLayout()
+            info = QLabel('Fetching files...')
+            layout.addWidget(info)
+
+            table = QTableWidget(0, 3)
+            table.setHorizontalHeaderLabels(['Filename', 'Size', 'Uploaded'])
+            from PySide6.QtWidgets import QAbstractItemView
+            table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            layout.addWidget(table)
+
+            btn_layout = QHBoxLayout()
+            download_btn = QPushButton('Download')
+            zip_btn = QPushButton('Download Selected as ZIP')
+            close_btn = QPushButton('Close')
+            btn_layout.addWidget(download_btn)
+            btn_layout.addWidget(zip_btn)
+            btn_layout.addWidget(close_btn)
+            layout.addLayout(btn_layout)
+
+            dlg.setLayout(layout)
+
+            # fetch files
+            resp = self.api_request('/api/garage/files', silent=True)
+            files = []
+            if not resp or not resp.get('ok'):
+                info.setText('Failed to fetch files')
+            else:
+                files = resp.get('files', [])
+                info.setText(f"{len(files)} files")
+                table.setRowCount(len(files))
+                for i, f in enumerate(files):
+                    table.setItem(i, 0, QTableWidgetItem(f.get('filename')))
+                    table.setItem(i, 1, QTableWidgetItem(str(f.get('size'))))
+                    table.setItem(i, 2, QTableWidgetItem(str(f.get('created'))))
+
+            def do_download():
+                sel = table.selectionModel().selectedRows()
+                if not sel:
+                    QMessageBox.information(dlg, 'No selection', 'Please select a file to download')
+                    return
+                row = sel[0].row()
+                safe_name = files[row].get('safe_name')
+                orig = files[row].get('filename')
+                path, _ = QFileDialog.getSaveFileName(self, 'Save file as', orig)
+                if not path:
+                    return
+
+                # perform download streaming in background thread
+                threading.Thread(target=self._download_garage_file, args=(safe_name, path, files[row].get('size')), daemon=True).start()
+                QMessageBox.information(dlg, 'Download started', f'Downloading {orig} to {path}')
+
+            def do_zip_download():
+                sel = table.selectionModel().selectedRows()
+                if not sel:
+                    QMessageBox.information(dlg, 'No selection', 'Please select one or more files to download as ZIP')
+                    return
+                safe_names = [files[r.row()].get('safe_name') for r in sel]
+                path, _ = QFileDialog.getSaveFileName(self, 'Save ZIP as', 'garage_files.zip', 'ZIP files (*.zip)')
+                if not path:
+                    return
+                threading.Thread(target=self._download_garage_zip, args=(safe_names, path), daemon=True).start()
+                QMessageBox.information(dlg, 'Download started', f'Downloading {len(safe_names)} files as ZIP to {path}')
+
+            download_btn.clicked.connect(do_download)
+            zip_btn.clicked.connect(do_zip_download)
+            close_btn.clicked.connect(dlg.close)
+
+            dlg.exec()
+        except Exception:
+            logger.exception('Failed to show garage files dialog')
+
+    def _download_garage_file(self, safe_name: str, path: str, total_size: int = None):
+        """Download a file and show a progress dialog by polling the partial file size."""
+        try:
+            import requests
+            s = requests.Session()
+            cookies = {c.name: c.value for c in self.cookie_jar}
+            s.cookies.update(cookies)
+            url = f"{self.server_url.rstrip('/')}/api/garage/download/{safe_name}"
+
+            # create control flags for progress polling
+            status = {'done': False, 'error': None}
+
+            # start downloader thread
+            def _worker():
+                try:
+                    r = s.get(url, stream=True, timeout=60)
+                    if r.status_code != 200:
+                        status['error'] = f"Download failed: {r.status_code} {r.text}"
+                        status['done'] = True
+                        return
+                    with open(path, 'wb') as out:
+                        for chunk in r.iter_content(1024 * 1024):
+                            if chunk:
+                                out.write(chunk)
+                    status['done'] = True
+                except Exception as e:
+                    status['error'] = str(e)
+                    status['done'] = True
+
+            t = threading.Thread(target=_worker, daemon=True)
+            t.start()
+
+            # progress dialog and poller
+            try:
+                from PySide6.QtWidgets import QProgressDialog, QMessageBox
+                from PySide6.QtCore import QTimer
+
+                if total_size and int(total_size) > 0:
+                    progress = QProgressDialog('Downloading...', 'Cancel', 0, int(total_size), self)
+                    progress.setWindowTitle('Downloading')
+                    progress.setMinimumDuration(200)
+                else:
+                    progress = QProgressDialog('Downloading...', 'Cancel', 0, 0, self)
+                    progress.setWindowTitle('Downloading')
+                    progress.setMinimumDuration(200)
+                    progress.setRange(0, 0)  # busy indicator
+
+                def poll():
+                    try:
+                        if status.get('done'):
+                            progress.close()
+                            if status.get('error'):
+                                QTimer.singleShot(0, lambda: QMessageBox.critical(self, 'Download failed', str(status.get('error'))))
+                            else:
+                                QTimer.singleShot(0, lambda: QMessageBox.information(self, 'Download complete', f'Downloaded to {path}'))
+                            return
+                        if progress.maximum() > 0:
+                            try:
+                                cur = os.path.getsize(path) if os.path.exists(path) else 0
+                                progress.setValue(int(cur))
+                            except Exception:
+                                pass
+                        QTimer.singleShot(300, poll)
+                    except Exception:
+                        pass
+
+                poll()
+            except Exception:
+                # no GUI feedback; wait for thread to finish
+                t.join(timeout=120)
+                if status.get('error'):
+                    logger.warning('Download thread error: %s', status.get('error'))
+                else:
+                    logger.info('Downloaded garage file %s to %s', safe_name, path)
+
+            if status.get('error'):
+                logger.warning('Download failed: %s', status.get('error'))
+            else:
+                logger.info('Downloaded garage file %s to %s', safe_name, path)
+        except Exception:
+            logger.exception('Failed to download garage file')
+
+    def _download_garage_zip(self, safe_names: list, path: str):
+        """Request a server-side ZIP and download it with progress bar."""
+        try:
+            import requests
+            s = requests.Session()
+            cookies = {c.name: c.value for c in self.cookie_jar}
+            s.cookies.update(cookies)
+            url = f"{self.server_url.rstrip('/')}/api/garage/download-zip"
+
+            status = {'done': False, 'error': None}
+
+            def _worker():
+                try:
+                    r = s.post(url, json={'safe_names': safe_names}, stream=True, timeout=120)
+                    if r.status_code != 200:
+                        status['error'] = f"Download failed: {r.status_code} {r.text}"
+                        status['done'] = True
+                        return
+                    total = int(r.headers.get('content-length') or 0)
+                    with open(path, 'wb') as out:
+                        for chunk in r.iter_content(1024 * 1024):
+                            if chunk:
+                                out.write(chunk)
+                    status['done'] = True
+                except Exception as e:
+                    status['error'] = str(e)
+                    status['done'] = True
+
+            t = threading.Thread(target=_worker, daemon=True)
+            t.start()
+
+            try:
+                from PySide6.QtWidgets import QProgressDialog, QMessageBox
+                from PySide6.QtCore import QTimer
+
+                # attempt to get total size from server by HEAD first
+                try:
+                    head = s.post(url, json={'safe_names': safe_names}, stream=True, timeout=10)
+                    total = int(head.headers.get('content-length') or 0)
+                except Exception:
+                    total = 0
+
+                if total > 0:
+                    progress = QProgressDialog('Downloading ZIP...', 'Cancel', 0, int(total), self)
+                    progress.setWindowTitle('Downloading ZIP')
+                    progress.setMinimumDuration(200)
+                else:
+                    progress = QProgressDialog('Downloading ZIP...', 'Cancel', 0, 0, self)
+                    progress.setWindowTitle('Downloading ZIP')
+                    progress.setMinimumDuration(200)
+                    progress.setRange(0, 0)
+
+                def poll():
+                    try:
+                        if status.get('done'):
+                            progress.close()
+                            if status.get('error'):
+                                QTimer.singleShot(0, lambda: QMessageBox.critical(self, 'Download failed', str(status.get('error'))))
+                            else:
+                                QTimer.singleShot(0, lambda: QMessageBox.information(self, 'Download complete', f'Downloaded to {path}'))
+                            return
+                        if progress.maximum() > 0:
+                            try:
+                                cur = os.path.getsize(path) if os.path.exists(path) else 0
+                                progress.setValue(int(cur))
+                            except Exception:
+                                pass
+                        QTimer.singleShot(300, poll)
+                    except Exception:
+                        pass
+
+                poll()
+            except Exception:
+                t.join(timeout=300)
+                if status.get('error'):
+                    logger.warning('ZIP download thread error: %s', status.get('error'))
+                else:
+                    logger.info('Downloaded ZIP to %s', path)
+
+            if status.get('error'):
+                logger.warning('ZIP download failed: %s', status.get('error'))
+            else:
+                logger.info('Downloaded ZIP to %s', path)
+        except Exception:
+            logger.exception('Failed to download garage ZIP')
             resume = False
             resume_upload_id = None
             if file_key in existing_records:
@@ -604,7 +912,12 @@ class QMSDesktopClient(QMainWindow):
                 }, silent=True)
 
                 if not init_resp or 'upload_id' not in init_resp:
-                    QMessageBox.critical(self, 'Upload Failed', 'Failed to start upload session')
+                    logger.warning('Garage init failed: %s', init_resp)
+                    msg = 'Failed to start upload session'
+                    # If server returned a JSON error with 'detail', show it
+                    if isinstance(init_resp, dict) and init_resp.get('detail'):
+                        msg = f"Failed to start upload session: {init_resp.get('detail')}"
+                    QMessageBox.critical(self, 'Upload Failed', msg)
                     return
 
                 upload_id = init_resp['upload_id']
@@ -838,6 +1151,38 @@ class QMSDesktopClient(QMainWindow):
             self.tray.show()
                                           
             QTimer.singleShot(1500, lambda: self.show_notification('QMS', 'Desktop client running'))
+
+    def _maybe_add_garage_action(self):
+        """Add or remove the 'Upload to Garage' action on the File menu based on current_user.
+        Idempotent and safe to call after login/logout to refresh UI."""
+        try:
+            user_email = self.current_user.get('email') if self.current_user else None
+            from core.config import GARAGE_ADMIN_EMAILS
+            # Remove existing action if present
+            try:
+                if hasattr(self, 'garage_action') and self.garage_action:
+                    try:
+                        if hasattr(self, 'file_menu') and self.file_menu:
+                            self.file_menu.removeAction(self.garage_action)
+                    except Exception:
+                        pass
+                    self.garage_action = None
+            except Exception:
+                pass
+
+            if not (user_email and user_email.lower() in GARAGE_ADMIN_EMAILS):
+                return
+
+            # Ensure file_menu exists
+            if not hasattr(self, 'file_menu') or self.file_menu is None:
+                return
+
+            # Add action
+            self.garage_action = QAction('Upload to Garage', self)
+            self.garage_action.triggered.connect(self.upload_to_garage)
+            self.file_menu.addAction(self.garage_action)
+        except Exception:
+            logger.debug('Failed to add garage action', exc_info=True)
     
     def show_window(self):
         self.showNormal()
@@ -1017,6 +1362,20 @@ class QMSDesktopClient(QMainWindow):
             if result and result.get("success"):
                 self.current_user = result.get("user", {})
                 self.save_cookies()
+                # Refresh admin UI elements (menu/tray) now that we're logged in
+                try:
+                    self._maybe_add_garage_action()
+                except Exception:
+                    logger.debug('Failed to add garage action after login', exc_info=True)
+                try:
+                    if hasattr(self, 'tray') and self.tray:
+                        try:
+                            self.tray.hide()
+                        except Exception:
+                            pass
+                    self.setup_tray()
+                except Exception:
+                    logger.debug('Failed to refresh tray after login', exc_info=True)
                 self.show_main_ui()
                 self.show_notification_popups()
             else:
@@ -1513,6 +1872,19 @@ class QMSDesktopClient(QMainWindow):
             if self.cookie_file.exists():
                 self.cookie_file.unlink()
             self.current_user = None
+            try:
+                self._maybe_add_garage_action()
+            except Exception:
+                logger.debug('Failed to remove garage action on logout', exc_info=True)
+            try:
+                if hasattr(self, 'tray') and self.tray:
+                    try:
+                        self.tray.hide()
+                    except Exception:
+                        pass
+                    self.setup_tray()
+            except Exception:
+                logger.debug('Failed to refresh tray on logout', exc_info=True)
             self.show_login_ui()
         except Exception:
             logger.debug("Error during logout", exc_info=True)

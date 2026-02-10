@@ -255,11 +255,7 @@ function renderConversations() {
               <span class="conv-author">${inq.created_by || '—'}</span>
               <button class="btn-delete-conv" onclick="deleteConversation(${inq.id})">🗑️</button>
             </div>
-            <div class="conv-content conv-content-inquiry" 
-                 onclick="editConversationFromElement(this, ${inq.id}, ${index})"
-                 data-conv-id="${inq.id}"
-                 data-original-content="${inq.content.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}"
-                 id="conv-display-${inq.id}">
+            <div class="conv-content conv-content-inquiry" onclick="editConversationFromElement(this, ${inq.id}, ${index})" data-conv-id="${inq.id}" data-original-content="${inq.content.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" id="conv-display-${inq.id}">
               ${inqContent}
             </div>
             <textarea class="conv-textarea hidden" id="conv-edit-${inq.id}" data-id="${inq.id}"></textarea>
@@ -282,11 +278,7 @@ function renderConversations() {
                   <span class="conv-author">${reply.created_by || '—'}</span>
                   <button class="btn-delete-conv" onclick="deleteConversation(${reply.id})">🗑️</button>
                 </div>
-                <div class="conv-content conv-content-reply" 
-                     onclick="editConversationFromElement(this, ${reply.id}, ${index}, true)"
-                     data-conv-id="${reply.id}"
-                     data-original-content="${reply.content.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}"
-                     id="conv-display-${reply.id}">
+                <div class="conv-content conv-content-reply" onclick="editConversationFromElement(this, ${reply.id}, ${index}, true)" data-conv-id="${reply.id}" data-original-content="${reply.content.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" id="conv-display-${reply.id}">
                   ${replyContent}
                 </div>
                 <textarea class="conv-textarea hidden" id="conv-edit-${reply.id}" data-id="${reply.id}"></textarea>
