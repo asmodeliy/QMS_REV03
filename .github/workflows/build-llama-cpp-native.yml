@@ -82,8 +82,10 @@ jobs:
           ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
 
           cd /tmp
-          git clone https://github.com/abetlen/llama-cpp-python
+          git clone --recursive https://github.com/abetlen/llama-cpp-python
+
           cd llama-cpp-python
+          git submodule update --init --recursive
 
           python3.11 -m pip install --upgrade pip wheel setuptools
 
