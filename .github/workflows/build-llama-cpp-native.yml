@@ -1,4 +1,4 @@
-name: Build llama.cpp NATIVE (Rocky 8.10)
+name: Build llama.cpp Ryzen5950X (Rocky 8.10)
 
 on:
   workflow_dispatch:
@@ -15,78 +15,106 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # -----------------------------
-      # Dependencies + Modern GCC
-      # -----------------------------
-      - name: Install dependencies
+      - name: Install deps (enable powertools + gcc-toolset)
         run: |
-          dnf -y update
-          dnf -y install epel-release
-          dnf -y groupinstall "Development Tools"
+          set -euxo pipefail
 
-          # 최신 GCC (Zen3 인식 필수)
+          dnf -y update
+          dnf -y install dnf-plugins-core epel-release
+
+          # Rocky 8: gcc-toolset은 보통 powertools가 필요합니다
+          dnf config-manager --set-enabled powertools || true
+
+          dnf -y groupinstall "Development Tools"
+          dnf -y install cmake git make ninja-build
+
+          # 최신 GCC toolset (Zen3/znver3 인식 및 최신 libstdc++)
           dnf -y install gcc-toolset-13 gcc-toolset-13-gcc gcc-toolset-13-gcc-c++ gcc-toolset-13-libstdc++-devel
 
-          dnf -y install cmake git numactl
+          # Python 3.11
           dnf -y install python3.11 python3.11-devel python3.11-pip
 
-      # -----------------------------
-      # Build llama.cpp (REAL Native)
-      # -----------------------------
-      - name: Build llama.cpp for Ryzen 5950X
+      - name: Build llama.cpp (5950X znver3, NO GGML_NATIVE)
         run: |
+          set -euxo pipefail
+
+          # toolset 활성화 (이 상태에서 configure 해야 gcc 13으로 잡힘)
           source /opt/rh/gcc-toolset-13/enable
+
+          # 반드시 toolset gcc/g++를 CMake에 고정
+          export CC=/opt/rh/gcc-toolset-13/root/usr/bin/gcc
+          export CXX=/opt/rh/gcc-toolset-13/root/usr/bin/g++
+
+          # 5950X(Zen3) 전용 플래그 (CI CPU랑 무관하게 강제)
+          export ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
+          export CFLAGS="$ARCHFLAGS"
+          export CXXFLAGS="$ARCHFLAGS"
 
           cd /tmp
           git clone https://github.com/ggerganov/llama.cpp
           cd llama.cpp
 
-          # Zen3 강제 네이티브
-          export CFLAGS="-O3 -march=znver3 -mtune=znver3 -mfma -mavx2 -mavx -mbmi2 -mf16c"
-          export CXXFLAGS="$CFLAGS"
-
-          cmake -S . -B build \
+          cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DGGML_NATIVE=ON \
+            -DGGML_NATIVE=OFF \
             -DGGML_OPENMP=ON \
             -DLLAMA_BUILD_EXAMPLES=OFF \
             -DLLAMA_BUILD_TESTS=OFF \
+            -DLLAMA_BUILD_TOOLS=OFF \
+            -DCMAKE_C_COMPILER="$CC" \
+            -DCMAKE_CXX_COMPILER="$CXX" \
             -DCMAKE_C_FLAGS="$CFLAGS" \
             -DCMAKE_CXX_FLAGS="$CXXFLAGS"
 
           cmake --build build -j$(nproc)
 
-          # 바이너리 확인
-          ls build/bin/
+          # 타깃 바이너리 복사 (repo 버전에 따라 이름이 다를 수 있어 후보들 처리)
+          if [ -f build/bin/llama-cli ]; then
+            cp build/bin/llama-cli /tmp/llama-5950x
+          elif [ -f build/bin/llama-main ]; then
+            cp build/bin/llama-main /tmp/llama-5950x
+          elif [ -f build/bin/main ]; then
+            cp build/bin/main /tmp/llama-5950x
+          else
+            echo "ERROR: cannot find llama binary in build/bin"
+            ls -al build/bin || true
+            exit 1
+          fi
 
-          cp build/bin/llama-cli /tmp/llama-5950x
           chmod +x /tmp/llama-5950x
+          echo "Built:"
+          /tmp/llama-5950x --help | head -n 5 || true
+          ls -lh /tmp/llama-5950x
 
-      # -----------------------------
-      # Build python binding
-      # -----------------------------
-      - name: Build llama-cpp-python (Zen3)
+      - name: Build llama-cpp-python wheel (5950X znver3)
         run: |
+          set -euxo pipefail
+
           source /opt/rh/gcc-toolset-13/enable
+          export CC=/opt/rh/gcc-toolset-13/root/usr/bin/gcc
+          export CXX=/opt/rh/gcc-toolset-13/root/usr/bin/g++
+
+          export ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
+          export CFLAGS="$ARCHFLAGS"
+          export CXXFLAGS="$ARCHFLAGS"
 
           cd /tmp
           git clone https://github.com/abetlen/llama-cpp-python
           cd llama-cpp-python
 
-          export CFLAGS="-O3 -march=znver3 -mtune=znver3 -mfma -mavx2 -mavx -mbmi2 -mf16c"
-          export CXXFLAGS="$CFLAGS"
+          # llama-cpp-python은 내부적으로 CMake를 다시 돌리므로 여기서도 native OFF + znver3 강제
+          export CMAKE_ARGS="-DGGML_NATIVE=OFF -DGGML_OPENMP=ON -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_FLAGS=$CFLAGS -DCMAKE_CXX_FLAGS=$CXXFLAGS"
+          export FORCE_CMAKE=1
 
-          CMAKE_ARGS="-DGGML_NATIVE=on" python3.11 -m pip wheel . --wheel-dir=/tmp/wheels --no-cache-dir
+          python3.11 -m pip install --upgrade pip wheel setuptools
+          python3.11 -m pip wheel . --wheel-dir=/tmp/wheels --no-cache-dir -v
 
           ls -lh /tmp/wheels/
 
-      # -----------------------------
-      # Upload
-      # -----------------------------
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: llama-5950x-native
+          name: llama-5950x-rocky8
           path: |
             /tmp/llama-5950x
             /tmp/wheels/*.whl
@@ -99,6 +127,8 @@ jobs:
             /tmp/llama-5950x
             /tmp/wheels/*.whl
           tag_name: ${{ github.ref_name }}
-          name: llama.cpp Ryzen5950X Native - ${{ github.ref_name }}
+          name: llama.cpp 5950X Rocky8 - ${{ github.ref_name }}
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
