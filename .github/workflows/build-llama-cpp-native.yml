@@ -6,6 +6,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write  # Release 업로드에 필요
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,15 +27,15 @@ jobs:
           dnf config-manager --set-enabled powertools || true
 
           dnf -y groupinstall "Development Tools"
-          dnf -y install cmake git ninja-build make findutils which
+          dnf -y install cmake git ninja-build make findutils which tar
 
-          # GCC toolset (C++17 filesystem, znver3 support)
+          # GCC toolset (znver3 지원)
           dnf -y install gcc-toolset-13 gcc-toolset-13-gcc gcc-toolset-13-gcc-c++ gcc-toolset-13-libstdc++-devel
 
-          # Python 3.11 for wheel build (optional)
+          # Python 3.11
           dnf -y install python3.11 python3.11-devel python3.11-pip
 
-      - name: Build llama.cpp (Ryzen 5950X znver3) -> llama-server
+      - name: Build llama.cpp server (b2757, Ryzen 5950X znver3)
         run: |
           set -euxo pipefail
 
@@ -40,10 +43,11 @@ jobs:
           export CC=/opt/rh/gcc-toolset-13/root/usr/bin/gcc
           export CXX=/opt/rh/gcc-toolset-13/root/usr/bin/g++
 
-          # Force Ryzen 5950X (Zen3) codegen in CI (do NOT use -march=native)
           export ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
           export CFLAGS="$ARCHFLAGS"
           export CXXFLAGS="$ARCHFLAGS"
+
+          mkdir -p /tmp/out
 
           cd /tmp
           git clone https://github.com/ggerganov/llama.cpp
@@ -51,23 +55,23 @@ jobs:
           git checkout b2757
 
           cmake -S . -B build -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DGGML_NATIVE=OFF \
-          -DGGML_OPENMP=ON \
-          -DLLAMA_BUILD_EXAMPLES=ON \
-          -DCMAKE_C_COMPILER="$CC" \
-          -DCMAKE_CXX_COMPILER="$CXX" \
-          -DCMAKE_C_FLAGS="$CFLAGS" \
-          -DCMAKE_CXX_FLAGS="$CXXFLAGS"
+            -DCMAKE_BUILD_TYPE=Release \
+            -DGGML_NATIVE=OFF \
+            -DGGML_OPENMP=ON \
+            -DLLAMA_BUILD_EXAMPLES=ON \
+            -DCMAKE_C_COMPILER="$CC" \
+            -DCMAKE_CXX_COMPILER="$CXX" \
+            -DCMAKE_C_FLAGS="$CFLAGS" \
+            -DCMAKE_CXX_FLAGS="$CXXFLAGS"
 
           cmake --build build -j$(nproc) --target server
 
-          cp build/bin/server /tmp/llama-5950x
-          chmod +x /tmp/llama-5950x
+          cp build/bin/server /tmp/out/llama-5950x
+          chmod +x /tmp/out/llama-5950x
 
-          echo "Built binary:"
-          ls -lh /tmp/llama-5950x
-          /tmp/llama-5950x --help | head -n 20 || true
+          echo "Built llama server:"
+          ls -lh /tmp/out/llama-5950x
+          /tmp/out/llama-5950x --help | head -n 10 || true
 
       - name: Build llama-cpp-python wheel (Ryzen 5950X znver3)
         run: |
@@ -77,20 +81,16 @@ jobs:
           export CC=/opt/rh/gcc-toolset-13/root/usr/bin/gcc
           export CXX=/opt/rh/gcc-toolset-13/root/usr/bin/g++
 
-          # (중요) 여기 플래그는 CMAKE_ARGS로만 넘길 거라
-          # CFLAGS/CXXFLAGS 환경변수로는 굳이 export 안 해도 됩니다.
           ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
 
           cd /tmp
           git clone --recursive https://github.com/abetlen/llama-cpp-python
-
           cd llama-cpp-python
           git submodule update --init --recursive
 
           python3.11 -m pip install --upgrade pip wheel setuptools
 
           export FORCE_CMAKE=1
-
           export CMAKE_ARGS="-DGGML_NATIVE=OFF -DGGML_OPENMP=ON \
             -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX \
             -DCMAKE_C_FLAGS='$ARCHFLAGS' -DCMAKE_CXX_FLAGS='$ARCHFLAGS'"
@@ -101,13 +101,27 @@ jobs:
           echo "Wheels:"
           ls -lh /tmp/wheels
 
+          # Release 첨부용으로 out에 복사 (의존성 포함 그대로)
+          cp /tmp/wheels/*.whl /tmp/out/
+          ls -lh /tmp/out
+
+      - name: Bundle outputs (optional)
+        run: |
+          set -euxo pipefail
+          # 파일이 많아도 Release에 한 번에 올리기 쉽게 tgz로 묶어둠(원하면 사용)
+          tar -C /tmp/out -czf /tmp/llama_5950x_bundle.tgz .
+          ls -lh /tmp/llama_5950x_bundle.tgz
+
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: |
             /tmp/out/*
+            /tmp/llama_5950x_bundle.tgz
           tag_name: ${{ github.ref_name }}
           name: llama.cpp 5950X Rocky8 - ${{ github.ref_name }}
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

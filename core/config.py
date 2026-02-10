@@ -8,9 +8,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = (BASE_DIR / "rpmt.db").resolve()
 PRODUCT_INFO_DB_PATH = (BASE_DIR / "product_info.db").resolve()
 
+APP_ENV = os.environ.get("APP_ENV", "development")
 SESSION_SECRET = os.environ.get("SESSION_SECRET", "rps-secret")
 ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "ramschip")
+
+# CORS and session security
+_cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
+CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()] if _cors_raw else []
+SESSION_HTTPS_ONLY = os.environ.get("SESSION_HTTPS_ONLY", "").lower() in ("1", "true", "yes")
+ENABLE_TEST_ENDPOINTS = os.environ.get("ENABLE_TEST_ENDPOINTS", "").lower() in ("1", "true", "yes")
 
 OUTLOOK_EMAIL = os.environ.get("OUTLOOK_EMAIL", "")
 OUTLOOK_PASSWORD = os.environ.get("OUTLOOK_PASSWORD", "")

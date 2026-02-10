@@ -1,4 +1,5 @@
 from pathlib import Path
+from contextvars import ContextVar
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse, FileResponse
@@ -14,9 +15,9 @@ try:
 except Exception:
     from services import compute_derived
 try:
-    from .core.config import BASE_DIR, SESSION_SECRET
+    from .core.config import BASE_DIR, SESSION_SECRET, APP_ENV, CORS_ORIGINS, SESSION_HTTPS_ONLY
 except Exception:
-    from core.config import BASE_DIR, SESSION_SECRET
+    from core.config import BASE_DIR, SESSION_SECRET, APP_ENV, CORS_ORIGINS, SESSION_HTTPS_ONLY
 try:
     from .core.middleware import RequestLoggingMiddleware
 except Exception:
@@ -43,23 +44,29 @@ except Exception:
 
 app_logger.info("Application started", {"version": "1.0.0", "modules": ["rpmt", "svit", "cits", "spec_center", "apqp", "product_info"]})
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if APP_ENV.lower() == "production" and SESSION_SECRET == "rps-secret":
+    raise RuntimeError("SESSION_SECRET must be set in production")
+
+if CORS_ORIGINS:
+    cors_allow_credentials = "*" not in CORS_ORIGINS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=cors_allow_credentials,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 app.add_middleware(RequestLoggingMiddleware)
 
+session_https_only = SESSION_HTTPS_ONLY or APP_ENV.lower() == "production"
 app.add_middleware(
     SessionMiddleware,
     secret_key=SESSION_SECRET,
     session_cookie="rams_sess",
     max_age=30 * 60,
     same_site="lax",
-    https_only=False
+    https_only=session_https_only
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -68,18 +75,18 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 templates.env.globals["compute"] = compute_derived
 templates.env.globals["img"] = lambda path: f"/img/{path}"
 
-_current_locale = {"locale": "en"}
+_current_locale = ContextVar("current_locale", default="en")
 
 def t_with_current_locale(key, locale=None):
     if locale is None:
-        locale = _current_locale.get("locale", "en")
+        locale = _current_locale.get()
     return t(key, locale)
 
 templates.env.globals["t"] = t_with_current_locale
 
 @app.middleware("http")
 async def set_locale_middleware(request: Request, call_next):
-    _current_locale["locale"] = get_locale(request)
+    _current_locale.set(get_locale(request))
     response = await call_next(request)
     return response
 
@@ -145,23 +152,33 @@ except Exception:
     from modules.mcp.gpt4all_routes import router as gpt4all_router
     from modules.product_info import router as product_info_router, set_templates as set_product_info_templates
 
-# Initialize RAG auto-updater
+# Initialize RAG auto-updater (start/stop on app lifecycle)
 _rag_updater = None
 
-try:
-    from modules.mcp.rag_auto_updater import RAGAutoUpdater
-    _rag_updater = RAGAutoUpdater(
-        project_root=".",
-        interval_seconds=300,  # Check every 5 minutes
-        full_index_interval_hours=12  # Full reindex every 12 hours
-    )
-    # Index spec-center documents on startup - DISABLED for performance
-    # Documents will be indexed incrementally during operation
-    # _rag_updater.index_spec_center_documents()
-    _rag_updater.start()
-    app_logger.info("RAG auto-updater started", {"interval_seconds": 300})
-except Exception as e:
-    app_logger.info("RAG auto-updater initialization failed", {"error": str(e)})
+@app.on_event("startup")
+def _start_rag_updater():
+    global _rag_updater
+    try:
+        from modules.mcp.rag_auto_updater import RAGAutoUpdater
+        _rag_updater = RAGAutoUpdater(
+            project_root=".",
+            interval_seconds=300,  # Check every 5 minutes
+            full_index_interval_hours=12  # Full reindex every 12 hours
+        )
+        _rag_updater.start()
+        app_logger.info("RAG auto-updater started", {"interval_seconds": 300})
+    except Exception as e:
+        app_logger.info("RAG auto-updater initialization failed", {"error": str(e)})
+
+@app.on_event("shutdown")
+def _stop_rag_updater():
+    global _rag_updater
+    try:
+        if _rag_updater:
+            _rag_updater.stop()
+            app_logger.info("RAG auto-updater stopped")
+    except Exception as e:
+        app_logger.info("RAG auto-updater shutdown failed", {"error": str(e)})
 
 set_auth_templates(templates)
 set_main_templates(templates)

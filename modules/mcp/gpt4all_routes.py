@@ -14,6 +14,14 @@ import json
 from modules.mcp.gpt4all_client import QMSAssistant, GPT4ALL_AVAILABLE
 
 try:
+    from ...core.config import ENABLE_TEST_ENDPOINTS
+except Exception:
+    try:
+        from core.config import ENABLE_TEST_ENDPOINTS
+    except Exception:
+        ENABLE_TEST_ENDPOINTS = False
+
+try:
     from modules.mcp.rag_retriever import RAGRetriever
     from modules.mcp.rag_indexer import RAGIndexer
     RAG_AVAILABLE = True
@@ -515,6 +523,8 @@ def chat_test(payload: ChatRequest) -> ChatResponse:
         Chat response
     """
     try:
+        if not ENABLE_TEST_ENDPOINTS:
+            raise HTTPException(status_code=404, detail="Not found")
         import time
         import threading
         
