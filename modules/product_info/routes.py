@@ -615,3 +615,14 @@ def update_ip_status(ip_name: str, node: str, request: Request, payload: Dict = 
     })
 
     return JSONResponse({"ok": True, "status": status})
+
+
+@router.get("/help", response_class=HTMLResponse)
+def help_page(request: Request):
+    """Display Product Info help page"""
+    locale = get_locale(request)
+    return templates.TemplateResponse(
+        "modules/product_info/help.html",
+        {"request": request, "locale": locale}
+    )
+

@@ -86,27 +86,28 @@
           {% if path.startswith('/rpmt') or path.startswith('/admin') %}
           <a href="/rpmt" class="nav-link {% if path.startswith('/rpmt') or path.startswith('/admin') %}active{% endif %}">{{ t("nav.rpmt") }}</a>
           <a href="/rpmt/weekly" class="nav-link {% if path.startswith('/rpmt/weekly') %}active{% endif %}">{{ t("nav.weekly") }}</a>
-          <a href="/rpmt/help" class="nav-link {% if path.startswith('/rpmt/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          <a href="/rpmt/help" class="nav-link nav-help {% if path.startswith('/rpmt/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
           {% if request.session.get("role") == "Admin" %}
           <a href="/rpmt/admin" class="nav-link {% if path.startswith('/rpmt/admin') or path.startswith('/admin') %}active{% endif %}">⚙️ {{ t("nav.admin", locale) }}</a>
           {% endif %}
           {% elif path.startswith('/svit') %}
           <a href="/svit" class="nav-link {% if path == '/svit' or path.startswith('/svit/') %}active{% endif %}">SVIT</a>
-          <a href="/svit/help" class="nav-link {% if path.startswith('/svit/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          <a href="/svit/help" class="nav-link nav-help {% if path.startswith('/svit/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
           {% if request.session.get("role") == "Admin" %}
           <a href="/svit/admin/register" class="nav-link {% if path.startswith('/svit/admin') %}active{% endif %}">⚙️ {{ t("nav.admin", locale) }}</a>
           {% endif %}
           {% elif path.startswith('/apqp') %}
           <a href="/apqp" class="nav-link {% if path.startswith('/apqp') %}active{% endif %}">APQP</a>
-          <a href="/apqp/help" class="nav-link {% if path.startswith('/apqp/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          <a href="/apqp/help" class="nav-link nav-help {% if path.startswith('/apqp/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
           {% elif path.startswith('/cits') %}
           <a href="/cits" class="nav-link {% if path.startswith('/cits') %}active{% endif %}">CITS</a>
-          <a href="/cits/help" class="nav-link {% if path.startswith('/cits/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          <a href="/cits/help" class="nav-link nav-help {% if path.startswith('/cits/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
           {% elif path.startswith('/spec-center') %}
           <a href="/spec-center/" class="nav-link {% if path.startswith('/spec-center') %}active{% endif %}">{{ t("nav.spec_center", locale) }}</a>
-          <a href="/spec-center/help" class="nav-link {% if path.startswith('/spec-center/help') %}active{% endif %}">{{ t("common.help") }}</a>
+          <a href="/spec-center/help" class="nav-link nav-help {% if path.startswith('/spec-center/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
           {% elif path.startswith('/product-info') %}
           <a href="/product-info" class="nav-link {% if path.startswith('/product-info') %}active{% endif %}">{{ t("nav.product_info", locale) }}</a>
+          <a href="/product-info/help" class="nav-link nav-help {% if path.startswith('/product-info/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
           {% elif path.startswith('/main') %}
           <a href="/main" class="nav-link {% if path == '/main' %}active{% endif %}">{{ t("nav.main") }}</a>
           {% if request.session.get("role") == "Admin" %}

@@ -1,18 +1,210 @@
 {% extends "base.html" %}
 {% block content %}
 
-<main class="container wide help-wrap cits-root">
-  <aside class="help-side">
-    <div class="head">CITS Help</div>
-    <ul class="toc">
-      <li><a href="#quick-start">Quick start</a></li>
-      <li><a href="#workflow">Issue workflow</a></li>
-      <li><a href="#fields">Fields & attachments</a></li>
-      <li><a href="#faq">FAQ</a></li>
+<main class="container wide help-wrap cits-root cits-help-wrap">
+  <aside class="help-side cits-help-side">
+    <div class="head cits-help-head">목차</div>
+    <ul class="toc cits-help-toc">
+      <li><a href="#overview">개요</a></li>
+      <li><a href="#quick-start">빠른 시작</a></li>
+      <li><a href="#workflow">이슈 흐름</a></li>
+      <li><a href="#fields">필드 설명</a></li>
+      <li><a href="#best-practices">베스트 프랙티스</a></li>
+      <li><a href="#faq">자주 묻는 질문</a></li>
     </ul>
   </aside>
 
-  <section class="help-main">
+  <section class="help-main cits-help-main">
+    
+    <div id="overview" class="help-section cits-help-section">
+      <div class="page-head">
+        <h2>📋 CITS 개요</h2>
+      </div>
+      <p><strong>CITS (Customer Issue Tracking System)</strong>는 고객으로부터 들어오는 문제(이슈)를 한곳에서 추적하고 관리하는 통합 시스템입니다.</p>
+      
+      <h3>주요 특징</h3>
+      <ul>
+        <li>📥 <strong>이슈 수집</strong>: 고객 이슈를 빠르게 등록하고 추적합니다.</li>
+        <li>🔄 <strong>상태 관리</strong>: OPEN → PENDING → CLOSE 3가지 상태로 진행도를 관리합니다.</li>
+        <li>👥 <strong>담당자 지정</strong>: 각 이슈를 팀원에게 할당하여 책임을 명확히 합니다.</li>
+        <li>📎 <strong>첨부파일</strong>: 고객 보내온 로그, 메모리 덤프, 스크린샷 등을 첨부합니다.</li>
+        <li>💬 <strong>커뮤니케이션</strong>: 내부 팀과 고객 간 커뮤니케이션을 기록합니다.</li>
+      </ul>
+    </div>
+
+    <div id="quick-start" class="help-section cits-help-section">
+      <div class="page-head">
+        <h2>🚀 빠른 시작</h2>
+        <div class="head-actions">
+          <button id="btn-feedback" class="btn nav cits-help-head-actions" style="margin-left:auto">피드백 보내기</button>
+        </div>
+      </div>
+
+      <h3>1단계: 새 이슈 등록</h3>
+      <ul>
+        <li>우측 상단의 <strong>"+ New Issue"</strong> 버튼을 클릭합니다.</li>
+        <li>고객 정보와 문제를 입력합니다:
+          <ul>
+            <li><strong>고객명</strong>: 문제를 보고한 고객</li>
+            <li><strong>제목</strong>: 문제의 간단한 설명</li>
+            <li><strong>설명</strong>: 상세한 문제 상황, 재현 방법, 영향도</li>
+            <li><strong>제품</strong>: 문제가 발생한 제품/칩</li>
+            <li><strong>노드</strong>: 해당 노드</li>
+          </ul>
+        </li>
+        <li>고객이 보낸 첨부파일 (로그, 덤프 등)을 첨부합니다.</li>
+        <li><strong>"Create"</strong> 버튼을 클릭합니다.</li>
+      </ul>
+
+      <h3>2단계: 이슈 분석 및 할당</h3>
+      <ul>
+        <li>등록된 이슈에서:
+          <ul>
+            <li>내용을 검토하고 담당팀/담당자를 지정합니다.</li>
+            <li>필요시 고객에서 추가 정보를 요청합니다 (댓글 사용).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>3단계: 이슈 진행</h3>
+      <ul>
+        <li>상태를 <strong>"PENDING"</strong>으로 변경합니다.</li>
+        <li>분석/수정 작업을 진행하며 주기적으로 댓글을 업데이트합니다.</li>
+      </ul>
+
+      <h3>4단계: 이슈 종료</h3>
+      <ul>
+        <li>문제가 완전히 해결되면 상태를 <strong>"CLOSE"</strong>로 변경합니다.</li>
+        <li>해결 방법과 결과를 최종 주석에 기록합니다.</li>
+      </ul>
+    </div>
+
+    <div id="workflow" class="help-section cits-help-section">
+      <h2>🔄 이슈 워크플로우</h2>
+      
+      <h3>3단계 상태 관리</h3>
+      
+      <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 15px 0; font-family: monospace;">
+        <strong>OPEN</strong> → <strong>PENDING</strong> → <strong>CLOSE</strong>
+      </div>
+
+      <h3>상태 상세 설명</h3>
+      
+      <h4>🔴 OPEN (열림) - 새로운 이슈</h4>
+      <ul>
+        <li>방금 등록된 이슈 상태입니다.</li>
+        <li>팀 리더나 담당자가 내용을 검토합니다.</li>
+        <li>필요시 고객에게 추가 정보를 요청합니다.</li>
+        <li>담당팀/담당자를 지정해야 합니다.</li>
+      </ul>
+
+      <h4>🟠 PENDING (대기중) - 진행 중</h4>
+      <ul>
+        <li>분석 또는 수정 작업이 진행 중인 상태입니다.</li>
+        <li>담당자가 주기적으로 진행 상황을 업데이트합니다.</li>
+        <li>고객에게 진행 현황을 공유합니다.</li>
+        <li>필요시 고객과 협력하여 문제를 해결합니다.</li>
+      </ul>
+
+      <h4>🟢 CLOSE (종료) - 해결됨</h4>
+      <ul>
+        <li>이슈가 완전히 해결되고 고객이 검증한 상태입니다.</li>
+        <li>해결 방법, 수정사항, 검증 결과를 상세히 기록합니다.</li>
+        <li>고객에게 최종 해결 방법을 안내합니다.</li>
+      </ul>
+
+      <h3>상태 전환 규칙</h3>
+      <ul>
+        <li>OPEN → PENDING: 분석 시작 시</li>
+        <li>PENDING → CLOSE: 고객 검증 완료 후</li>
+        <li>되돌리간: CLOSE에서 PENDING으로 되돌리칠 수 있습니다 (재현 시)</li>
+      </ul>
+    </div>
+
+    <div id="fields" class="help-section cits-help-section">
+      <h2>📝 필드 설명</h2>
+      
+      <h3>고객 정보</h3>
+      <ul>
+        <li><strong>고객명</strong>: 문제를 보고한 고객 또는 조직</li>
+        <li><strong>연락처</strong>: 고객 담당자 연락처</li>
+        <li><strong>고객 이슈 ID</strong>: 고객이 자신의 시스템에서 사용하는 ID (선택사항)</li>
+      </ul>
+
+      <h3>기술 정보</h3>
+      <ul>
+        <li><strong>제품/칩</strong>: 문제가 발생한 제품 또는 칩 이름</li>
+        <li><strong>노드</strong>: IP/IC, Node 정보</li>
+        <li><strong>버전</strong>: 소프트웨어/펌웨어 버전</li>
+        <li><strong>현상</strong>: 발생한 문제의 구체적인 현상</li>
+      </ul>
+
+      <h3>관리 정보</h3>
+      <ul>
+        <li><strong>상태</strong>: OPEN / PENDING / CLOSE</li>
+        <li><strong>담당자</strong>: 이슈를 담당할 팀원</li>
+        <li><strong>심각도</strong>: Critical / High / Medium / Low (선택 사항)</li>
+        <li><strong>태그</strong>: 검색과 분류를 위한 태그</li>
+      </ul>
+
+      <h3>첨부파일</h3>
+      <ul>
+        <li>고객이 보낸 로그, 메모리 덤프, 스크린샷 등을 첨부합니다.</li>
+        <li>파일명에 특수문자(# ? %)는 사용하지 않습니다.</li>
+        <li>대용량 파일은 zip으로 압축합니다.</li>
+      </ul>
+    </div>
+
+    <div id="best-practices" class="help-section cits-help-section">
+      <h2>✅ 베스트 프랙티스</h2>
+
+      <h3>이슈 등록시 팁</h3>
+      <ul>
+        <li>✍️ <strong>명확한 제목</strong>: "Bug" 대신 "Chip XX not responding after power reset"처럼 구체적으로</li>
+        <li>📐 <strong>재현 방법 상세히</strong>: 다른 팀원도 쉽게 문제를 재현할 수 있도록</li>
+        <li>📎 <strong>첨부파일 준비</strong>: 로그, 덤프, 스크린샷을 함께 제공</li>
+        <li>🎯 <strong>심각도 정확히</strong>: 제품 출시, 고객 만족도에 미치는 영향을 고려</li>
+      </ul>
+
+      <h3>이슈 관리시 팁</h3>
+      <ul>
+        <li>⏰ <strong>빠른 응답</strong>: Critical 이슈는 4시간 내 응답</li>
+        <li>🔄 <strong>정기적 업데이트</strong>: 최소 주 1회 진행 상황을 고객에게 알립니다</li>
+        <li>📝 <strong>상세한 기록</strong>: 시도한 모든 방법, 결과를 기록합니다</li>
+        <li>✅ <strong>고객 검증</strong>: 고객이 해결을 확인한 후 CLOSE합니다</li>
+      </ul>
+
+      <h3>심각도 가이드</h3>
+      <ul>
+        <li><strong>🔴 Critical</strong>: 제품이 작동하지 않음, 데이터 손상</li>
+        <li><strong>🟠 High</strong>: 주요 기능이 작동하지 않음</li>
+        <li><strong>🟡 Medium</strong>: 특정 기능에 결함, 임시방안 있음</li>
+        <li><strong>🟢 Low</strong>: 부가 기능, 사소한 버그</li>
+      </ul>
+    </div>
+
+    <div id="faq" class="help-section cits-help-section">
+      <h2>❓ 자주 묻는 질문</h2>
+
+      <h4>Q: 이슈를 고객과 공유할 수 있나요?</h4>
+      <p>A: 네, 이슈를 생성한 후 고객에게 이슈 ID와 링크를 전달하면 고객도 진행 상황을 확인할 수 있습니다. 관리자에게 고객 접근 권한을 요청하세요.</p>
+
+      <h4>Q: 이슈를 재개(Reopen)할 수 있나요?</h4>
+      <p>A: 네, CLOSE 상태의 이슈에서 "Reopen" 버튼으로 다시 PENDING 상태로 변경할 수 있습니다. 고객이 문제를 재현한 경우 사용합니다.</p>
+
+      <h4>Q: 고객으로부터 온 로그가 너무 큽니다. 어떻게 하나요?</h4>
+      <p>A: 고객에게 필요한 부분만 추출해달라고 요청하거나, zip으로 압축하여 여러 파일로 나누어 업로드하세요.</p>
+
+      <h4>Q: 여러 고객 문제가 같은 원인일 수 있나요?</h4>
+      <p>A: 네, 가능합니다. "Related Issues" 기능으로 연관된 이슈들을 링크할 수 있습니다. 관리자에게 연관 관계를 요청하세요.</p>
+
+      <h4>Q: 해결 방법을 다른 팀과 공유하려면?</h4>
+      <p>A: 이슈의 최종 댓글에 해결 방법을 상세히 기록하고, 필요한 팀원을 @태그로 언급하면 알림을 받게 됩니다.</p>
+    </div>
+  </section>
+</main>
+
+{% endblock %}
     <div id="quick-start" class="help-section">
       <div class="page-head">
         <h2>🚀 Customer Issue Tracking</h2>

@@ -1,18 +1,202 @@
 {% extends "base.html" %}
 {% block content %}
 
-<main class="container wide help-wrap apqp-root">
-  <aside class="help-side">
-    <div class="head">APQP Help</div>
-    <ul class="toc">
-      <li><a href="#quick-start">Quick start</a></li>
-      <li><a href="#phases">Phases</a></li>
-      <li><a href="#deliverables">Deliverables</a></li>
-      <li><a href="#faq">FAQ</a></li>
+<main class="container wide help-wrap apqp-root apqp-help-wrap">
+  <aside class="help-side apqp-help-side">
+    <div class="head apqp-help-head">목차</div>
+    <ul class="toc apqp-help-toc">
+      <li><a href="#overview">개요</a></li>
+      <li><a href="#quick-start">빠른 시작</a></li>
+      <li><a href="#phases">5가지 단계</a></li>
+      <li><a href="#deliverables">산출물</a></li>
+      <li><a href="#best-practices">베스트 프랙티스</a></li>
+      <li><a href="#faq">자주 묻는 질문</a></li>
     </ul>
   </aside>
 
-  <section class="help-main">
+  <section class="help-main apqp-help-main">
+    <div id="overview" class="help-section apqp-help-section">
+      <div class="page-head">
+        <h2>📋 APQP 개요</h2>
+      </div>
+      <p><strong>APQP (Advanced Product Quality Planning)</strong>는 자동차 산업 표준(AIAG)을 따르는 프로세스로, 신제품 개발 전 단계에서 품질을 계획하고 관리합니다.</p>
+      
+      <h3>주요 특징</h3>
+      <ul>
+        <li>🎯 <strong>5단계 프로세스</strong>: 기획 → 제품설계 → 공정설계 → 검증 → 양산 및 피드백</li>
+        <li>📋 <strong>명확한 산출물</strong>: 각 단계별로 필요한 문서와 증거물을 관리</li>
+        <li>👥 <strong>담당자 지정</strong>: 각 항목에 소유자와 완료일을 设정</li>
+        <li>📅 <strong>마일스톤 추적</strong>: Gate별로 진행 상황을 모니터링</li>
+        <li>📎 <strong>문서 관리</strong>: DFMEA, PFMEA, 제어계획, 능력성 자료 등을 중앙에서 관리</li>
+      </ul>
+    </div>
+
+    <div id="quick-start" class="help-section apqp-help-section">
+      <div class="page-head">
+        <h2>🚀 빠른 시작</h2>
+        <div class="head-actions">
+          <button id="btn-feedback" class="btn nav apqp-help-head-actions" style="margin-left:auto">피드백 보내기</button>
+        </div>
+      </div>
+
+      <h3>1단계: 프로그램 선택</h3>
+      <ul>
+        <li>메인 페이지에서 관리하려는 프로그램(제품)을 선택합니다.</li>
+        <li>프로그램이 없다면 관리자에게 요청하여 생성해달라고 하세요.</li>
+      </ul>
+
+      <h3>2단계: Gate 선택</h3>
+      <ul>
+        <li>프로그램 내에서 진행 중인 Gate를 선택합니다:</li>
+        <li>
+          <ul>
+            <li><strong>Gate 1 (기획)</strong>: 고객 음성 수집, 사업성 검토</li>
+            <li><strong>Gate 2 (제품설계)</strong>: 기술명세 작성, DFMEA 수행</li>
+            <li><strong>Gate 3 (공정설계)</strong>: 공정 설계, PFMEA 수행</li>
+            <li><strong>Gate 4 (검증)</strong>: MSA, 능력성 검증</li>
+            <li><strong>Gate 5 (양산)</strong>: PPAP, lessons learned</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>3단계: 산출물 등록</h3>
+      <ul>
+        <li>각 Gate 내의 산출물 항목들을 관리합니다.</li>
+        <li>필수 정보:
+          <ul>
+            <li>산출물명 (예: "DFMEA 시트")</li>
+            <li>담당자</li>
+            <li>완료예정일</li>
+            <li>상태 (Not Started / In Progress / Complete / Delayed)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>4단계: 증거물 첨부</h3>
+      <ul>
+        <li>완성된 문서를 첨부합니다: PDF, Excel, Word 등</li>
+        <li>파일명은 명확하게 작성합니다 (예: "DFMEA_Chip_XYZ_v1.0.pdf")</li>
+      </ul>
+    </div>
+
+    <div id="phases" class="help-section apqp-help-section">
+      <h2>🗂️ APQP 5단계</h2>
+
+      <h3>1️⃣ Gate 1: 기획 및 정의 (Plan & Define)</h3>
+      <ul>
+        <li><strong>고객 음성 (VOC)</strong>: 고객 요구사항 수집</li>
+        <li><strong>사업성 검토</strong>: 기술 가능성, 경제성 검토</li>
+        <li><strong>프로그램 계획</strong>: 일정, 예산, 리소스 계획</li>
+        <li><strong>초기 위험 평가</strong>: 주요 리스크 식별</li>
+      </ul>
+
+      <h3>2️⃣ Gate 2: 제품설계 (Product Design)</h3>
+      <ul>
+        <li><strong>기술명세 작성</strong>: 제품 요구사항 상세 정의</li>
+        <li><strong>DFMEA</strong>: 디자인 수준의 고장분석</li>
+        <li><strong>도면 및 사양</strong>: 최종 설계 도면 발행</li>
+        <li><strong>프로토타입 제작</strong>: 초기 프로토타입 제작 및 테스트</li>
+      </ul>
+
+      <h3>3️⃣ Gate 3: 공정설계 (Process Design)</h3>
+      <ul>
+        <li><strong>공정설계</strong>: 생산 공정 상세 설계</li>
+        <li><strong>PFMEA</strong>: 공정 수준의 고장분석</li>
+        <li><strong>제어계획</strong>: 공정 제어 방법 정의</li>
+        <li><strong>검사 지침</strong>: 검사 기준 및 방법 정의</li>
+      </ul>
+
+      <h3>4️⃣ Gate 4: 검증 (Validate)</h3>
+      <ul>
+        <li><strong>MSA</strong>: 측정 시스템 분석</li>
+        <li><strong>능력성 검증</strong>: Cpk/Ppk 검증</li>
+        <li><strong>양산 유사 시험</strong>: 실제 양산 조건에서의 테스트</li>
+        <li><strong>승인</strong>: 비용/품질/일정 승인</li>
+      </ul>
+
+      <h3>5️⃣ Gate 5: 양산 및 피드백 (Launch & Feedback)</h3>
+      <ul>
+        <li><strong>PPAP 제출</strong>: 양산 부품 승인 패키지</li>
+        <li><strong>양산 준비</strong>: 최종 문서 준비, 팀 교육</li>
+        <li><strong>Lessons Learned</strong>: 프로젝트 회고</li>
+        <li><strong>변경관리</strong>: 양산 후 변경사항 관리</li>
+      </ul>
+    </div>
+
+    <div id="deliverables" class="help-section apqp-help-section">
+      <h2>📑 산출물 및 담당자</h2>
+      
+      <h3>산출물 상태</h3>
+      <ul>
+        <li><strong>🔴 Not Started</strong>: 아직 시작하지 않음</li>
+        <li><strong>🟠 In Progress</strong>: 진행 중</li>
+        <li><strong>🟢 Complete</strong>: 완료됨</li>
+        <li><strong>🟡 Delayed</strong>: 지연됨</li>
+      </ul>
+
+      <h3>효과적인 산출물 관리 팁</h3>
+      <ul>
+        <li><strong>담당자 명확히</strong>: 각 산출물의 소유자를 명확히 지정합니다.</li>
+        <li><strong>완료일 설정</strong>: 현실적이면서도 도전적인 완료일을 설정합니다.</li>
+        <li><strong>주석 달기</strong>: 진행 상황을 주석으로 기록합니다 (예: [2025-02-10] 고객 리뷰 완료, 수정사항 적용중)</li>
+        <li><strong>정기적 업데이트</strong>: 주 1회 이상 상태를 업데이트합니다.</li>
+        <li><strong>증거물 첨부</strong>: 완성된 산출물을 PDF/Excel로 첨부합니다.</li>
+      </ul>
+
+      <h3>주요 산출물 체크리스트</h3>
+      <ul>
+        <li>☐ DFMEA (Design Failure Mode & Effects Analysis)</li>
+        <li>☐ PFMEA (Process Failure Mode & Effects Analysis)</li>
+        <li>☐ 제어계획 (Control Plan)</li>
+        <li>☐ 측정 시스템 분석 (MSA)</li>
+        <li>☐ 공정 능력성 데이터 (Cpk/Ppk)</li>
+        <li>☐ 양산 부품 승인 패키지 (PPAP)</li>
+      </ul>
+    </div>
+
+    <div id="best-practices" class="help-section apqp-help-section">
+      <h2>✅ 베스트 프랙티스</h2>
+      
+      <h3>APQP 성공 팁</h3>
+      <ul>
+        <li><strong>조기 시작</strong>: Gate별로 미리미리 준비하세요. 마지막 순간 준비는 품질 문제를 야기합니다.</li>
+        <li><strong>크로스펑셔널 협력</strong>: 영업, 기술, 품질, 생산 등 모든 부서가 함께 참여합니다.</li>
+        <li><strong>고객 참여</strong>: 주요 고객과 정기적으로 리뷰하여 기대사항을 일치시킵니다.</li>
+        <li><strong>리스크 조기 식별</strong>: DFMEA/PFMEA를 통해 리스크를 조기에 파악하고 대응합니다.</li>
+        <li><strong>데이터 기반 의사결정</strong>: 능력성, MSA 등 통계적 증거를 바탕으로 Gate를 통과합니다.</li>
+      </ul>
+
+      <h3>파일 관리 규칙</h3>
+      <ul>
+        <li>📝 <strong>파일명 규칙</strong>: "DFMEA_ProductName_Rev_Date.pdf" 형식</li>
+        <li>📦 <strong>대용량 파일</strong>: Zip으로 압축하여 업로드</li>
+        <li>🔒 <strong>버전 관리</strong>: 파일명에 Rev 버전을 포함 (v1.0, v1.1 등)</li>
+        <li>🗂️ <strong>구조화</strong>: 폴더 구조를 체계적으로 유지</li>
+      </ul>
+    </div>
+
+    <div id="faq" class="help-section apqp-help-section">
+      <h2>❓ 자주 묻는 질문</h2>
+
+      <h4>Q: 산출물을 잘못 첨부했어요. 어떻게 하나요?</h4>
+      <p>A: 산출물 페이지에서 삭제 후 올바른 파일을 다시 첨부하시면 됩니다. 관리자에게 도움을 요청할 수도 있습니다.</p>
+
+      <h4>Q: Gate를 건너뛸 수 있나요?</h4>
+      <p>A: 아니오, APQP는 순차적인 5단계 프로세스입니다. 각 Gate를 완료해야 다음 단계로 진행할 수 있습니다.</p>
+
+      <h4>Q: 완료일을 변경하려면?</h4>
+      <p>A: 산출물 페이지에서 "Edit" 버튼으로 완료예정일을 수정하고, 변경 사유를 주석으로 남겨주세요.</p>
+
+      <h4>Q: 여러 사람이 한 산출물을 작업할 수 있나요?</h4>
+      <p>A: 담당자는 1명으로 지정되지만, 댓글로 협력팀을 태그하여 의견을 공유할 수 있습니다.</p>
+
+      <h4>Q: 외부 고객도 APQP를 볼 수 있나요?</h4>
+      <p>A: 기본적으로는 내부 팀만 접근 가능합니다. 고객과 공유하려면 관리자에게 문의하세요.</p>
+    </div>
+  </section>
+</main>
+
+{% endblock %}
     <div id="quick-start" class="help-section">
       <div class="page-head">
         <h2>🚀 APQP overview</h2>

@@ -683,6 +683,26 @@ body {
   box-shadow:0 2px 6px rgba(46,91,255,.35)
 }
 
+.nav-link.nav-help {
+  padding:4px 10px;
+  background:#f0f4ff;
+  border-color:#c7d9ff;
+  color:#5b7cfa;
+  font-weight:500
+}
+
+.nav-link.nav-help:hover {
+  background:#e5ebff;
+  border-color:#9fc3ff;
+  color:#4c63d2
+}
+
+.nav-link.nav-help.active {
+  background:linear-gradient(135deg, #ff9800, #fb8c00);
+  color:#fff;
+  box-shadow:0 2px 6px rgba(255,152,0,.35)
+}
+
 .header-right {
   display:flex;
   align-items:center;

@@ -53,7 +53,7 @@ class SpecCenterParser:
         try:
             content = []
             with open(file_path, 'rb') as f:
-                reader = PyPDF2.PdfReader(f)
+                reader = PdfReader(f)
                 for page_num, page in enumerate(reader.pages[:10]):  # Limit to first 10 pages
                     text = page.extract_text()
                     if text.strip():

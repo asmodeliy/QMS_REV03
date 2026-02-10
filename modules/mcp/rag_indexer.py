@@ -175,15 +175,13 @@ class RAGIndexer:
             elif file_ext == '.pdf':
                 # PDF files
                 try:
-                try:
                     from pypdf import PdfReader
                 except ImportError:
                     from PyPDF2 import PdfReader
+                
+                try:
                     reader = PdfReader(file_path)
                     content = "\n".join([page.extract_text() for page in reader.pages])
-                except ImportError:
-                    print(f"Warning: PyPDF2 not installed. Skipping {file_path}")
-                    return False
                 except Exception as e:
                     print(f"Warning: Could not read PDF {file_path}: {e}")
                     return False

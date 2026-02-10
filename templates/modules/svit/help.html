@@ -5,15 +5,325 @@
     <aside class="help-side svit-help-side">
       <div class="head svit-help-head">{{ t('svit.help_toc', locale) }}</div>
       <ul class="toc svit-help-toc">
+        <li><a href="#overview">{{ t('help.overview', locale) if t('help.overview', locale) != 'help.overview' else '개요' }}</a></li>
         <li><a href="#quick-start">{{ t('svit.help_quick_start', locale) }}</a></li>
         <li><a href="#issue-workflow">{{ t('svit.help_issue_workflow', locale) }}</a></li>
-        <li><a href="#status-details">{{ t('svit.help_status_details', locale) }}</a></li>
+        <li><a href="#fields">필드 설명</a></li>
         <li><a href="#best-practices">{{ t('svit.help_best_practices', locale) }}</a></li>
         <li><a href="#faq">{{ t('help.faq', locale) }}</a></li>
       </ul>
     </aside>
 
     <section class="help-main svit-help-main">
+      
+      <div id="overview" class="help-section svit-help-section">
+        <div class="page-head">
+          <h2>📋 SVIT 개요</h2>
+        </div>
+        {% if locale == 'ko' %}
+          <p><strong>SVIT (System Verification Issue Tracking)</strong>는 시스템 검증 및 테스트 과정에서 발견된 이슈를 효과적으로 관리하고 추적하는 통합 도구입니다.</p>
+          
+          <h3>주요 특징</h3>
+          <ul>
+            <li>🆔 <strong>자동 ID 생성</strong>: 각 이슈는 고유한 ID로 관리되어 추적과 참조가 용이합니다.</li>
+            <li>🔄 <strong>상태 관리</strong>: New → In Progress → Under Review → Resolved 상태로 진행도를 관리합니다.</li>
+            <li>⚠️ <strong>우선순위 설정</strong>: Critical, High, Medium, Low 4단계로 이슈 중요도를 구분합니다.</li>
+            <li>👥 <strong>담당자 지정</strong>: 각 이슈에 담당자를 할당하여 책임을 명확히 합니다.</li>
+            <li>📎 <strong>첨부파일 지원</strong>: 로그, 메모리 덤프, 스크린샷 등을 첨부하여 문제 분석을 도와줍니다.</li>
+          </ul>
+        {% else %}
+          <p><strong>SVIT (System Verification Issue Tracking)</strong> is a comprehensive tool for managing and tracking issues discovered during system verification and testing processes.</p>
+          
+          <h3>Key Features</h3>
+          <ul>
+            <li>🆔 <strong>Auto ID Generation</strong>: Each issue gets a unique ID for easy tracking and reference.</li>
+            <li>🔄 <strong>Status Management</strong>: Track progress from New → In Progress → Under Review → Resolved.</li>
+            <li>⚠️ <strong>Priority Levels</strong>: Classify issues by Critical, High, Medium, or Low importance.</li>
+            <li>👥 <strong>Assignee</strong>: Assign owners to each issue to ensure clear responsibility.</li>
+            <li>📎 <strong>Attachments</strong>: Support logs, dumps, and screenshots for better analysis.</li>
+          </ul>
+        {% endif %}
+      </div>
+      
+      <div id="quick-start" class="help-section svit-help-section">
+        <div class="page-head">
+          <h2>🚀 {{ t('svit.help_quick_start', locale) }}</h2>
+          <div class="head-actions">
+              <button id="btn-feedback" class="btn nav svit-help-head-actions" style="margin-left:auto">{{ t('help.send_feedback', locale) }}</button>
+          </div>
+        </div>
+        {% if locale == 'ko' %}
+          <h3>1단계: 새 이슈 생성</h3>
+          <ul>
+            <li>우측 상단의 <strong>"+ New Issue"</strong> 버튼을 클릭합니다.</li>
+            <li>필수 정보를 입력합니다:
+              <ul>
+                <li><strong>제목</strong>: 이슈의 간단한 설명 (예: "Login page 버튼이 동작하지 않음")</li>
+                <li><strong>설명</strong>: 상세한 재현 방법, 예상 동작, 실제 동작 등</li>
+                <li><strong>시스템</strong>: 이슈가 발생한 시스템 선택</li>
+                <li><strong>우선순위</strong>: Critical / High / Medium / Low</li>
+              </ul>
+            </li>
+            <li>필요시 로그, 스크린샷 등의 첨부파일을 추가합니다.</li>
+            <li><strong>"Create"</strong> 버튼을 클릭하여 이슈를 생성합니다.</li>
+          </ul>
+
+          <h3>2단계: 이슈 할당 및 추적</h3>
+          <ul>
+            <li>생성된 이슈의 상세 페이지에서 담당자를 지정합니다.</li>
+            <li>상태를 업데이트하여 진행 상황을 표시합니다:
+              <ul>
+                <li><strong>New</strong>: 새로 등록된 이슈</li>
+                <li><strong>In Progress</strong>: 분석/수정 중</li>
+                <li><strong>Under Review</strong>: 검증/테스트 대기중</li>
+                <li><strong>Resolved</strong>: 해결됨</li>
+              </ul>
+            </li>
+            <li>필요시 댓글로 진행 상황을 공유합니다.</li>
+          </ul>
+
+          <h3>3단계: 이슈 조회 및 필터링</h3>
+          <ul>
+            <li>우측 상단의 필터 버튼으로 상태, 우선순위, 담당자별로 필터링합니다.</li>
+            <li>검색창에 이슈 ID나 키워드를 입력하여 빠르게 찾을 수 있습니다.</li>
+          </ul>
+        {% else %}
+          <h3>Step 1: Create New Issue</h3>
+          <ul>
+            <li>Click the <strong>"+ New Issue"</strong> button at top right.</li>
+            <li>Fill in required information:
+              <ul>
+                <li><strong>Title</strong>: Brief description (e.g., "Login button not responsive")</li>
+                <li><strong>Description</strong>: How to reproduce, expected vs actual behavior</li>
+                <li><strong>System</strong>: Select affected system</li>
+                <li><strong>Priority</strong>: Critical / High / Medium / Low</li>
+              </ul>
+            </li>
+            <li>Add attachments (logs, screenshots) if needed.</li>
+            <li>Click <strong>"Create"</strong> to submit.</li>
+          </ul>
+
+          <h3>Step 2: Assign & Track</h3>
+          <ul>
+            <li>Assign the issue to team members on the detail page.</li>
+            <li>Update status to track progress.</li>
+            <li>Add comments to share updates.</li>
+          </ul>
+
+          <h3>Step 3: Filter & Search</h3>
+          <ul>
+            <li>Use filters for status, priority, and assignee.</li>
+            <li>Search by issue ID or keywords.</li>
+          </ul>
+        {% endif %}
+      </div>
+
+      
+      <div id="issue-workflow" class="help-section svit-help-section">
+        <h2>🔄 {{ t('svit.help_issue_workflow', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <h3>이슈 생명 주기</h3>
+          <p>각 이슈는 다음과 같은 상태 전환을 따릅니다:</p>
+          
+          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 15px 0; font-family: monospace;">
+            <strong>New</strong> → <strong>In Progress</strong> → <strong>Under Review</strong> → <strong>Resolved</strong>
+          </div>
+
+          <ul>
+            <li><strong>New (새 이슈)</strong>
+              <ul>
+                <li>방금 등록된 이슈입니다.</li>
+                <li>팀 리더가 내용을 검토 후 담당자를 지정합니다.</li>
+              </ul>
+            </li>
+            <li><strong>In Progress (진행 중)</strong>
+              <ul>
+                <li>담당자가 이슈 해결을 위해 작업 중입니다.</li>
+                <li>진행 상황을 주기적으로 댓글로 업데이트합니다.</li>
+              </ul>
+            </li>
+            <li><strong>Under Review (검증 대기)</strong>
+              <ul>
+                <li>수정/해결이 완료되고 검증을 기다리는 상태입니다.</li>
+                <li>테스터가 이슈를 재현 및 검증합니다.</li>
+              </ul>
+            </li>
+            <li><strong>Resolved (해결됨)</strong>
+              <ul>
+                <li>이슈가 완전히 해결되고 검증된 상태입니다.</li>
+                <li>해결 방법과 최종 결과를 기록합니다.</li>
+              </ul>
+            </li>
+          </ul>
+        {% else %}
+          <h3>Issue Lifecycle</h3>
+          <p>Issues follow this state transition:</p>
+          
+          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 15px 0; font-family: monospace;">
+            <strong>New</strong> → <strong>In Progress</strong> → <strong>Under Review</strong> → <strong>Resolved</strong>
+          </div>
+
+          <ul>
+            <li><strong>New</strong>
+              <ul>
+                <li>Newly created issue awaiting review.</li>
+                <li>Team leader reviews and assigns an owner.</li>
+              </ul>
+            </li>
+            <li><strong>In Progress</strong>
+              <ul>
+                <li>Assignee is actively working on the issue.</li>
+                <li>Provide regular updates in comments.</li>
+              </ul>
+            </li>
+            <li><strong>Under Review</strong>
+              <ul>
+                <li>Fix/solution is ready for validation.</li>
+                <li>Tester reproduces and verifies the fix.</li>
+              </ul>
+            </li>
+            <li><strong>Resolved</strong>
+              <ul>
+                <li>Issue is completely resolved and verified.</li>
+                <li>Document resolution method and results.</li>
+              </ul>
+            </li>
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="fields" class="help-section svit-help-section">
+        <h2>📝 필드 설명</h2>
+        {% if locale == 'ko' %}
+          <div style="margin-top: 15px;">
+            <div style="background: #fff3cd; padding: 12px; border-left: 4px solid #ffc107; margin-bottom: 15px; border-radius: 4px;">
+              <strong>필수 필드 (반드시 입력해야 함):</strong>
+            </div>
+            
+            <h4>기본 정보</h4>
+            <ul>
+              <li><strong>제목</strong>: 이슈의 핵심을 간단히 설명 (50자 이내 권장)</li>
+              <li><strong>설명</strong>: 상세한 설명, 재현 방법, 예상/실제 동작</li>
+              <li><strong>시스템</strong>: 이슈가 발생한 시스템 선택</li>
+              <li><strong>우선순위</strong>: Critical / High / Medium / Low</li>
+            </ul>
+
+            <h4>할당 정보</h4>
+            <ul>
+              <li><strong>담당자</strong>: 이슈를 해결할 담당자</li>
+              <li><strong>리포터</strong>: 이슈를 발견한 사람 (자동으로 설정됨)</li>
+            </ul>
+
+            <h4>추적 정보</h4>
+            <ul>
+              <li><strong>상태</strong>: New / In Progress / Under Review / Resolved</li>
+              <li><strong>생성일</strong>: 이슈 생성 날짜 (자동)
+              <li><strong>마지막 업데이트</strong>: 마지막 수정 날짜 (자동)</li>
+              <li><strong>첨부파일</strong>: 로그, 덤프, 스크린샷 등</li>
+            </ul>
+          </div>
+        {% else %}
+          <div style="margin-top: 15px;">
+            <div style="background: #fff3cd; padding: 12px; border-left: 4px solid #ffc107; margin-bottom: 15px; border-radius: 4px;">
+              <strong>Required Fields:</strong>
+            </div>
+            
+            <h4>Basic Information</h4>
+            <ul>
+              <li><strong>Title</strong>: Concise description of the core issue (recommended: under 50 characters)</li>
+              <li><strong>Description</strong>: Detailed description, reproduction steps, expected vs. actual behavior</li>
+              <li><strong>System</strong>: Select the affected system</li>
+              <li><strong>Priority</strong>: Critical / High / Medium / Low</li>
+            </ul>
+
+            <h4>Assignment</h4>
+            <ul>
+              <li><strong>Assignee</strong>: Person responsible for fixing the issue</li>
+              <li><strong>Reporter</strong>: Person who found the issue (auto-filled)</li>
+            </ul>
+
+            <h4>Tracking</h4>
+            <ul>
+              <li><strong>Status</strong>: New / In Progress / Under Review / Resolved</li>
+              <li><strong>Created</strong>: Issue creation date (auto)</li>
+              <li><strong>Last Updated</strong>: Last modification date (auto)</li>
+              <li><strong>Attachments</strong>: Logs, dumpsscreenshots, etc.</li>
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+
+      <div id="best-practices" class="help-section svit-help-section">
+        <h2>✅ {{ t('svit.help_best_practices', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <h3>이슈 등록시 베스트 프랙티스</h3>
+          <ul>
+            <li><strong>명확한 제목 작성</strong>: "Bug: X page not loading" 대신 "X page fails to load when visiting with admin role"처럼 구체적으로</li>
+            <li><strong>재현 방법 상세히 기록</strong>: 다른 사람도 쉽게 이슈를 재현할 수 있도록</li>
+            <li><strong>첨부파일 준비</strong>: 로그, 스크린샷, 에러 메시지 등을 함께 제공</li>
+            <li><strong>우선순위 정확히 설정</strong>: 서비스 영향도와 심각성을 고려</li>
+            <li><strong>정기적으로 상태 업데이트</strong>: 담당자는 진행 상황을 주 1회 이상 업데이트</li>
+          </ul>
+
+          <h3>우선순위 가이드</h3>
+          <ul>
+            <li><strong>🔴 Critical</strong>: 전체 시스템 작동 불가, 데이터 손상 위험</li>
+            <li><strong>🟠 High</strong>: 주요 기능 가동 불가, 사용자 작업 차단</li>
+            <li><strong>🟡 Medium</strong>: 특정 기능 미작동, 임시방안 있음</li>
+            <li><strong>🟢 Low</strong>: 부가 기능 미작동, 사용자 영향 미미</li>
+          </ul>
+        {% else %}
+          <h3>Best Practices for Issue Reporting</h3>
+          <ul>
+            <li><strong>Clear Titles</strong>: Be specific and descriptive</li>
+            <li><strong>Detailed Reproduction Steps</strong>: Others should easily reproduce the issue</li>
+            <li><strong>Attach Evidence</strong>: Include logs, screenshots, error messages</li>
+            <li><strong>Accurate Priority</strong>: Consider impact and severity</li>
+            <li><strong>Regular Updates</strong>: Assignee should update status at least weekly</li>
+          </ul>
+
+          <h3>Priority Guidelines</h3>
+          <ul>
+            <li><strong>🔴 Critical</strong>: Complete system failure, data loss risk</li>
+            <li><strong>🟠 High</strong>: Major feature unavailable, user blocked</li>
+            <li><strong>🟡 Medium</strong>: Feature unavailable, workaround exists</li>
+            <li><strong>🟢 Low</strong>: Minor feature affected, minimal user impact</li>
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="faq" class="help-section svit-help-section">
+        <h2>❓ {{ t('help.faq', locale) }}</h2>
+        {% if locale == 'ko' %}
+          <h4>Q: 이슈에 댓글을 달 수 있나요?</h4>
+          <p>A: 네, 이슈 상세 페이지의 "댓글" 섹션에서 언제든 댓글을 달 수 있습니다. 진행 상황 업데이트나 추가 정보 공유에 유용합니다.</p>
+
+          <h4>Q: 이슈를 닫을 수 있나요?</h4>
+          <p>A: 이슈는 상태를 "Resolved"로 변경할 수 있습니다. 해결 방법과 검증 결과를 기록한 후 담당자가 설정합니다.</p>
+
+          <h4>Q: 이슈 ID는 무엇을 의미하나요?</h4>
+          <p>A: 각 이슈는 고유한 ID (예: SVIT-2025-001)로 관리됩니다. 이를 사용하여 이슈를 추적하고 참조할 수 있습니다.</p>
+
+          <h4>Q: 파일을 첨부할 때 제한이 있나요?</h4>
+          <p>A: 파일명에는 특수문자(#, ?, %)를 사용하지 않기를 권장합니다. 최대 파일 크기는 설정에 따라 다릅니다.</p>
+        {% else %}
+          <h4>Q: Can I add comments to an issue?</h4>
+          <p>A: Yes, you can add comments in the "Comments" section on the issue detail page. Great for updates and additional information sharing.</p>
+
+          <h4>Q: Can I close an issue?</h4>
+          <p>A: You can change the status to "Resolved". Document the solution and verification results before marking it resolved.</p>
+
+          <h4>Q: What does the Issue ID mean?</h4>
+          <p>A: Each issue has a unique ID (e.g., SVIT-2025-001) for tracking and reference purposes.</p>
+
+          <h4>Q: Are there file upload restrictions?</h4>
+          <p>A: Avoid special characters (#, ?, %) in filenames. Maximum file size depends on system configuration.</p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+
+{% endblock %}
       
       <div id="quick-start" class="help-section svit-help-section">
         <div class="page-head">
