@@ -77,9 +77,9 @@ jobs:
           export CC=/opt/rh/gcc-toolset-13/root/usr/bin/gcc
           export CXX=/opt/rh/gcc-toolset-13/root/usr/bin/g++
 
-          export ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
-          export CFLAGS="$ARCHFLAGS"
-          export CXXFLAGS="$ARCHFLAGS"
+          # (중요) 여기 플래그는 CMAKE_ARGS로만 넘길 거라
+          # CFLAGS/CXXFLAGS 환경변수로는 굳이 export 안 해도 됩니다.
+          ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
 
           cd /tmp
           git clone https://github.com/abetlen/llama-cpp-python
@@ -87,15 +87,17 @@ jobs:
 
           python3.11 -m pip install --upgrade pip wheel setuptools
 
-          # Force CMake rebuild + enforce znver3 flags + disable GGML_NATIVE (CI CPU mismatch)
           export FORCE_CMAKE=1
-          export CMAKE_ARGS="-DGGML_NATIVE=OFF -DGGML_OPENMP=ON -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_FLAGS=$CFLAGS -DCMAKE_CXX_FLAGS=$CXXFLAGS"
+
+          export CMAKE_ARGS="-DGGML_NATIVE=OFF -DGGML_OPENMP=ON \
+            -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX \
+            -DCMAKE_C_FLAGS='$ARCHFLAGS' -DCMAKE_CXX_FLAGS='$ARCHFLAGS'"
 
           mkdir -p /tmp/wheels
           python3.11 -m pip wheel . --wheel-dir=/tmp/wheels --no-cache-dir -v
 
           echo "Wheels:"
-          ls -lh /tmp/wheels || true
+          ls -lh /tmp/wheels
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
