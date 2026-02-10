@@ -13,7 +13,7 @@ jobs:
       image: rockylinux:8.10
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Install dependencies
         run: |
@@ -47,42 +47,23 @@ jobs:
           ls -lh /tmp/wheels/
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: llama-cpp-native-rocky8.10
           path: |
             /tmp/llama-main-native-rocky8.10
             /tmp/wheels/*.whl
       
-      - name: Create Release
+      - name: Create and Upload Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: llama.cpp NATIVE Build for Rocky 8.10
+          files: |
+            /tmp/llama-main-native-rocky8.10
+            /tmp/wheels/*.whl
+          tag_name: ${{ github.ref_name }}
+          name: llama.cpp NATIVE Build - ${{ github.ref_name }}
           draft: false
           prerelease: false
-      
-      - name: Upload Release Assets (Binary)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /tmp/llama-main-native-rocky8.10
-          asset_name: llama-main-native-rocky8.10
-          asset_content_type: application/octet-stream
-      
-      - name: Upload Release Assets (Wheel)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /tmp/wheels/llama_cpp_python-*.whl
-          asset_name: llama-cpp-python-rocky8.10.whl
-          asset_content_type: application/octet-stream
