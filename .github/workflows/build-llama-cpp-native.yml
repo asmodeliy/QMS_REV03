@@ -62,11 +62,11 @@ jobs:
             -DCMAKE_CXX_FLAGS="$CXXFLAGS"
 
           # Build only the server executable (exists in current llama.cpp layouts)
-          cmake --build build -j$(nproc) --target llama-server
+          cmake --build build -j$(nproc) --target server
 
           # Copy the binary
-          if [ -f build/bin/llama-server ]; then
-            cp build/bin/llama-server /tmp/llama-5950x
+          if [ -f build/bin/server ]; then
+            cp build/examples/server/server /tmp/llama-5950x
           else
             echo "ERROR: build/bin/llama-server not found"
             ls -al build/bin || true
