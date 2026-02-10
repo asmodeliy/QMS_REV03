@@ -3,7 +3,10 @@ from pathlib import Path
 from openpyxl import load_workbook 
 from docx import Document 
 from docx .enum .text import WD_ALIGN_PARAGRAPH 
-from PyPDF2 import PdfReader 
+try:
+    from pypdf import PdfReader
+except ImportError:
+    from PyPDF2 import PdfReader 
 from pptx import Presentation 
 import base64 
 import io 

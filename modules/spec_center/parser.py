@@ -13,11 +13,15 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 try:
-    import PyPDF2
+    from pypdf import PdfReader
     PDF_AVAILABLE = True
 except ImportError:
-    PDF_AVAILABLE = False
-    print("Warning: PyPDF2 not installed. PDF support limited.")
+    try:
+        from PyPDF2 import PdfReader
+        PDF_AVAILABLE = True
+    except ImportError:
+        PDF_AVAILABLE = False
+        print("Warning: pypdf/PyPDF2 not installed. PDF support limited.")
 
 try:
     from docx import Document

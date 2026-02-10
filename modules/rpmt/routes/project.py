@@ -160,11 +160,11 @@ def project_detail (pid :int ,request :Request ,db :Session =Depends (get_db )):
     })
 
 @router.get("/projects/{pid}/kpi.json")
-def project_kpi_json (
-pid :int ,
-kind :str =Query (...,regex ="^(done|progress|late|not_started|na)$"),
-request :Request =...,
-db :Session =Depends (get_db )
+def project_kpi_json(
+    pid: int,
+    kind: str = Query(..., pattern="^(done|progress|late|not_started|na)$"),
+    request: Request = ...,
+    db: Session = Depends(get_db)
 ):
     if request.headers.get('x-debug-bypass') != '1':
         auth_check = ensure_authenticated(request)
