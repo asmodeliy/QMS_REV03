@@ -11,134 +11,94 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: rockylinux:8
-    
+
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Build Cache (ccache)
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: ${{ runner.os }}-ccache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-ccache-
-      
+
+      # -----------------------------
+      # Dependencies + Modern GCC
+      # -----------------------------
       - name: Install dependencies
         run: |
-          dnf groupinstall "Development Tools" -y
-          dnf install -y cmake git python3-pip python3-devel
-          
-          # ccache 설치 시도 (실패해도 계속 진행)
-          dnf install -y epel-release && dnf install -y ccache || echo "ccache not available, continuing without cache"
-          
-          # Python 3.11 설치 (서버 환경에 맞춤)
-          dnf install -y python3.11 python3.11-devel python3.11-pip
-      
-      - name: Clone and build llama.cpp with NATIVE optimization
-        env:
-          CCACHE_DIR: ~/.ccache
-          CCACHE_MAXSIZE: 2G
-          CXXFLAGS: "-march=native -lstdc++ -lstdc++fs"
-          LDFLAGS: "-lstdc++ -lstdc++fs"
+          dnf -y update
+          dnf -y install epel-release
+          dnf -y groupinstall "Development Tools"
+
+          # 최신 GCC (Zen3 인식 필수)
+          dnf -y install gcc-toolset-13 gcc-toolset-13-gcc gcc-toolset-13-gcc-c++ gcc-toolset-13-libstdc++-devel
+
+          dnf -y install cmake git numactl
+          dnf -y install python3.11 python3.11-devel python3.11-pip
+
+      # -----------------------------
+      # Build llama.cpp (REAL Native)
+      # -----------------------------
+      - name: Build llama.cpp for Ryzen 5950X
         run: |
-          ccache -z  # 통계 초기화
+          source /opt/rh/gcc-toolset-13/enable
+
           cd /tmp
           git clone https://github.com/ggerganov/llama.cpp
           cd llama.cpp
-          
-          # CMake으로 빌드 (NATIVE 최적화 활성화)
-          mkdir -p build
-          cd build
-          cmake .. \
+
+          # Zen3 강제 네이티브
+          export CFLAGS="-O3 -march=znver3 -mtune=znver3 -mfma -mavx2 -mavx -mbmi2 -mf16c"
+          export CXXFLAGS="$CFLAGS"
+
+          cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DLLAMA_NATIVE=ON \
             -DGGML_NATIVE=ON \
-            -DGGML_CCACHE=ON \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-            -DCMAKE_C_FLAGS="-march=native" \
-            -DCMAKE_CXX_FLAGS_INIT="-march=native -lstdc++ -lstdc++fs" \
-            -DCMAKE_CXX_FLAGS="-march=native -lstdc++ -lstdc++fs" \
-            -DCMAKE_SHARED_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--as-needed" \
-            -DCMAKE_MODULE_LINKER_FLAGS="-lstdc++ -lstdc++fs" \
-            -DCMAKE_EXE_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--copy-dt-needed-entries"
-          
-          cmake --build . --config Release -j$(nproc) 2>&1 | tee build.log || {
-            echo "Main build failed, trying without examples..."
-            # 다시 시도: examples 제외
-            cd ..
-            rm -rf build
-            mkdir build
-            cd build
-            cmake .. \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DLLAMA_NATIVE=ON \
-              -DGGML_NATIVE=ON \
-              -DGGML_CCACHE=ON \
-              -DCMAKE_CXX_STANDARD=17 \
-              -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-              -DCMAKE_C_FLAGS="-march=native" \
-              -DCMAKE_CXX_FLAGS_INIT="-march=native -lstdc++ -lstdc++fs" \
-              -DCMAKE_CXX_FLAGS="-march=native -lstdc++ -lstdc++fs" \
-              -DCMAKE_SHARED_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--as-needed" \
-              -DCMAKE_EXE_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--copy-dt-needed-entries"
-            
-            cmake --build . --config Release -j$(nproc) --target llama-main
-          }
-          
-          # 바이너리 복사
-          if [ -f bin/llama-main ]; then
-            cp bin/llama-main /tmp/llama-main-native-rocky8
-          elif [ -f llama-main ]; then
-            cp llama-main /tmp/llama-main-native-rocky8
-          else
-            echo "ERROR: llama-main binary not found!"
-            find . -name "llama-main" 2>/dev/null || echo "No llama-main found"
-            exit 1
-          fi
-          
-          chmod +x /tmp/llama-main-native-rocky8
-          echo "Build complete:"
-          ls -lh /tmp/llama-main-native-rocky8
-          
-          # ccache 통계
-          echo ""
-          echo "=== ccache 통계 ==="
-          ccache -s
-      
-      - name: Build llama-cpp-python wheel
+            -DGGML_OPENMP=ON \
+            -DLLAMA_BUILD_EXAMPLES=OFF \
+            -DLLAMA_BUILD_TESTS=OFF \
+            -DCMAKE_C_FLAGS="$CFLAGS" \
+            -DCMAKE_CXX_FLAGS="$CXXFLAGS"
+
+          cmake --build build -j$(nproc)
+
+          # 바이너리 확인
+          ls build/bin/
+
+          cp build/bin/llama-cli /tmp/llama-5950x
+          chmod +x /tmp/llama-5950x
+
+      # -----------------------------
+      # Build python binding
+      # -----------------------------
+      - name: Build llama-cpp-python (Zen3)
         run: |
+          source /opt/rh/gcc-toolset-13/enable
+
           cd /tmp
           git clone https://github.com/abetlen/llama-cpp-python
           cd llama-cpp-python
-          
-          # Python 3.11로 wheel 빌드 (서버 환경 맞춤)
-          CMAKE_ARGS="-DLLAMA_NATIVE=on" python3.11 -m pip install . --no-cache-dir -v
-          
-          # Python 3.11 wheel 생성
-          python3.11 -m pip wheel . --wheel-dir=/tmp/wheels --no-cache-dir
-          
-          echo "Wheel created (Python 3.11):"
+
+          export CFLAGS="-O3 -march=znver3 -mtune=znver3 -mfma -mavx2 -mavx -mbmi2 -mf16c"
+          export CXXFLAGS="$CFLAGS"
+
+          CMAKE_ARGS="-DGGML_NATIVE=on" python3.11 -m pip wheel . --wheel-dir=/tmp/wheels --no-cache-dir
+
           ls -lh /tmp/wheels/
-      
+
+      # -----------------------------
+      # Upload
+      # -----------------------------
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: llama-cpp-native-rocky8
+          name: llama-5950x-native
           path: |
-            /tmp/llama-main-native-rocky8
+            /tmp/llama-5950x
             /tmp/wheels/*.whl
-      
-      - name: Create and Upload Release
+
+      - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            /tmp/llama-main-native-rocky8
+            /tmp/llama-5950x
             /tmp/wheels/*.whl
           tag_name: ${{ github.ref_name }}
-          name: llama.cpp NATIVE Build - ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          name: llama.cpp Ryzen5950X Native - ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
