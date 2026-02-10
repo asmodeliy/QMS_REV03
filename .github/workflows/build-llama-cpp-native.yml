@@ -15,16 +15,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Setup Build Cache (ccache)
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+      
       - name: Install dependencies
         run: |
           dnf groupinstall "Development Tools" -y
-          dnf install -y cmake git python3-pip python3-devel
+          dnf install -y cmake git python3-pip python3-devel ccache
           
           # Python 3.11 설치 (서버 환경에 맞춤)
           dnf install -y python3.11 python3.11-devel python3.11-pip
       
       - name: Clone and build llama.cpp with NATIVE optimization
+        env:
+          CCACHE_DIR: ~/.ccache
+          CCACHE_MAXSIZE: 2G
         run: |
+          ccache -z  # 통계 초기화
           cd /tmp
           git clone https://github.com/ggerganov/llama.cpp
           cd llama.cpp
@@ -35,10 +47,13 @@ jobs:
           cmake .. \
             -DCMAKE_BUILD_TYPE=Release \
             -DLLAMA_NATIVE=ON \
+            -DGGML_CCACHE=ON \
             -DCMAKE_CXX_STANDARD=17 \
             -DCMAKE_CXX_STANDARD_REQUIRED=ON \
             -DCMAKE_C_FLAGS="-march=native" \
-            -DCMAKE_CXX_FLAGS="-march=native -lstdc++fs"
+            -DCMAKE_CXX_FLAGS="-march=native" \
+            -DCMAKE_SHARED_LINKER_FLAGS="-lstdc++fs" \
+            -DCMAKE_EXE_LINKER_FLAGS="-lstdc++fs"
           
           cmake --build . --config Release -j$(nproc)
           
@@ -47,6 +62,11 @@ jobs:
           chmod +x /tmp/llama-main-native-rocky8
           echo "Build complete:"
           ls -lh /tmp/llama-main-native-rocky8
+          
+          # ccache 통계
+          echo ""
+          echo "=== ccache 통계 ==="
+          ccache -s
       
       - name: Build llama-cpp-python wheel
         run: |
