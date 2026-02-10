@@ -48,33 +48,21 @@ jobs:
           cd /tmp
           git clone https://github.com/ggerganov/llama.cpp
           cd llama.cpp
+          git checkout b2757
 
           cmake -S . -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DGGML_NATIVE=OFF \
-            -DGGML_OPENMP=ON \
-            -DLLAMA_BUILD_EXAMPLES=ON \
-            -DLLAMA_BUILD_TESTS=OFF \
-            -DLLAMA_BUILD_TOOLS=OFF \
-            -DCMAKE_C_COMPILER="$CC" \
-            -DCMAKE_CXX_COMPILER="$CXX" \
-            -DCMAKE_C_FLAGS="$CFLAGS" \
-            -DCMAKE_CXX_FLAGS="$CXXFLAGS"
+          -DCMAKE_BUILD_TYPE=Release \
+          -DGGML_NATIVE=OFF \
+          -DGGML_OPENMP=ON \
+          -DLLAMA_BUILD_EXAMPLES=ON \
+          -DCMAKE_C_COMPILER="$CC" \
+          -DCMAKE_CXX_COMPILER="$CXX" \
+          -DCMAKE_C_FLAGS="$CFLAGS" \
+          -DCMAKE_CXX_FLAGS="$CXXFLAGS"
 
-          # Build only the server executable (exists in current llama.cpp layouts)
           cmake --build build -j$(nproc) --target server
 
-          # Copy the binary
-          if [ -f build/bin/server ]; then
-            cp build/examples/server/server /tmp/llama-5950x
-          else
-            echo "ERROR: build/bin/llama-server not found"
-            ls -al build/bin || true
-            # Fallback: search for any executable named llama-server
-            find build -maxdepth 4 -type f -executable -name "llama-server" -print -exec cp {} /tmp/llama-5950x \; -quit || true
-          fi
-
-          test -f /tmp/llama-5950x
+          cp build/bin/server /tmp/llama-5950x
           chmod +x /tmp/llama-5950x
 
           echo "Built binary:"
