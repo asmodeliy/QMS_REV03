@@ -101,24 +101,13 @@ jobs:
           echo "Wheels:"
           ls -lh /tmp/wheels
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: llama-5950x-rocky8
-          path: |
-            /tmp/llama-5950x
-            /tmp/wheels/*.whl
-
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            /tmp/llama-5950x
-            /tmp/wheels/*.whl
+            /tmp/out/*
           tag_name: ${{ github.ref_name }}
           name: llama.cpp 5950X Rocky8 - ${{ github.ref_name }}
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
