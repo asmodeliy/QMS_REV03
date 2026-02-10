@@ -15,37 +15,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install deps (enable powertools + gcc-toolset)
+      - name: Install deps (powertools + gcc-toolset-13 + Python 3.11)
         run: |
           set -euxo pipefail
 
           dnf -y update
           dnf -y install dnf-plugins-core epel-release
-
-          # Rocky 8: gcc-toolset은 보통 powertools가 필요합니다
           dnf config-manager --set-enabled powertools || true
 
           dnf -y groupinstall "Development Tools"
-          dnf -y install cmake git make ninja-build
+          dnf -y install cmake git ninja-build make findutils which
 
-          # 최신 GCC toolset (Zen3/znver3 인식 및 최신 libstdc++)
+          # GCC toolset (C++17 filesystem, znver3 support)
           dnf -y install gcc-toolset-13 gcc-toolset-13-gcc gcc-toolset-13-gcc-c++ gcc-toolset-13-libstdc++-devel
 
-          # Python 3.11
+          # Python 3.11 for wheel build (optional)
           dnf -y install python3.11 python3.11-devel python3.11-pip
 
-      - name: Build llama.cpp (5950X znver3, NO GGML_NATIVE)
+      - name: Build llama.cpp (Ryzen 5950X znver3) -> llama-server
         run: |
           set -euxo pipefail
 
-          # toolset 활성화 (이 상태에서 configure 해야 gcc 13으로 잡힘)
           source /opt/rh/gcc-toolset-13/enable
-
-          # 반드시 toolset gcc/g++를 CMake에 고정
           export CC=/opt/rh/gcc-toolset-13/root/usr/bin/gcc
           export CXX=/opt/rh/gcc-toolset-13/root/usr/bin/g++
 
-          # 5950X(Zen3) 전용 플래그 (CI CPU랑 무관하게 강제)
+          # Force Ryzen 5950X (Zen3) codegen in CI (do NOT use -march=native)
           export ARCHFLAGS="-O3 -march=znver3 -mtune=znver3 -mavx2 -mfma -mbmi2 -mf16c"
           export CFLAGS="$ARCHFLAGS"
           export CXXFLAGS="$ARCHFLAGS"
@@ -58,7 +53,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DGGML_NATIVE=OFF \
             -DGGML_OPENMP=ON \
-            -DLLAMA_BUILD_EXAMPLES=OFF \
+            -DLLAMA_BUILD_EXAMPLES=ON \
             -DLLAMA_BUILD_TESTS=OFF \
             -DLLAMA_BUILD_TOOLS=OFF \
             -DCMAKE_C_COMPILER="$CC" \
@@ -66,27 +61,27 @@ jobs:
             -DCMAKE_C_FLAGS="$CFLAGS" \
             -DCMAKE_CXX_FLAGS="$CXXFLAGS"
 
-          cmake --build build -j$(nproc)
+          # Build only the server executable (exists in current llama.cpp layouts)
+          cmake --build build -j$(nproc) --target llama-server
 
-          # 타깃 바이너리 복사 (repo 버전에 따라 이름이 다를 수 있어 후보들 처리)
-          if [ -f build/bin/llama-cli ]; then
-            cp build/bin/llama-cli /tmp/llama-5950x
-          elif [ -f build/bin/llama-main ]; then
-            cp build/bin/llama-main /tmp/llama-5950x
-          elif [ -f build/bin/main ]; then
-            cp build/bin/main /tmp/llama-5950x
+          # Copy the binary
+          if [ -f build/bin/llama-server ]; then
+            cp build/bin/llama-server /tmp/llama-5950x
           else
-            echo "ERROR: cannot find llama binary in build/bin"
+            echo "ERROR: build/bin/llama-server not found"
             ls -al build/bin || true
-            exit 1
+            # Fallback: search for any executable named llama-server
+            find build -maxdepth 4 -type f -executable -name "llama-server" -print -exec cp {} /tmp/llama-5950x \; -quit || true
           fi
 
+          test -f /tmp/llama-5950x
           chmod +x /tmp/llama-5950x
-          echo "Built:"
-          /tmp/llama-5950x --help | head -n 5 || true
-          ls -lh /tmp/llama-5950x
 
-      - name: Build llama.cpp (5950X znver3, build CLI only)
+          echo "Built binary:"
+          ls -lh /tmp/llama-5950x
+          /tmp/llama-5950x --help | head -n 20 || true
+
+      - name: Build llama-cpp-python wheel (Ryzen 5950X znver3)
         run: |
           set -euxo pipefail
 
@@ -99,50 +94,20 @@ jobs:
           export CXXFLAGS="$ARCHFLAGS"
 
           cd /tmp
-          git clone https://github.com/ggerganov/llama.cpp
-          cd llama.cpp
+          git clone https://github.com/abetlen/llama-cpp-python
+          cd llama-cpp-python
 
-          cmake -S . -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DGGML_NATIVE=OFF \
-            -DGGML_OPENMP=ON \
-            -DLLAMA_BUILD_EXAMPLES=OFF \
-            -DLLAMA_BUILD_TESTS=OFF \
-            -DCMAKE_C_COMPILER="$CC" \
-            -DCMAKE_CXX_COMPILER="$CXX" \
-            -DCMAKE_C_FLAGS="$CFLAGS" \
-            -DCMAKE_CXX_FLAGS="$CXXFLAGS"
+          python3.11 -m pip install --upgrade pip wheel setuptools
 
-          # repo 버전마다 타깃명이 달라서, 존재하는 걸 찾아서 빌드
-          ninja -C build -t targets all | tee /tmp/llama_targets.txt
+          # Force CMake rebuild + enforce znver3 flags + disable GGML_NATIVE (CI CPU mismatch)
+          export FORCE_CMAKE=1
+          export CMAKE_ARGS="-DGGML_NATIVE=OFF -DGGML_OPENMP=ON -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_FLAGS=$CFLAGS -DCMAKE_CXX_FLAGS=$CXXFLAGS"
 
-          if grep -qE '^llama-cli:' /tmp/llama_targets.txt; then
-            cmake --build build -j$(nproc) --target llama-cli
-          elif grep -qE '^llama-main:' /tmp/llama_targets.txt; then
-            cmake --build build -j$(nproc) --target llama-main
-          elif grep -qE '^main:' /tmp/llama_targets.txt; then
-            cmake --build build -j$(nproc) --target main
-          else
-            echo "ERROR: No known CLI target found. Available targets (filtered):"
-            grep -E 'llama|main|cli' /tmp/llama_targets.txt || true
-            exit 1
-          fi
+          mkdir -p /tmp/wheels
+          python3.11 -m pip wheel . --wheel-dir=/tmp/wheels --no-cache-dir -v
 
-          # 바이너리 경로도 버전별로 달라서 후보를 넓게 탐색
-          echo "Searching for built executable..."
-          find build -maxdepth 3 -type f -executable -name "llama-cli" -o -name "llama-main" -o -name "main" | tee /tmp/llama_bins.txt
-
-          BIN="$(head -n 1 /tmp/llama_bins.txt || true)"
-          if [ -z "$BIN" ]; then
-            echo "ERROR: executable not found after build"
-            find build -maxdepth 4 -type f -executable | head -n 50 || true
-            exit 1
-          fi
-
-          cp "$BIN" /tmp/llama-5950x
-          chmod +x /tmp/llama-5950x
-          ls -lh /tmp/llama-5950x
-          /tmp/llama-5950x --help | head -n 5 || true
+          echo "Wheels:"
+          ls -lh /tmp/wheels || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
