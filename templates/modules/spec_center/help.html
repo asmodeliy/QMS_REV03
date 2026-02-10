@@ -3,22 +3,23 @@
 
 <main class="container wide help-wrap spec-center-root spec-center-help-wrap">
   <aside class="help-side spec-center-help-side">
-    <div class="head spec-center-help-head">목차</div>
+    <div class="head spec-center-help-head">{% if locale == 'ko' %}목차{% else %}Table of Contents{% endif %}</div>
     <ul class="toc spec-center-help-toc">
-      <li><a href="#overview">개요</a></li>
-      <li><a href="#quick-start">빠른 시작</a></li>
-      <li><a href="#browse">검색 및 조회</a></li>
-      <li><a href="#features">주요 기능</a></li>
-      <li><a href="#admin">관리자 도구</a></li>
-      <li><a href="#faq">자주 묻는 질문</a></li>
+      <li><a href="#overview">{% if locale == 'ko' %}개요{% else %}Overview{% endif %}</a></li>
+      <li><a href="#quick-start">{% if locale == 'ko' %}빠른 시작{% else %}Quick Start{% endif %}</a></li>
+      <li><a href="#browse">{% if locale == 'ko' %}검색 및 조회{% else %}Search & Browse{% endif %}</a></li>
+      <li><a href="#features">{% if locale == 'ko' %}주요 기능{% else %}Features{% endif %}</a></li>
+      <li><a href="#admin">{% if locale == 'ko' %}관리자 도구{% else %}Admin Tools{% endif %}</a></li>
+      <li><a href="#faq">{% if locale == 'ko' %}자주 묻는 질문{% else %}FAQ{% endif %}</a></li>
     </ul>
   </aside>
 
   <section class="help-main spec-center-help-main">
     <div id="overview" class="help-section spec-center-help-section">
       <div class="page-head">
-        <h2>📂 Spec Center 개요</h2>
+        <h2>📂 Spec Center {% if locale == 'ko' %}개요{% else %}Overview{% endif %}</h2>
       </div>
+      {% if locale == 'ko' %}
       <p><strong>Spec Center (사양 센터)</strong>는 회사 내 모든 기술 문서, 사양서, 드로잉을 한곳에서 관리하고 검색하는 중앙 저장소입니다.</p>
       
       <h3>주요 특징</h3>
@@ -30,17 +31,31 @@
         <li>🏷️ <strong>메타데이터</strong>: 파일 크기, 업로드자, 수정 날짜를 표시합니다.</li>
         <li>🤖 <strong>AI 챗봇</strong>: 문서 내용을 기반으로 질문에 답변합니다.</li>
       </ul>
+      {% else %}
+      <p><strong>Spec Center</strong> is a centralized repository for managing and searching all technical documents, specifications, and drawings within the company.</p>
+      
+      <h3>Key Features</h3>
+      <ul>
+        <li>📁 <strong>Organized by Category</strong>: Systematically manage documents in a folder tree structure.</li>
+        <li>🔍 <strong>Fast Search</strong>: Quickly find files by filename.</li>
+        <li>👁️ <strong>Inline Preview</strong>: View PDFs and images directly in the browser.</li>
+        <li>📥 <strong>Easy Download</strong>: Download files with one click.</li>
+        <li>🏷️ <strong>Metadata</strong>: Display file size, uploader, and modification date.</li>
+        <li>🤖 <strong>AI Chatbot</strong>: Answer questions based on document content.</li>
+      </ul>
+      {% endif %}
     </div>
 
     <div id="quick-start" class="help-section spec-center-help-section">
       <div class="page-head">
-        <h2>🚀 빠른 시작</h2>
+        <h2>🚀 {% if locale == 'ko' %}빠른 시작{% else %}Quick Start{% endif %}</h2>
         <div class="head-actions">
-          <button id="btn-feedback" class="btn nav spec-center-help-head-actions" style="margin-left:auto">피드백 보내기</button>
+          <button id="btn-feedback" class="btn nav spec-center-help-head-actions" style="margin-left:auto">{% if locale == 'ko' %}피드백 보내기{% else %}Send Feedback{% endif %}</button>
         </div>
       </div>
 
-      <h3>1단계: 문서 찾기</h3>
+      <h3>{% if locale == 'ko' %}1단계: 문서 찾기{% else %}Step 1: Find Documents{% endif %}</h3>
+      {% if locale == 'ko' %}
       <ul>
         <li><strong>방법 1 - 검색 사용 (권장)</strong>:
           <ul>
@@ -69,185 +84,157 @@
         <li>파일 행의 우측에 있는 <strong>"⬇️ 다운로드"</strong> 버튼을 클릭합니다.</li>
         <li>파일이 다운로드됩니다.</li>
       </ul>
+      {% else %}
+      <ul>
+        <li><strong>Method 1 - Search (Recommended)</strong>:
+          <ul>
+            <li>Enter the filename to find in the search box at the top.</li>
+            <li>Click the file from search results.</li>
+            <li>Automatically navigate to the containing folder.</li>
+          </ul>
+        </li>
+        <li><strong>Method 2 - Browse Categories</strong>:
+          <ul>
+            <li>Click folders in the category tree on the left.</li>
+            <li>All files in that folder are displayed.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Step 2: Preview Documents</h3>
+      <ul>
+        <li>PDF Files: Open directly in browser with page navigation and zoom.</li>
+        <li>Image Files: Large images show as download links.</li>
+        <li>Office Files (Excel, Word): Links shown; download and open.</li>
+      </ul>
+
+      <h3>Step 3: Download</h3>
+      <ul>
+        <li>Click the <strong>"⬇️ Download"</strong> button at the right of the file row.</li>
+        <li>File will be downloaded.</li>
+      </ul>
+      {% endif %}
+    </div>
+
+    <div class="help-screenshot-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3>📸 {% if locale == 'ko' %}사용 화면{% else %}Screenshots{% endif %}</h3>
+      <p style="color: #666; font-size: 14px; margin-bottom: 15px;">{% if locale == 'ko' %}Spec-Center를 사용한 기술 스펙 검색{% else %}Technical specification search using Spec-Center{% endif %}</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+          <img src="/img/help/spec_center_screen_01_dashboard.png" alt="Spec-Center 대시보드" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
+          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ 대시보드</div>
+        </div>
+        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+          <img src="/img/help/spec_center_screen_02_pdf_preview.png" alt="Spec-Center PDF 미리보기" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
+          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ PDF 미리보기</div>
+        </div>
+      </div>
+    </div>
+      </div>
     </div>
 
     <div id="browse" class="help-section spec-center-help-section">
-      <h2>🔍 검색 및 조회</h2>
+      <h2>🔍 {% if locale == 'ko' %}검색 및 조회{% else %}Search & Browse{% endif %}</h2>
 
-      <h3>검색 기능</h3>
+      <h3>{% if locale == 'ko' %}검색 기능{% else %}Search Features{% endif %}</h3>
       <ul>
-        <li>📝 <strong>파일명 검색</strong>: 파일명의 일부를 입력하면 자동완성으로 관련 파일을 제안합니다.</li>
-        <li>⚡ <strong>실시간 검색</strong>: 입력할 때마다 결과가 업데이트됩니다.</li>
-        <li>🎯 <strong>정확한 매칭</strong>: 검색 결과를 클릭하면 해당 폴더로 이동합니다.</li>
+        <li>📝 <strong>{% if locale == 'ko' %}파일명 검색{% else %}File Name Search{% endif %}</strong>: {% if locale == 'ko' %}파일명의 일부를 입력하면 자동완성으로 관련 파일을 제안합니다.{% else %}Type part of filename and autocomplete suggests related files.{% endif %}</li>
+        <li>⚡ <strong>{% if locale == 'ko' %}실시간 검색{% else %}Real-time Search{% endif %}</strong>: {% if locale == 'ko' %}입력할 때마다 결과가 업데이트됩니다.{% else %}Results update as you type.{% endif %}</li>
+        <li>🎯 <strong>{% if locale == 'ko' %}정확한 매칭{% else %}Exact Matching{% endif %}</strong>: {% if locale == 'ko' %}검색 결과를 클릭하면 해당 폴더로 이동합니다.{% else %}Click search result to navigate to that folder.{% endif %}</li>
       </ul>
 
-      <h3>카테고리 탐색</h3>
+      <h3>{% if locale == 'ko' %}카테고리 탐색{% else %}Category Browse{% endif %}</h3>
       <ul>
-        <li>좌측 패널의 폴더 트리를 사용하여 문서를 탐색합니다.</li>
-        <li>각 폴더를 펼치거나 접을 수 있습니다.</li>
-        <li>현재 위치는 상단의 경로 표시(Breadcrumb)에 나타납니다.</li>
+        <li>{% if locale == 'ko' %}좌측 패널의 폴더 트리를 사용하여 문서를 탐색합니다.{% else %}Use folder tree in left panel to browse documents.{% endif %}</li>
+        <li>{% if locale == 'ko' %}각 폴더를 펼치거나 접을 수 있습니다.{% else %}Expand or collapse folders as needed.{% endif %}</li>
+        <li>{% if locale == 'ko' %}현재 위치는 상단의 경로 표시(Breadcrumb)에 나타납니다.{% else %}Current location shown in breadcrumb at top.{% endif %}</li>
       </ul>
 
-      <h3>파일 목록 컬럼</h3>
+      <h3>{% if locale == 'ko' %}파일 목록 컬럼{% else %}File List Columns{% endif %}</h3>
       <ul>
-        <li><strong>파일명</strong>: 클릭하면 미리보기를 확인합니다.</li>
-        <li><strong>크기</strong>: 파일의 용량</li>
-        <li><strong>업로드자</strong>: 파일을 업로드한 사람</li>
-        <li><strong>수정 날짜</strong>: 마지막 수정 시간</li>
-        <li><strong>다운로드</strong>: 파일 다운로드 버튼</li>
+        <li><strong>{% if locale == 'ko' %}파일명{% else %}File Name{% endif %}</strong>: {% if locale == 'ko' %}클릭하면 미리보기를 확인합니다.{% else %}Click to preview.{% endif %}</li>
+        <li><strong>{% if locale == 'ko' %}크기{% else %}Size{% endif %}</strong>: {% if locale == 'ko' %}파일의 용량{% else %}File size{% endif %}</li>
+        <li><strong>{% if locale == 'ko' %}업로드자{% else %}Uploaded By{% endif %}</strong>: {% if locale == 'ko' %}파일을 업로드한 사람{% else %}Person who uploaded{% endif %}</li>
+        <li><strong>{% if locale == 'ko' %}수정 날짜{% else %}Modified Date{% endif %}</strong>: {% if locale == 'ko' %}마지막 수정 시간{% else %}Last modification time{% endif %}</li>
+        <li><strong>{% if locale == 'ko' %}다운로드{% else %}Download{% endif %}</strong>: {% if locale == 'ko' %}파일 다운로드 버튼{% else %}File download button{% endif %}</li>
       </ul>
     </div>
 
     <div id="features" class="help-section spec-center-help-section">
-      <h2>⭐ 주요 기능</h2>
+      <h2>⭐ {% if locale == 'ko' %}주요 기능{% else %}Features{% endif %}</h2>
 
-      <h3>1. PDF/이미지 인라인 미리보기</h3>
+      <h3>{% if locale == 'ko' %}1. PDF/이미지 인라인 미리보기{% else %}1. PDF/Image Inline Preview{% endif %}</h3>
       <ul>
-        <li>PDF 파일을 클릭하면 브라우저에서 바로 열립니다.</li>
-        <li>다음/이전 페이지 네비게이션, 확대/축소, 검색 기능이 있습니다.</li>
-        <li>이미지도 미리보기를 지원합니다.</li>
+        <li>{% if locale == 'ko' %}PDF 파일을 클릭하면 브라우저에서 바로 열립니다.{% else %}Click PDF file to open directly in browser.{% endif %}</li>
+        <li>{% if locale == 'ko' %}다음/이전 페이지 네비게이션, 확대/축소, 검색 기능이 있습니다.{% else %}Supports navigation, zoom, and search within PDF.{% endif %}</li>
+        <li>{% if locale == 'ko' %}이미지도 미리보기를 지원합니다.{% else %}Image preview also supported.{% endif %}</li>
       </ul>
 
-      <h3>2. 클립보드 복사</h3>
+      <h3>{% if locale == 'ko' %}2. 클립보드 복사{% else %}2. Clipboard Copy{% endif %}</h3>
       <ul>
-        <li>파일명 옆의 복사 아이콘을 클릭하면 파일명을 클립보드에 복사합니다.</li>
-        <li>다른 문서나 메일에 쉽게 붙여넣을 수 있습니다.</li>
+        <li>{% if locale == 'ko' %}파일명 옆의 복사 아이콘을 클릭하면 파일명을 클립보드에 복사합니다.{% else %}Click copy icon next to filename to copy to clipboard.{% endif %}</li>
+        <li>{% if locale == 'ko' %}다른 문서나 메일에 쉽게 붙여넣을 수 있습니다.{% else %}Easily paste into documents or emails.{% endif %}</li>
       </ul>
 
-      <h3>3. AI 챗봇 지원</h3>
+      <h3>{% if locale == 'ko' %}3. AI 챗봇 지원{% else %}3. AI Chatbot Support{% endif %}</h3>
       <ul>
-        <li>우측 하단의 채팅 아이콘을 클릭합니다.</li>
-        <li>문서 내용에 대한 질문을 입력하면 AI가 답변합니다.</li>
-        <li>예: "DFMEA는 언제 수행되나요?", "제어계획의 샘플링 방법은?"</li>
+        <li>{% if locale == 'ko' %}우측 하단의 채팅 아이콘을 클릭합니다.{% else %}Click chat icon at bottom right.{% endif %}</li>
+        <li>{% if locale == 'ko' %}문서 내용에 대한 질문을 입력하면 AI가 답변합니다.{% else %}Ask questions about document content and AI responds.{% endif %}</li>
+        <li>{% if locale == 'ko' %}예: "DFMEA는 언제 수행되나요?", "제어계획의 샘플링 방법은?"{% else %}Examples: "When is DFMEA performed?", "What are sampling methods for control plan?"{% endif %}</li>
       </ul>
 
-      <h3>4. 모바일 지원</h3>
+      <h3>{% if locale == 'ko' %}4. 모바일 지원{% else %}4. Mobile Support{% endif %}</h3>
       <ul>
-        <li>스마트폰/태블릿에서도 Spec Center를 접근할 수 있습니다.</li>
-        <li>반응형 디자인으로 자동으로 화면 크기에 맞춥니다.</li>
+        <li>{% if locale == 'ko' %}스마트폰/태블릿에서도 Spec Center를 접근할 수 있습니다.{% else %}Access Spec Center on smartphones and tablets.{% endif %}</li>
+        <li>{% if locale == 'ko' %}반응형 디자인으로 자동으로 화면 크기에 맞춥니다.{% else %}Responsive design adapts to screen size.{% endif %}</li>
       </ul>
     </div>
 
     <div id="admin" class="help-section spec-center-help-section">
-      <h2>⚙️ 관리자 도구</h2>
+      <h2>⚙️ {% if locale == 'ko' %}관리자 도구{% else %}Admin Tools{% endif %}</h2>
 
-      <h3>문서 업로드 (관리자 전용)</h3>
+      <h3>{% if locale == 'ko' %}문서 업로드 (관리자 전용){% else %}Document Upload (Admins Only){% endif %}</h3>
       <ul>
-        <li>관리자는 <strong>"+ Upload"</strong> 버튼으로 새 파일을 업로드할 수 있습니다.</li>
-        <li>지원 포맷: PDF, DOC, XLS, PPT, 이미지 등</li>
-        <li>최대 파일 크기는 시스템 설정에 따릅니다.</li>
+        <li>{% if locale == 'ko' %}관리자는 <strong>"+ Upload"</strong> 버튼으로 새 파일을 업로드할 수 있습니다.{% else %}Admins can upload new files using <strong>"+ Upload"</strong> button.{% endif %}</li>
+        <li>{% if locale == 'ko' %}지원 포맷: PDF, DOC, XLS, PPT, 이미지 등{% else %}Supported formats: PDF, DOC, XLS, PPT, images, etc.{% endif %}</li>
+        <li>{% if locale == 'ko' %}최대 파일 크기는 시스템 설정에 따릅니다.{% else %}Maximum file size depends on system settings.{% endif %}</li>
       </ul>
 
-      <h3>폴더 관리 (관리자 전용)</h3>
+      <h3>{% if locale == 'ko' %}폴더 관리 (관리자 전용){% else %}Folder Management (Admins Only){% endif %}</h3>
       <ul>
-        <li><strong>폴더 생성</strong>: "New Folder" 버튼으로 새 카테고리를 만듭니다.</li>
-        <li><strong>폴더명 수정</strong>: F2 키 또는 우측 메뉴에서 수정합니다.</li>
-        <li><strong>폴더 삭제</strong>: 우측 메뉴의 삭제 옵션을 사용합니다.</li>
+        <li><strong>{% if locale == 'ko' %}폴더 생성{% else %}Create Folder{% endif %}</strong>: {% if locale == 'ko' %}"New Folder" 버튼으로 새 카테고리를 만듭니다.{% else %}"New Folder" button creates new category.{% endif %}</li>
+        <li><strong>{% if locale == 'ko' %}폴더명 수정{% else %}Rename Folder{% endif %}</strong>: {% if locale == 'ko' %}F2 키 또는 우측 메뉴에서 수정합니다.{% else %}Use F2 key or right-click menu to rename.{% endif %}</li>
+        <li><strong>{% if locale == 'ko' %}폴더 삭제{% else %}Delete Folder{% endif %}</strong>: {% if locale == 'ko' %}우측 메뉴의 삭제 옵션을 사용합니다.{% else %}Use delete option in right-click menu.{% endif %}</li>
       </ul>
 
-      <h3>권한 관리 (관리자 전용)</h3>
+      <h3>{% if locale == 'ko' %}권한 관리 (관리자 전용){% else %}Permission Management (Admins Only){% endif %}</h3>
       <ul>
-        <li>기본적으로 모든 인증된 사용자가 문서를 볼 수 있습니다.</li>
-        <li>특정 폴더에 접근 제한을 설정할 수 있습니다.</li>
-        <li>관리자에게 요청하여 권한을 조정합니다.</li>
+        <li>{% if locale == 'ko' %}기본적으로 모든 인증된 사용자가 문서를 볼 수 있습니다.{% else %}By default, all authenticated users can view documents.{% endif %}</li>
+        <li>{% if locale == 'ko' %}특정 폴더에 접근 제한을 설정할 수 있습니다.{% else %}Access restrictions can be set for specific folders.{% endif %}</li>
+        <li>{% if locale == 'ko' %}관리자에게 요청하여 권한을 조정합니다.{% else %}Request admins to adjust permissions as needed.{% endif %}</li>
       </ul>
     </div>
 
     <div id="faq" class="help-section spec-center-help-section">
-      <h2>❓ 자주 묻는 질문</h2>
+      <h2>❓ {% if locale == 'ko' %}자주 묻는 질문{% else %}FAQ{% endif %}</h2>
 
-      <h4>Q: 문서가 최신인지 어떻게 알 수 있나요?</h4>
-      <p>A: 파일 목록의 "수정 날짜" 컬럼을 확인하세요. 최신 문서가 상단에 표시되도록 정렬할 수 있습니다.</p>
+      <h4>Q: {% if locale == 'ko' %}문서가 최신인지 어떻게 알 수 있나요?{% else %}How do I know if a document is current?{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}파일 목록의 "수정 날짜" 컬럼을 확인하세요. 최신 문서가 상단에 표시되도록 정렬할 수 있습니다.{% else %}Check the "Modified Date" column in file list. Sort to show latest documents at top.{% endif %}</p>
 
-      <h4>Q: 버전이 여러 개 있는 문서를 찾으려면?</h4>
-      <p>A: 파일명에 버전을 포함시킵니다 (예: "DFMEA_ProductXYZ_v1.2.pdf"). 검색할 때 버전을 포함해서 검색하세요.</p>
+      <h4>Q: {% if locale == 'ko' %}버전이 여러 개 있는 문서를 찾으려면?{% else %}How do I find versioned documents?{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}파일명에 버전을 포함시킵니다 (예: "DFMEA_ProductXYZ_v1.2.pdf"). 검색할 때 버전을 포함해서 검색하세요.{% else %}Include version in filename (e.g., "DFMEA_ProductXYZ_v1.2.pdf"). Search including version number.{% endif %}</p>
 
-      <h4>Q: 문서를 업로드하려면?</h4>
-      <p>A: 현재는 관리자만 업로드 권한이 있습니다. 새 문서를 추가해달라고 관리자에게 요청하세요.</p>
+      <h4>Q: {% if locale == 'ko' %}문서를 업로드하려면?{% else %}How do I upload documents?{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}현재는 관리자만 업로드 권한이 있습니다. 새 문서를 추가해달라고 관리자에게 요청하세요.{% else %}Currently only admins can upload. Request admin to add new documents.{% endif %}</p>
 
-      <h4>Q: 오프라인에서 Spec Center를 사용할 수 있나요?</h4>
-      <p>A: 아니오, Spec Center는 웹 기반 서비스입니다. 필요한 문서를 미리 다운로드하여 오프라인에서 사용하세요.</p>
+      <h4>Q: {% if locale == 'ko' %}오프라인에서 Spec Center를 사용할 수 있나요?{% else %}Can I use Spec Center offline?{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}아니오, Spec Center는 웹 기반 서비스입니다. 필요한 문서를 미리 다운로드하여 오프라인에서 사용하세요.{% else %}No, Spec Center is web-based. Download needed documents for offline use.{% endif %}</p>
 
-      <h4>Q: 문서 다운로드가 안 됩니다.</h4>
-      <p>A: 브라우저 다운로드 설정을 확인하거나, 관리자에게 권한을 요청하세요. 큰 파일의 경우 시간이 걸릴 수 있습니다.</p>
+      <h4>Q: {% if locale == 'ko' %}문서 다운로드가 안 됩니다.{% else %}Document download is not working.{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}브라우저 다운로드 설정을 확인하거나, 관리자에게 권한을 요청하세요. 큰 파일의 경우 시간이 걸릴 수 있습니다.{% else %}Check browser download settings or request permission from admin. Large files may take time.{% endif %}</p>
 
-      <h4>Q: AI 챗봇이 잘못된 답변을 했어요.</h4>
-      <p>A: AI는 학습 데이터 기반으로 답변합니다. 명확하지 않으면 문서를 직접 확인하거나 팀에 물어보세요.</p>
-    </div>
-  </section>
-</main>
-
-{% endblock %}
-    <div id="quick-start" class="help-section">
-      <div class="page-head">
-        <h2>📂 Spec Center overview</h2>
-      </div>
-      <div class="help-hero" style="background:linear-gradient(135deg,#e0f2fe 0%, #f8fbff 100%);">
-        <div>
-          <div class="badge">Spec Center</div>
-          <p>Central hub for specs, drawings, and reference docs with in-browser previews and category tree.</p>
-        </div>
-        <div class="help-figure" aria-hidden="true">
-          <div class="figure-label">Preview</div>
-          <div class="figure-lines"><span></span><span></span><span class="accent"></span></div>
-        </div>
-      </div>
-      <ul class="spaced-list">
-        <li><strong>Navigate</strong>: Category tree + breadcrumb</li>
-        <li><strong>Preview</strong>: PDF/images inline; large Office files show download link</li>
-        <li><strong>Download</strong>: Icon on each row</li>
-      </ul>
-    </div>
-
-    <div id="browse" class="help-section">
-      <h2>🔎 Browse & search</h2>
-      <ul class="spaced-list">
-        <li><strong>Typeahead search</strong>: Use the header search to find files by name; click result to jump to its folder.</li>
-        <li><strong>Columns</strong>: Size, uploader, and updated-at help validate freshness before opening.</li>
-        <li><strong>Keyboard</strong>: F2 renames a category (admin only), Enter opens selected file.</li>
-      </ul>
-      <div class="help-screenshot" style="margin-top: 2rem; text-align: center;">
-        <img src="/img/help/spec_center_browser_placeholder.png" alt="Spec Center File Browser" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;">
-        <p style="color: #999; font-size: 0.9rem; margin-top: 0.5rem;">Replace this placeholder with a screenshot of the file browser interface</p>
-      </div>
-    </div>
-
-    <div id="admin" class="help-section">
-      <h2>⚙️ Admin actions</h2>
-      <div class="help-card-grid">
-        <div class="help-card">
-          <h4>Upload</h4>
-          <p>Drag files into a category or use the Upload button. Allowed: pdf, pptx, docx, doc, xlsx, xls.</p>
-        </div>
-        <div class="help-card">
-          <h4>Move</h4>
-          <p>Drag a file row to another category. The tree highlights valid drop targets.</p>
-        </div>
-        <div class="help-card">
-          <h4>Rename</h4>
-          <p>Select a category and press <strong>F2</strong> to inline-rename; Enter to save, Esc to cancel.</p>
-        </div>
-        <div class="help-card">
-          <h4>Delete</h4>
-          <p>Use the trash icon on a file or category. Deletions are immediate—double-check before confirming.</p>
-        </div>
-      </div>
-      {% if is_admin %}
-      <div class="box" style="margin-top:12px;">Admin only: conversions to PDF run in the background when possible (soffice/Word COM).</div>
-      {% endif %}
-      <div class="help-screenshot" style="margin-top: 2rem; text-align: center;">
-        <img src="/img/help/spec_center_browser_placeholder.png" alt="Spec Center Upload and Admin Interface" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;">
-        <p style="color: #999; font-size: 0.9rem; margin-top: 0.5rem;">Replace this placeholder with a screenshot showing the upload interface</p>
-      </div>
-    </div>
-
-    <div id="faq" class="help-section">
-      <h2>❓ FAQ</h2>
-      <ul class="spaced-list">
-        <li><strong>Preview failed</strong>: Large files—download or convert to PDF</li>
-        <li><strong>Category</strong>: Admin adds; root=bold</li>
-        <li><strong>Filenames</strong>: Avoid commas/quotes; use descriptive names</li>
-      </ul>
+      <h4>Q: {% if locale == 'ko' %}AI 챗봇이 잘못된 답변을 했어요.{% else %}AI chatbot gave wrong answer.{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}AI는 학습 데이터 기반으로 답변합니다. 명확하지 않으면 문서를 직접 확인하거나 팀에 물어보세요.{% else %}AI answers based on learning data. For unclear answers, verify in document or ask team.{% endif %}</p>
     </div>
   </section>
 </main>

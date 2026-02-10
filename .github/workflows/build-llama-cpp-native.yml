@@ -1,0 +1,88 @@
+name: Build llama.cpp NATIVE (Rocky 8.10)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: rockylinux:8.10
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: |
+          dnf groupinstall "Development Tools" -y
+          dnf install -y cmake git python3-pip python3-devel
+      
+      - name: Clone and build llama.cpp with NATIVE optimization
+        run: |
+          cd /tmp
+          git clone https://github.com/ggerganov/llama.cpp
+          cd llama.cpp
+          make LLAMA_NATIVE=1 -j$(nproc)
+          
+          # Copy binary for upload
+          cp ./main /tmp/llama-main-native-rocky8.10
+          echo "Build complete: $(ls -lh /tmp/llama-main-native-rocky8.10)"
+      
+      - name: Build llama-cpp-python wheel
+        run: |
+          cd /tmp
+          git clone https://github.com/abetlen/llama-cpp-python
+          cd llama-cpp-python
+          
+          # Build with NATIVE optimization
+          CMAKE_ARGS="-DLLAMA_NATIVE=on" pip3 install . --no-cache-dir -v
+          
+          # Create wheel
+          pip3 wheel . --wheel-dir=/tmp/wheels --no-cache-dir
+          
+          echo "Wheel created:"
+          ls -lh /tmp/wheels/
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: llama-cpp-native-rocky8.10
+          path: |
+            /tmp/llama-main-native-rocky8.10
+            /tmp/wheels/*.whl
+      
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: llama.cpp NATIVE Build for Rocky 8.10
+          draft: false
+          prerelease: false
+      
+      - name: Upload Release Assets (Binary)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /tmp/llama-main-native-rocky8.10
+          asset_name: llama-main-native-rocky8.10
+          asset_content_type: application/octet-stream
+      
+      - name: Upload Release Assets (Wheel)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /tmp/wheels/llama_cpp_python-*.whl
+          asset_name: llama-cpp-python-rocky8.10.whl
+          asset_content_type: application/octet-stream

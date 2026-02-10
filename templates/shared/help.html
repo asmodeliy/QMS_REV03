@@ -71,6 +71,21 @@
       </div>
 
       
+      <div class="help-screenshot-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3>📸 화면 예시</h3>
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">RPMT 대시보드와 주간 타임라인</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+            <img src="/img/dashboard.png" alt="대시보드" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
+            <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ 프로젝트 대시보드</div>
+          </div>
+          <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+            <img src="/img/weekly_overall.png" alt="주간 타임라인" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
+            <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ 주간 타임라인</div>
+          </div>
+        </div>
+      </div>
+
       <div id="dashboard" class="rpmt-help-section">
         <h2>📊 {{ t('dashboard.title', locale) }}</h2>
         {% if locale == 'ko' %}

@@ -94,7 +94,7 @@ def get_assistant() -> QMSAssistant:
             )
         
         # Get model path from environment variable
-        model_path = os.environ.get('GPT4ALL_MODEL_PATH', r'C:\Users\이상원\Downloads\Models')
+        model_path = os.environ.get('GPT4ALL_MODEL_PATH', r'/home/ronnie/LLM/models')
         model_name = os.environ.get('GPT4ALL_MODEL_NAME', 'Meta-Llama-3-8B-Instruct.Q5_K_M')
         
         print(f"Initializing QMSAssistant with model_path={model_path}, model_name={model_name}")
@@ -163,6 +163,8 @@ def chat_with_gpt4all(payload: ChatRequest, request: Request) -> ChatResponse:
     try:
         _require_admin(request)
         import time
+        import signal
+        import threading
         
         assistant = get_assistant()
         
@@ -172,7 +174,39 @@ def chat_with_gpt4all(payload: ChatRequest, request: Request) -> ChatResponse:
         print(f"\n[GPT4All] Received message: {payload.message[:100]}...")
         start_time = time.time()
         
-        response = assistant.chat(payload.message)
+        # Set timeout - max 30 seconds for response
+        MAX_RESPONSE_TIME = 30
+        response_container = [None]
+        error_container = [None]
+        
+        def generate_response():
+            try:
+                response_container[0] = assistant.chat(payload.message, max_tokens=64)
+            except Exception as e:
+                error_container[0] = e
+        
+        # Run response generation in thread with timeout
+        response_thread = threading.Thread(target=generate_response, daemon=True)
+        response_thread.start()
+        response_thread.join(timeout=MAX_RESPONSE_TIME)
+        
+        if response_thread.is_alive():
+            # Timeout occurred
+            elapsed = time.time() - start_time
+            print(f"[GPT4All] TIMEOUT: Response took longer than {MAX_RESPONSE_TIME}s (elapsed: {elapsed:.2f}s)")
+            return ChatResponse(
+                response="응답 생성 시간 초과 (30초). 서버 모델 성능을 확인해주세요.",
+                success=False
+            )
+        
+        if error_container[0]:
+            raise error_container[0]
+        
+        response = response_container[0] or ""
+        
+        # Limit response length
+        if len(response) > 2000:
+            response = response[:2000] + "...[응답이 너무 길어서 자름]"
         
         elapsed = time.time() - start_time
         print(f"[GPT4All] Response generated in {elapsed:.2f}s: {response[:100]}...")
@@ -463,4 +497,63 @@ def gpt4all_status_extended(request: Request) -> Dict[str, Any]:
     except HTTPException:
         raise
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ==================== TEST ENDPOINTS (NO AUTH) ====================
+
+@router.post("/gpt4all/chat/test")
+def chat_test(payload: ChatRequest) -> ChatResponse:
+    """Test chat endpoint without authentication
+    
+    WARNING: This endpoint is for testing only and should not be used in production.
+    Remove this endpoint after testing performance.
+    
+    Args:
+        payload: Chat request with message
+    
+    Returns:
+        Chat response
+    """
+    try:
+        import time
+        import threading
+        
+        assistant = get_assistant()
+        
+        if payload.reset:
+            assistant.reset_conversation()
+        
+        print(f"\n[Test] Starting chat: {payload.message[:50]}")
+        start = time.time()
+        
+        # Use default max_tokens=128
+        response_container = [None]
+        error_container = [None]
+        
+        def generate():
+            try:
+                step1 = time.time()
+                response_container[0] = assistant.chat(payload.message)
+                step2 = time.time()
+                print(f"[Test] Chat time: {step2-step1:.2f}s")
+            except Exception as e:
+                error_container[0] = e
+        
+        response_thread = threading.Thread(target=generate, daemon=True)
+        response_thread.start()
+        response_thread.join(timeout=60)
+        
+        if response_thread.is_alive():
+            print("[Test] TIMEOUT after 60s")
+            return ChatResponse(response="Timeout", success=False)
+        
+        if error_container[0]:
+            raise error_container[0]
+        
+        elapsed = time.time() - start
+        print(f"[Test] Total time: {elapsed:.2f}s")
+        
+        return ChatResponse(response=response_container[0] or "", success=True)
+    except Exception as e:
+        print(f"[Test] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

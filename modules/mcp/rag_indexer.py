@@ -215,7 +215,13 @@ class RAGIndexer:
                 return False
             
             file_hash = self._get_file_hash(file_path)
-            relative_path = file_path.relative_to(self.base_dir)
+            # Convert to absolute path before relative_to
+            abs_file_path = file_path.resolve() if not file_path.is_absolute() else file_path
+            try:
+                relative_path = abs_file_path.relative_to(self.base_dir.resolve())
+            except ValueError:
+                # If file is not under base_dir, use the file path as-is
+                relative_path = file_path if file_path.is_absolute() else Path(file_path)
             
             # Extract metadata
             summary = self._extract_summary(content)
@@ -275,6 +281,88 @@ class RAGIndexer:
                 
         except Exception as e:
             print(f"Error indexing {file_path}: {e}")
+            return False
+    
+    def add_document(self, file_path: str, content: str, file_type: str = "document", module_name: Optional[str] = None) -> bool:
+        """Add a document with already-parsed content (used for dynamically created documents like spec-center)
+        
+        Args:
+            file_path: Virtual file path/name for the document (e.g., "spec_center/document_name")
+            content: The text content of the document
+            file_type: Type of document (e.g., "specification", "document")
+            module_name: Module name/category for the document
+        
+        Returns:
+            True if successfully added, False otherwise
+        """
+        try:
+            if not content or len(content.strip()) < 10:
+                return False
+            
+            # Create hash from content
+            file_hash = hashlib.sha256(content.encode()).hexdigest()
+            
+            # Extract metadata
+            summary = self._extract_summary(content)
+            keywords = self._extract_keywords(content, file_path)
+            chunks = self._chunk_content(content)
+            
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            try:
+                # Check if document already indexed and hasn't changed
+                cursor.execute(
+                    "SELECT id, content_hash FROM documents WHERE file_path = ?",
+                    (str(file_path),)
+                )
+                result = cursor.fetchone()
+                
+                if result and result[1] == file_hash:
+                    # Already indexed and content hasn't changed
+                    return True
+                
+                # Delete old document if exists
+                if result:
+                    cursor.execute("DELETE FROM documents WHERE id = ?", (result[0],))
+                
+                # Extract file name from path
+                file_name = file_path.split('/')[-1] if '/' in file_path else file_path
+                
+                # Insert new document
+                cursor.execute("""
+                    INSERT INTO documents 
+                    (file_path, file_name, file_type, content_hash, content, summary, keywords, module_name)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    str(file_path),
+                    file_name,
+                    file_type,
+                    file_hash,
+                    content[:50000],  # Limit content size
+                    summary,
+                    json.dumps(keywords),
+                    module_name or "specification"
+                ))
+                
+                doc_id = cursor.lastrowid
+                
+                # Insert chunks
+                for idx, chunk in enumerate(chunks):
+                    chunk_keywords = self._extract_keywords(chunk, file_name)
+                    cursor.execute("""
+                        INSERT INTO chunks (document_id, chunk_index, chunk_text, chunk_keywords)
+                        VALUES (?, ?, ?, ?)
+                    """, (doc_id, idx, chunk, json.dumps(chunk_keywords)))
+                
+                conn.commit()
+                return True
+                
+            finally:
+                conn.close()
+                
+        except Exception as e:
+            print(f"Error adding document {file_path}: {e}")
             return False
     
     def index_directory(self, dir_path: Path, pattern: str = "*.py", recursive: bool = True) -> int:
@@ -352,8 +440,8 @@ class RAGIndexer:
         docs_dir = self.base_dir / "docs"
         counts['markdown'] += self.index_directory(docs_dir, "*.md")
         
-        # Index spec-center documents
-        spec_center_dir = self.base_dir / "modules" / "spec_center" / "uploads"
+        # Index spec-center documents (from uploads/spec_center)
+        spec_center_dir = self.base_dir / "uploads" / "spec_center"
         if spec_center_dir.exists():
             print(f"[RAG] Indexing spec-center documents from {spec_center_dir}")
             counts['docx'] += self.index_directory(spec_center_dir, "*.docx")
@@ -372,7 +460,7 @@ class RAGIndexer:
         return counts
     
     def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
-        """Search for relevant documents
+        """Search for relevant documents (optimized)
         
         Args:
             query: Search query
@@ -381,43 +469,58 @@ class RAGIndexer:
         Returns:
             List of matching documents with relevance scores
         """
-        query_terms = set(query.lower().split())
+        if not query or not query.strip():
+            return []
+        
+        query_lower = query.lower()
+        query_terms = set(query_lower.split())
         
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
         try:
-            # Get all documents and calculate relevance
-            cursor.execute("SELECT id, file_path, file_name, content, summary, keywords FROM documents")
-            all_docs = cursor.fetchall()
+            # Use SQL LIKE operator for faster matching
+            sql_patterns = ' OR '.join([f"(file_name LIKE ? OR summary LIKE ? OR keywords LIKE ?)" for _ in query_terms])
+            params = []
+            for term in query_terms:
+                params.extend([f"%{term}%", f"%{term}%", f"%{term}%"])
+            
+            query_sql = f"SELECT id, file_path, file_name, content, summary, keywords FROM documents WHERE {sql_patterns} LIMIT 100"
+            cursor.execute(query_sql, params)
+            matched_docs = cursor.fetchall()
+            
+            if not matched_docs:
+                # Fallback: return most recent documents
+                cursor.execute("SELECT id, file_path, file_name, content, summary, keywords FROM documents ORDER BY indexed_at DESC LIMIT ?", (limit,))
+                matched_docs = cursor.fetchall()
             
             results = []
-            for doc_id, file_path, file_name, content, summary, keywords_json in all_docs:
+            for doc_id, file_path, file_name, content, summary, keywords_json in matched_docs:
                 try:
                     keywords = json.loads(keywords_json) if keywords_json else []
                 except:
                     keywords = []
                 
-                # Calculate relevance score
+                # Fast relevance scoring
                 score = 0
                 
-                # File name match
-                file_terms = set(file_name.lower().replace('_', ' ').replace('.', ' ').split())
-                score += len(query_terms & file_terms) * 3
+                # File name match (weight: 3x)
+                if any(term in file_name.lower() for term in query_terms):
+                    score += 10
                 
-                # Keywords match
-                keyword_terms = set(k.lower() for k in keywords)
-                score += len(query_terms & keyword_terms) * 2
+                # Summary match (weight: 2x)
+                if summary and any(term in summary.lower() for term in query_terms):
+                    score += 5
                 
-                # Content match (simple substring search)
-                content_lower = content.lower()
-                for term in query_terms:
-                    score += content_lower.count(term)
+                # Keywords match (weight: 2x)
+                keyword_str = ' '.join(keywords).lower()
+                if any(term in keyword_str for term in query_terms):
+                    score += 8
                 
-                # Summary match
-                if summary:
-                    summary_lower = summary.lower()
-                    score += len(query_terms & set(summary_lower.split())) * 2
+                # Quick content check (first 1000 chars only)
+                content_preview = content[:1000].lower() if content else ""
+                match_count = sum(content_preview.count(term) for term in query_terms)
+                score += match_count
                 
                 if score > 0:
                     results.append({

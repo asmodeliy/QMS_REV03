@@ -3,182 +3,206 @@
 
 <main class="container wide help-wrap product-info-root product-info-help-wrap">
   <aside class="help-side product-info-help-side">
-    <div class="head product-info-help-head">목차</div>
+    <div class="head product-info-help-head">{% if locale == 'ko' %}목차{% else %}Table of Contents{% endif %}</div>
     <ul class="toc product-info-help-toc">
-      <li><a href="#overview">개요</a></li>
-      <li><a href="#quick-start">빠른 시작</a></li>
-      <li><a href="#search">검색 및 조회</a></li>
-      <li><a href="#details">상세 정보</a></li>
-      <li><a href="#best-practices">베스트 프랙티스</a></li>
-      <li><a href="#faq">자주 묻는 질문</a></li>
+      <li><a href="#overview">{% if locale == 'ko' %}개요{% else %}Overview{% endif %}</a></li>
+      <li><a href="#quick-start">{% if locale == 'ko' %}빠른 시작{% else %}Quick Start{% endif %}</a></li>
+      <li><a href="#search">{% if locale == 'ko' %}검색 및 조회{% else %}Search & Browse{% endif %}</a></li>
+      <li><a href="#details">{% if locale == 'ko' %}상세 정보{% else %}Details{% endif %}</a></li>
+      <li><a href="#best-practices">{% if locale == 'ko' %}베스트 프랙티스{% else %}Best Practices{% endif %}</a></li>
+      <li><a href="#faq">{% if locale == 'ko' %}자주 묻는 질문{% else %}FAQ{% endif %}</a></li>
     </ul>
   </aside>
 
   <section class="help-main product-info-help-main">
     <div id="overview" class="help-section product-info-help-section">
       <div class="page-head">
-        <h2>📦 Product Info 개요</h2>
+        <h2>📊 Product Info {% if locale == 'ko' %}개요 - IP 매트릭스{% else %}Overview - IP Matrix{% endif %}</h2>
       </div>
-      <p><strong>Product Info (제품 정보 관리)</strong>는 회사에서 보유한 모든 제품/칩의 기술 사양, 성능, 특징을 한곳에서 조회하고 관리하는 시스템입니다.</p>
+      {% if locale == 'ko' %}
+      <p><strong>Product Info (제품 정보 관리)</strong>는 다양한 공정 노드에서 제공 가능한 회사의 모든 IP(Intellectual Property) 포트폴리오를 한눈에 조회하는 시스템입니다.</p>
       
       <h3>주요 특징</h3>
       <ul>
-        <li>📊 <strong>제품 카탈로그</strong>: 모든 제품/칩의 정보를 중앙에서 관리합니다.</li>
-        <li>🔍 <strong>빠른 검색</strong>: 제품명, 모델번호, 카테고리로 검색합니다.</li>
-        <li>📋 <strong>상세 정보</strong>: 성능, 사양, 패키지, 양산 여부 등을 확인합니다.</li>
-        <li>💾 <strong>데이터시트 연동</strong>: PDF 데이터시트에 직접 링크합니다.</li>
-        <li>🏢 <strong>제품 분류</strong>: 카테고리, 라인, 기술 노드별로 분류합니다.</li>
-        <li>⏰ <strong>라이프사이클 추적</strong>: 상용화, EOS, EOL 등 제품 단계를 표시합니다.</li>
+        <li>📊 <strong>IP 매트릭스 조회</strong>: 원하는 IP의 다양한 노드 (SF28nm, SF14nm, SF8nm, SF5nm, SF4nm 등)에서의 개발 상태를 확인합니다.</li>
+        <li>🔍 <strong>상태 조회</strong>: 각 IP-노드 조합의 상태를 분류합니다 (Mass 생산, Proven 검증완료, Dev 개발중, Plan 계획, 또는 미지원).</li>
+        <li>🏗️ <strong>IP 포트폴리오</strong>: PHY, 인터페이스, 아날로그 회로 등 다양한 IP를 관리합니다.</li>
+        <li>⚙️ <strong>세부 정보</strong>: 각 IP의 성능 사양, 특징, 적용 예시를 확인합니다.</li>
       </ul>
+      {% else %}
+      <p><strong>Product Info</strong> is a system for viewing the entire portfolio of company IPs (Intellectual Property) available across different process nodes at a glance.</p>
+      
+      <h3>Key Features</h3>
+      <ul>
+        <li>📊 <strong>IP Matrix View</strong>: Check development status of desired IP across various nodes (SF28nm, SF14nm, SF8nm, SF5nm, SF4nm, etc.)</li>
+        <li>🔍 <strong>Status View</strong>: Classify status of each IP-node combination (Mass, Proven, Dev, Plan, or Not Supported).</li>
+        <li>🏗️ <strong>IP Portfolio</strong>: Manage diverse IPs including PHY, interfaces, and analog circuits.</li>
+        <li>⚙️ <strong>Details</strong>: View performance specs, features, and application examples for each IP.</li>
+      </ul>
+      {% endif %}
     </div>
 
     <div id="quick-start" class="help-section product-info-help-section">
       <div class="page-head">
-        <h2>🚀 빠른 시작</h2>
+        <h2>🚀 {% if locale == 'ko' %}빠른 시작{% else %}Quick Start{% endif %}</h2>
         <div class="head-actions">
-          <button id="btn-feedback" class="btn nav product-info-help-head-actions" style="margin-left:auto">피드백 보내기</button>
+          <button id="btn-feedback" class="btn nav product-info-help-head-actions" style="margin-left:auto">{% if locale == 'ko' %}피드백 보내기{% else %}Send Feedback{% endif %}</button>
         </div>
       </div>
 
-      <h3>1단계: 제품 검색</h3>
+      <h3>{% if locale == 'ko' %}1단계: IP 매트릭스 조회{% else %}Step 1: View IP Matrix{% endif %}</h3>
       <ul>
-        <li><strong>방법 1 - 검색</strong>:
+        <li>Product-Info 메인 페이지에 <strong>대형 매트릭스 테이블</strong>이 표시됩니다.</li>
+        <li>행(Row): 회사의 모든 IP 이름 (MIPI D/C PHY Combo, Ethernet PHY 등)</li>
+        <li>열(Column): 지원 가능한 공정 노드 (SF28nm, SF14nm, SF8nm, SF5nm, SF4nm 등)</li>
+        <li>각 셀의 상태:
           <ul>
-            <li>상단의 검색창에 찾는 제품명이나 모델번호를 입력합니다.</li>
-            <li>예: "MPW27", "DDR5", "5nm"</li>
-            <li>검색 결과에서 원하는 제품을 클릭합니다.</li>
-          </ul>
-        </li>
-        <li><strong>방법 2 - 카테고리 탐색</strong>:
-          <ul>
-            <li>좌측의 카테고리 필터를 클릭합니다.</li>
-            <li>예: "Memory", "Logic", "Analog" 등</li>
-            <li>해당 카테고리의 모든 제품이 표시됩니다.</li>
-          </ul>
-        </li>
-      </ul>
-
-      <h3>2단계: 제품 정보 확인</h3>
-      <ul>
-        <li>제품 목록에서 제품을 클릭하여 상세 페이지를 엽니다.</li>
-        <li>다음 정보를 확인할 수 있습니다:
-          <ul>
-            <li>기본 정보 (모델, 카테고리, 출시일)</li>
-            <li>기술 사양 (노드, 프로세스, 성능)</li>
-            <li>패키지 정보</li>
-            <li>상태 (활성, EOS 예정, etc.)</li>
+            <li><strong>green "mass"</strong>: 대량 생산 가능</li>
+            <li><strong>yellow "proven"</strong>: 검증 완료, 사용 가능</li>
+            <li><strong>blue "dev"</strong>: 개발 진행 중</li>
+            <li><strong>gray "plan"</strong>: 향후 계획</li>
+            <li><strong>흰색 (empty)</strong>: 미지원 또는 계획 없음</li>
           </ul>
         </li>
       </ul>
 
-      <h3>3단계: 데이터시트 다운로드</h3>
+      <h3>{% if locale == 'ko' %}2단계: IP 상세 정보 확인{% else %}Step 2: View IP Details{% endif %}</h3>
       <ul>
-        <li>상세 페이지의 "Datasheet" 섹션에서 PDF를 다운로드합니다.</li>
-        <li>또는 상단의 "📥 Datasheet 다운로드" 버튼을 클릭합니다.</li>
+        <li>{% if locale == 'ko' %}\ub9e4\ud2b8\ub9ad\uc2a4\uc758 \uc5b4\ub5a4 IP \uc774\ub984\uc744 \ud074\ub9ad\ud558\uba74 \uc0c1\uc138 \ud398\uc774\uc9c0\ub85c \uc774\ub3d9\ud569\ub2c8\ub2e4.{% else %}Click any IP name in matrix to view details page.{% endif %}</li>
+        <li>{% if locale == 'ko' %}\uc0c1\uc138 \ud398\uc774\uc9c0\uc5d0\uc11c \ud655\uc778 \uac00\ub2a5\ud55c \uc815\ubcf4:{% else %}Information available on details page:{% endif %}
+          <ul>
+            <li>{% if locale == 'ko' %}IP\uc758 \uae30\uc220\uc801 \uac1c\uc694 \ubc0f \uc6a9\ub3c4{% else %}Technical overview and purpose{% endif %}</li>
+            <li>{% if locale == 'ko' %}\uac01 \ub178\ub4dc\ubcc4 \uc138\ubd80 \uc0c1\ud0dc (mass/proven/dev/plan){% else %}Status by node (mass/proven/dev/plan){% endif %}</li>
+            <li>{% if locale == 'ko' %}\uc778\ud130\ud398\uc774\uc2a4 \ud45c\uc900 (\uc608: MIPI Alliance, PCIe Consortium){% else %}Interface standards (e.g., MIPI Alliance, PCIe Consortium){% endif %}</li>
+            <li>{% if locale == 'ko' %}\uc131\ub2a5 \uc0ac\uc591{% else %}Performance specs{% endif %}</li>
+            <li>{% if locale == 'ko' %}\uc801\uc6a9 \uac00\ub2a5\ud55c \uc81c\ud488\uad70{% else %}Applicable product families{% endif %}</li>
+          </ul>
+        </li>
       </ul>
+
+      <h3>{% if locale == 'ko' %}3단계: \विशेष 노드 IP 찾기{% else %}Step 3: Find IP for Specific Node{% endif %}</h3>
+      <ul>
+        <li>{% if locale == 'ko' %}\uc608\ub97c \ub4e4\uc5b4, <strong>\"SF5nm\uc5d0\uc11c Mass \uc0c1\ud0dc\uc778 IP\"</strong>\ub97c \ucc3e\uc73c\ub824\uba74:{% else %}For example, to find <strong>\"IP in Mass status at SF5nm\"</strong>:{% endif %}</li>
+        <li>{% if locale == 'ko' %}SF5nm \uc5f4\uc744 \uc2a4\ucea0\ub294 \uc911 \uc5b4\ub5a4 IP\uc758 \uc0c1\ud0dc\uac00 \ucd08\ub85d\uc0c9(mass)\uc778\uc9c0 \ud655\uc778\ud569\ub2c8\ub2e4.{% else %}Scan SF5nm column to see which IP status is green (mass).{% endif %}</li>
+        <li>{% if locale == 'ko' %}\ucc3e\uc740 IP \uc774\ub984\uc744 \ud074\ub9ad\ud558\uc5ec \uc0c1\uc138 \uc815\ubcf4\ub97c \ubd05\ub2c8\ub2e4.{% else %}Click found IP name to see details.{% endif %}</li>
+      </ul>
+
+    <div class="help-screenshot-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3>📸 {% if locale == 'ko' %}사용 화면{% else %}Screenshots{% endif %}</h3>
+      <p style="color: #666; font-size: 14px; margin-bottom: 15px;">{% if locale == 'ko' %}Product-Info\ub97c \uc0ac\uc6a9\ud55c IP \ub9e4\ud2b8\ub9ad\uc2a4 \oc1c\ub78c{% else %}IP matrix viewing using Product-Info{% endif %}</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+          <img src="/img/help/product_info_screen_01_dashboard.png" alt="Product-Info 대시보드" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
+          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ {% if locale == 'ko' %}\ub300\ub2dc\ubcf4\ub4dc{% else %}Dashboard{% endif %}</div>
+        </div>
+        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+          <img src="/img/help/product_info_screen_02_product_detail.png" alt="Product-Info 제품 상세" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
+          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ {% if locale == 'ko' %}\uc81c\ud488 \uc0c1\uc138{% else %}Product Detail{% endif %}</div>
+        </div>
+      </div>
     </div>
 
     <div id="search" class="help-section product-info-help-section">
-      <h2>🔍 검색 및 필터링</h2>
+      <h2>🔍 {% if locale == 'ko' %}IP 검색 및 필터링{% else %}IP Search & Filtering{% endif %}</h2>
 
-      <h3>검색 팁</h3>
+      <h3>{% if locale == 'ko' %}IP 검색 팁{% else %}IP Search Tips{% endif %}</h3>
       <ul>
-        <li>📝 <strong>제품명 검색</strong>: 정확한 모델명 또는 부분 검색</li>
-        <li>🔤 <strong>텍스트 기반</strong>: 대소문자를 구분하지 않습니다</li>
-        <li>⚡ <strong>실시간 검색</strong>: 입력할수록 결과가 정확해집니다</li>
+        <li>📝 <strong>IP 이름 검색</strong>: "MIPI", "PHY", "Ethernet" 등 정확한 이름 또는 부분 검색</li>
+        <li>🔤 <strong>인터페이스 표준 검색</strong>: MIPI, PCIe, USB, SATA 등의 표준명으로 검색</li>
+        <li>⚡ <strong>실시간 검색</strong>: 메인 페이지의 IP 목록에서 바로 필터링</li>
       </ul>
 
-      <h3>필터링 옵션</h3>
+      <h3>노드별 조회</h3>
       <ul>
-        <li><strong>카테고리</strong>: Memory, Logic, Analog, Mixed-Signal 등</li>
-        <li><strong>공정 기술</strong>: 5nm, 7nm, 14nm, 28nm 등</li>
-        <li><strong>상태</strong>: Active (활성), EOS (생산 종료 예정), EOL (생산 종료)</li>
-        <li><strong>연도</strong>: 제품 출시 연도</li>
+        <li><strong>SF28nm</strong>: 첫 세대 공정, 기존 IP 대부분 지원</li>
+        <li><strong>SF14nm</strong>: 주력 공정, 신규 IP 추가 지원</li>
+        <li><strong>SF8nm</strong>: 고성능 공정, 검증 완료된 IP들</li>
+        <li><strong>SF5nm</strong>: 최신 공정, 개발 중인 고급 IP</li>
+        <li><strong>SF4nm</strong>: 차세대 공정, 향후 계획 IP</li>
+      </ul>
+
+      <h3>상태별 조회</h3>
+      <ul>
+        <li><strong>🟢 Mass (대량생산)</strong>: 현재 상용 제품으로 사용 가능</li>
+        <li><strong>🟡 Proven (검증완료)</strong>: 기술 검증 완료, 즉시 사용 가능</li>
+        <li><strong>🔵 Dev (개발중)</strong>: 개발 진행 중, 최근에 사용 가능</li>
+        <li><strong>⚫ Plan (계획)</strong>: 향후 개발 계획</li>
+        <li><strong>⚪ 미지원</strong>: 해당 노드에서 미지원</li>
       </ul>
 
       <h3>정렬 옵션</h3>
       <ul>
-        <li>이름순</li>
-        <li>출시일순 (최신순 / 오래된 순)</li>
-        <li>공정 기술순</li>
-        <li>상태순</li>
+        <li>IP 이름순</li>
+        <li>인터페이스 표준별</li>
+        <li>해당 노드에서의 첫 지원 시점</li>
       </ul>
     </div>
 
     <div id="details" class="help-section product-info-help-section">
-      <h2>📋 상세 정보</h2>
+      <h2>📋 {% if locale == 'ko' %}IP 상세 정보{% else %}IP Details{% endif %}</h2>
 
-      <h3>기본 정보</h3>
+      <h3>{% if locale == 'ko' %}매트릭스 뷰{% else %}Matrix View{% endif %}</h3>
       <ul>
-        <li><strong>모델명</strong>: 제품의 정식 모델 번호</li>
-        <li><strong>제품명</strong>: 일반적인 제품 이름/별칭</li>
-        <li><strong>카테고리</strong>: 제품 유형 분류</li>
-        <li><strong>출시일</strong>: 공식 출시 날짜</li>
+        <li><strong>행 (IP 이름)</strong>: 
+          <ul>
+            <li>PHY 계열: MIPI D/C PHY Combo, D-PHY, A-PHY, ARM HSSTP TX PHY 등</li>
+            <li>인터페이스: USB, HDMI, PCIe, UCIe, Ethernet</li>
+             <li>디스플레이: Intra Panel Display TX</li>
+            <li>다중 프로토콜: Multi Protocol PHY (PCIe/USB/SATA)</li>
+          </ul>
+        </li>
+        <li><strong>열 (공정 노드)</strong>: SF28nm, SF14nm, SF8nm, SF5nm, SF4nm</li>
+        <li><strong>셀 (개발 상태)</strong>: 색상으로 표시된 progress 상태</li>
       </ul>
 
-      <h3>기술 사양</h3>
+      <h3>IP별 상세 페이지</h3>
       <ul>
-        <li><strong>공정 기술 (Node)</strong>: 7nm, 5nm 등 미세공정</li>
-        <li><strong>아키텍처</strong>: CPU, GPU, 메모리 아키텍처</li>
-        <li><strong>성능</strong>: 속도, 전력 소비, 트랜지스터 수</li>
-        <li><strong>메모리 크기</strong>: 메모리 용량 (해당 시 )</li>
+        <li><strong>🔵 기본 정보</strong>
+          <ul>
+            <li>IP 정식명</li>
+            <li>분류 (PHY / Interface / Analog / etc)</li>
+            <li>인터페이스 표준 및 사양</li>
+          </ul>
+        </li>
+        <li><strong>🔵 노드별 상태</strong>
+          <ul>
+            <li>SF28nm: status (mass/proven/dev/plan)</li>
+            <li>SF14nm: status (mass/proven/dev/plan)</li>
+            <li>SF8nm: status (mass/proven/dev/plan)</li>
+            <li>SF5nm: status (mass/proven/dev/plan)</li>
+            <li>SF4nm: status (mass/proven/dev/plan)</li>
+          </ul>
+        </li>
+        <li><strong>🔵 기술 사양</strong>
+          <ul>
+            <li>데이터 레이트 (Gbps)</li>
+            <li>레인 수</li>
+            <li>전력 소비</li>
+            <li>안정성/검증 이력</li>
+          </ul>
+        </li>
+        <li><strong>🔵 적용 제품</strong>: 이 IP가 사용 중인 실제 칩/제품군</li>
+        <li><strong>🔵 참고자료</strong>: 데이터시트, 설계 가이드 링크</li>
       </ul>
-
-      <h3>패키지 정보</h3>
-      <ul>
-        <li><strong>BGA / LGA / QFP</strong> 등 패키지 타입</li>
-        <li><strong>핀 수</strong>: 출력 핀의 개수</li>
-        <li><strong>패키지 크기</strong>: 물리적 크기</li>
-      </ul>
-
-      <h3>라이프사이클 상태</h3>
-      <ul>
-        <li><strong>🟢 Active</strong>: 현재 활발히 판매 중</li>
-        <li><strong>🟡 EOS (End of Sales)</strong>: 일정 기간 후 판매 종료 예정</li>
-        <li><strong>🔴 EOL (End of Life)</strong>: 이미 판매 종료됨, 지원 제한됨</li>
-        <li><strong>⚫ Obsolete</strong>: 더 이상 사용되지 않음</li>
-      </ul>
-    </div>
 
     <div id="best-practices" class="help-section product-info-help-section">
-      <h2>✅ 베스트 프랙티스</h2>
-
-      <h3>제품 정보 활용 팁</h3>
+      <h2>✅ {% if locale == 'ko' %}베스트 프랙티스{% else %}Best Practices{% endif %}</h2>
+      <h3>{% if locale == 'ko' %}제품 정보 보고{% else %}Report Product Issues{% endif %}</h3>
       <ul>
-        <li>📖 <strong>먼저 검색하기</strong>: 원하는 제품이 이미 있는지 확인합니다.</li>
-        <li>📊 <strong>비교 기능 활용</strong>: 유사 제품들을 비교하여 선택합니다.</li>
-        <li>📅 <strong>라이프사이클 확인</strong>: EOS/EOL 제품은 피하고, Active 제품을 선택합니다.</li>
-        <li>📥 <strong>데이터시트 저장</strong>: 자주 참고하는 제품의 데이터시트를 로컬에 저장합니다.</li>
-      </ul>
-
-      <h3>제품 정보 보고</h3>
-      <ul>
-        <li>잘못되거나 오래된 정보를 발견했다면 피드백을 보내주세요.</li>
-        <li>우측의 "피드백 보내기" 버튼을 클릭하여 보고합니다.</li>
-        <li>Product Team에서 확인 후 업데이트합니다.</li>
+        <li>{% if locale == 'ko' %}잘못되거나 오래된 정보를 발견했다면 피드백을 보내주세요.{% else %}If you find incorrect or outdated information, please send feedback.{% endif %}</li>
+        <li>{% if locale == 'ko' %}우측의 "피드백 보내기" 버튼을 클릭하여 보고합니다.{% else %}Click "Send Feedback" button to report.{% endif %}</li>
+        <li>{% if locale == 'ko' %}Product Team에서 확인 후 업데이트합니다.{% else %}Product Team will verify and update.{% endif %}</li>
       </ul>
     </div>
 
     <div id="faq" class="help-section product-info-help-section">
-      <h2>❓ 자주 묻는 질문</h2>
+      <h2>❓ {% if locale == 'ko' %}자주 묻는 질문{% else %}FAQ{% endif %}</h2>
 
-      <h4>Q: 찾는 제품이 없습니다.</h4>
-      <p>A: 다음을 확인해보세요: 1) 정확한 모델명으로 검색했는가? 2) 필터 설정이 너무 좁지 않은가? 3) 제품이 아직 등록되지 않았을 수 있습니다. 관리자에게 문의하세요.</p>
+      <h4>Q: {% if locale == 'ko' %}찾는 제품이 없습니다.{% else %}I cannot find the product I'm looking for.{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}다음을 확인해보세요: 1) 정확한 모델명으로 검색했는가? 2) 필터 설정이 너무 좁지 않은가? 3) 제품이 아직 등록되지 않았을 수 있습니다. 관리자에게 문의하세요.{% else %}Check: 1) Did you search with exact model name? 2) Are filters too narrow? 3) Product may not be registered yet. Contact admin.{% endif %}</p>
 
-      <h4>Q: 제품 정보를 수정하려면?</h4>
-      <p>A: 현재는 관리자만 제품 정보를 수정할 수 있습니다. 필요한 변경사항이 있으면 관리자에게 요청하세요.</p>
-
-      <h4>Q: 오래된 제품 정보도 있나요?</h4>
-      <p>A: 네, EOL 상태의 제품도 기록으로 보관하고 있습니다. 필터에서 "모든 상태"를 선택하면 확인할 수 있습니다.</p>
-
-      <h4>Q: 데이터시트를 찾을 수 없습니다.</h4>
-      <p>A: 일부 제품은 데이터시트가 아직 업로드되지 않았을 수 있습니다. 관리자에게 추가 요청하세요.</p>
-
-      <h4>Q: 여러 제품을 비교할 수 있나요?</h4>
-      <p>A: 비교 기능은 로드맵에 있습니다. 현재는 여러 제품의 상세 페이지를 각각 열어 비교하세요.</p>
-
-      <h4>Q: API를 통해 제품 정보를 가져올 수 있나요?</h4>
-      <p>A: 현재는 웹 UI만 지원합니다. API 통합이 필요하면 개발팀에 요청하세요.</p>
+      <h4>Q: {% if locale == 'ko' %}제품 정보를 수정하려면?{% else %}How to edit product information?{% endif %}</h4>
+      <p>A: {% if locale == 'ko' %}현재는 관리자만 제품 정보를 수정할 수 있습니다. 필요한 변경사항이 있으면 관리자에게 요청하세요.{% else %}Currently only admins can edit product information. Please request admin for changes.{% endif %}</p>
     </div>
   </section>
 </main>

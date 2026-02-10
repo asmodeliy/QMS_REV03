@@ -281,7 +281,7 @@ def delete_row(conn: sqlite3.Connection, table_name: str, rowid: int):
     conn.commit()
 
 
-@router.get("/product-info", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse)
 def product_info_page(request: Request):
                                                                      
     session_param = request.query_params.get("session")
@@ -330,7 +330,7 @@ def product_info_page(request: Request):
     )
 
 
-@router.get("/product-info/ip/{ip_name:path}", response_class=HTMLResponse)
+@router.get("/ip/{ip_name:path}", response_class=HTMLResponse)
 def product_info_detail(ip_name: str, request: Request):
     _ensure_templates()
     auth_check = ensure_authenticated(request)
@@ -374,7 +374,7 @@ def product_info_detail(ip_name: str, request: Request):
     )
 
 
-@router.get("/product-info/admin", response_class=HTMLResponse)
+@router.get("/admin", response_class=HTMLResponse)
 def product_info_admin_page(request: Request):
     _ensure_templates()
     auth_check = ensure_authenticated(request)
@@ -556,7 +556,7 @@ def delete_matrix_row(ip_name: str, request: Request):
     return result
 
 
-@router.get("/product-info/api/matrix")
+@router.get("/api/matrix")
 def api_get_matrix(request: Request):
     """Return the current matrix as JSON (nodes + rows)"""
     auth_check = ensure_authenticated(request)

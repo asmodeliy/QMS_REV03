@@ -161,7 +161,7 @@ class IncrementalRAGIndexer:
             for file_path in batch:
                 try:
                     # Index file
-                    if self.indexer.index_single_file(str(file_path)):
+                    if self.indexer.index_file(file_path):
                         print(f"  ✅ {file_path.name}")
                         stats['indexed'] += 1
                         

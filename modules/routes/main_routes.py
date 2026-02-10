@@ -50,12 +50,6 @@ def apqp_page (request :Request ):
     return templates .TemplateResponse ("modules/apqp/index.html",{"request":request ,"locale":locale })
 
 
-@router .get ("/apqp/help",response_class =HTMLResponse )
-def apqp_help (request :Request ):
-    locale =get_locale (request )
-    return templates .TemplateResponse ("modules/apqp/help.html",{"request":request ,"locale":locale })
-
-
 @router .get ("/tbd",response_class =HTMLResponse )
 def tbd_redirect (request :Request ):
     return RedirectResponse(url="/spec-center", status_code=303)

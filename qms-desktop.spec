@@ -6,11 +6,11 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=['pathlib', 'zipfile'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['pandas', 'sqlalchemy', 'fastapi', 'uvicorn', 'numpy', 'openpyxl', 'scipy', 'pathlib'],
+    excludes=['pandas', 'sqlalchemy', 'fastapi', 'uvicorn', 'numpy', 'openpyxl', 'scipy'],
     noarchive=False,
     optimize=0,
 )
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['/home/ronnie/QMS_Server/static/icons/qms-q.ico'],
+    icon=['static/icons/qms-q.ico'],
 )

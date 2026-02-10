@@ -1017,3 +1017,18 @@ WHERE users.email = ?]
 {"timestamp": "2026-02-09 15:25:07", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "swlee@ramschip.com"}"}
 {"timestamp": "2026-02-09 15:25:07", "level": "DEBUG", "module": "auth", "message": "Login attempt for swlee@ramschip.com | {"ip": "127.0.0.1"}"}
 {"timestamp": "2026-02-09 15:25:07", "level": "INFO", "module": "auth", "message": "User swlee@ramschip.com logged in successfully | {"user_id": 8, "ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 10:55:59", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "admin@localhost"}"}
+{"timestamp": "2026-02-10 10:55:59", "level": "DEBUG", "module": "auth", "message": "Login attempt for admin@localhost | {"ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 10:55:59", "level": "INFO", "module": "auth", "message": "User admin@localhost logged in successfully | {"user_id": 6, "ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 11:04:59", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "admin@localhost"}"}
+{"timestamp": "2026-02-10 11:04:59", "level": "DEBUG", "module": "auth", "message": "Login attempt for admin@localhost | {"ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 11:04:59", "level": "INFO", "module": "auth", "message": "User admin@localhost logged in successfully | {"user_id": 6, "ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 12:27:36", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "admin@localhost"}"}
+{"timestamp": "2026-02-10 12:27:36", "level": "DEBUG", "module": "auth", "message": "Login attempt for admin@localhost | {"ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 12:27:36", "level": "INFO", "module": "auth", "message": "User admin@localhost logged in successfully | {"user_id": 6, "ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 13:00:35", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "admin@localhost"}"}
+{"timestamp": "2026-02-10 13:00:35", "level": "DEBUG", "module": "auth", "message": "Login attempt for admin@localhost | {"ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 13:00:35", "level": "INFO", "module": "auth", "message": "User admin@localhost logged in successfully | {"user_id": 6, "ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 13:00:45", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "admin@localhost"}"}
+{"timestamp": "2026-02-10 13:00:45", "level": "DEBUG", "module": "auth", "message": "Login attempt for admin@localhost | {"ip": "127.0.0.1"}"}
+{"timestamp": "2026-02-10 13:00:45", "level": "INFO", "module": "auth", "message": "User admin@localhost logged in successfully | {"user_id": 6, "ip": "127.0.0.1"}"}

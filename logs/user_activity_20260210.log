@@ -1,0 +1,5 @@
+2026-02-10 10:55:59 | INFO | {"timestamp": "2026-02-10T10:55:59.359704", "user": "admin@localhost", "action": "login", "module": "auth", "success": true, "ip": "127.0.0.1"}
+2026-02-10 11:04:59 | INFO | {"timestamp": "2026-02-10T11:04:59.955522", "user": "admin@localhost", "action": "login", "module": "auth", "success": true, "ip": "127.0.0.1"}
+2026-02-10 12:27:36 | INFO | {"timestamp": "2026-02-10T12:27:36.067838", "user": "admin@localhost", "action": "login", "module": "auth", "success": true, "ip": "127.0.0.1"}
+2026-02-10 13:00:35 | INFO | {"timestamp": "2026-02-10T13:00:35.791819", "user": "admin@localhost", "action": "login", "module": "auth", "success": true, "ip": "127.0.0.1"}
+2026-02-10 13:00:45 | INFO | {"timestamp": "2026-02-10T13:00:45.934415", "user": "admin@localhost", "action": "login", "module": "auth", "success": true, "ip": "127.0.0.1"}

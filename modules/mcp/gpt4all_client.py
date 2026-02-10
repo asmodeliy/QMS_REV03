@@ -297,19 +297,33 @@ Instructions:
         except Exception as e:
             return {"error": str(e)}
     
-    def chat(self, user_message: str, max_iterations: int = 1, use_rag: bool = False) -> str:
-        """Chat with the assistant - with proper tool detection and execution"""
+    def chat(self, user_message: str, max_iterations: int = 1, use_rag: bool = False, max_tokens: int = 64) -> str:
+        """Chat with the assistant - with proper tool detection and execution
+        
+        Args:
+            user_message: The message from the user
+            max_iterations: Maximum number of tool iterations (unused)
+            use_rag: Whether to use RAG context
+            max_tokens: Maximum tokens to generate (default: 128 for faster response)
+        """
+        import time
+        t0 = time.time()
+        
         if self.model is None:
             self.load_model()
         
+        t1 = time.time()
         self.conversation_history.append({"role": "user", "content": user_message})
         msg_lower = user_message.lower()
+        
+        print(f"[PERF] Chat init: {(t1-t0)*1000:.1f}ms")
         
         # ALWAYS prioritize actual database queries over LLM responses
         # Check in order of specificity: module-specific first, then general keywords
         
         # 1. SVIT (Silicon Verification Issue Tracking)
         if any(w in msg_lower for w in ['이슈', 'issue', 'svit', 'shuttle', '셔틀', 'verification', '검증', 'tracking_no', 'tracking no', 'hvit']):
+            t_tool = time.time()
             print(f"[Chat] → SVIT query detected")
             if 'power' in msg_lower or any(w in msg_lower for w in ['shuttle', '셔틀']) and 'issue' not in msg_lower:
                 shuttles = self._execute_tool('list_shuttles', {'limit': 20})
@@ -324,11 +338,13 @@ Instructions:
             else:
                 issues = self._execute_tool('list_issues', {'limit': 20})
                 response = self._format_issues_response(issues)
+            print(f"[PERF] SVIT tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 2. RPMT (Risk & Project Management)
         elif any(w in msg_lower for w in ['rpmt', 'pdk', 'dk', 'engineer', 'qa', '위험', '리스크', 'risk', 'verification', 'kickoff']):
+            t_tool = time.time()
             print(f"[Chat] → RPMT query detected")
             if any(w in msg_lower for w in ['task', 'pdk', 'dk']):
                 tasks = self._execute_tool('list_rpmt_tasks', {'limit': 20})
@@ -336,11 +352,13 @@ Instructions:
             else:
                 projects = self._execute_tool('list_rpmt_projects', {'limit': 20})
                 response = self._format_rpmt_projects_response(projects)
+            print(f"[PERF] RPMT tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 3. CITS (Customer Issue Tracking System)
         elif any(w in msg_lower for w in ['cits', 'customer', '고객', 'ticket', '티켓', 'claim', '클레임', 'support', '지원']):
+            t_tool = time.time()
             print(f"[Chat] → CITS query detected")
             if any(w in msg_lower for w in ['customer', '고객']):
                 customers = self._execute_tool('list_customers', {'limit': 20})
@@ -355,11 +373,13 @@ Instructions:
             else:
                 issues = self._execute_tool('list_customer_issues', {'limit': 20})
                 response = self._format_customer_issues_response(issues)
+            print(f"[PERF] CITS tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 4. Spec-Center (Specification Management)
         elif any(w in msg_lower for w in ['spec', 'specification', '사양', '스펙', 'category', '분류', 'iso', '26262', 'aec', 'q100', 'standard', '표준']):
+            t_tool = time.time()
             print(f"[Chat] → Spec-Center query detected")
             
             # Search for specific standards/keywords in documents
@@ -381,46 +401,57 @@ Instructions:
             else:
                 categories = self._execute_tool('list_spec_categories', {'limit': 20})
                 response = self._format_spec_categories_response(categories)
+            print(f"[PERF] Spec-Center tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 5. Summary/Module count questions
         elif any(w in msg_lower for w in ['모듈', 'module', '수', 'count', '요약', 'summary', 
                                          '통계', 'statistic', 'overview', '전체', 'total']):
+            t_tool = time.time()
             print(f"[Chat] → Summary query detected")
             summary = self._execute_tool('get_project_summary', {})
             response = self._format_summary_response(summary)
+            print(f"[PERF] Summary tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 6. Project list questions
         elif any(w in msg_lower for w in ['프로젝트', 'project', '활성', 'active', '비활성']):
+            t_tool = time.time()
             print(f"[Chat] → Project list query detected")
             projects = self._execute_tool('list_projects', {'active_only': True, 'limit': 20})
             response = self._format_projects_response(projects)
+            print(f"[PERF] Project tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 7. Task/work questions  
         elif any(w in msg_lower for w in ['작업', 'task', 'work', '진행', 'progress']):
+            t_tool = time.time()
             print(f"[Chat] → Task list query detected")
             tasks = self._execute_tool('list_tasks', {'project_id': None, 'status': None, 'limit': 20})
             response = self._format_tasks_response(tasks)
+            print(f"[PERF] Task tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 8. User/people questions
         elif any(w in msg_lower for w in ['사용자', 'user', 'team', '팀', 'member', '멤버', 'people']):
+            t_tool = time.time()
             print(f"[Chat] → User list query detected")
             users = self._execute_tool('list_users', {'active_only': True, 'limit': 20})
             response = self._format_users_response(users)
+            print(f"[PERF] User tool exec: {(time.time()-t_tool)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
         
         # 9. General LLM response for other questions
         else:
-            print(f"[Chat] → General conversation")
-            response = self._generate_llm_response(user_message)
+            t_llm = time.time()
+            print(f"[Chat] → General conversation (generating with LLM)")
+            response = self._generate_llm_response(user_message, max_tokens=max_tokens)
+            print(f"[PERF] LLM generation: {(time.time()-t_llm)*1000:.1f}ms")
             self.conversation_history.append({"role": "assistant", "content": response})
             return response
     
@@ -771,26 +802,46 @@ Instructions:
             keyword_display = keyword.replace('_', ' ') if keyword else "검색"
             return f"**{keyword_display}** 관련 문서를 찾을 수 없습니다."
     
-    def _generate_llm_response(self, user_message: str) -> str:
+    def _generate_llm_response(self, user_message: str, max_tokens: int = 64) -> str:
         """Generate response using LLM for general questions"""
+        import time
+        t0 = time.time()
+        
         prompt = self._create_system_prompt(use_rag_context=False) + "\n\n"
+        t1 = time.time()
         
         # Add RAG context if available
         if self.enable_rag and self.rag_retriever:
             try:
+                t_rag = time.time()
                 rag_ctx = self.rag_retriever.build_context(user_message, max_context_length=1000)
+                print(f"[PERF] RAG context build: {(time.time()-t_rag)*1000:.1f}ms")
                 if rag_ctx:
                     prompt += f"【관련 문서】\n{rag_ctx}\n\n"
-            except:
-                pass
+            except Exception as e:
+                print(f"[PERF] RAG error: {e}")
+        
+        t2 = time.time()
         
         # Add conversation context
         for msg in self.conversation_history[-3:]:
             prompt += f"{msg['role']}: {msg['content']}\n"
         prompt += "assistant: "
         
-        print(f"[LLM] Generating... (tokens: 120)")
-        response = self.model.generate(prompt, max_tokens=120, temp=0.3)
+        t3 = time.time()
+        print(f"[PERF] LLM prompt ({max_tokens} tokens): {(t3-t0)*1000:.1f}ms total (setup: {(t1-t0)*1000:.1f}ms, RAG: {(t2-t1)*1000:.1f}ms, context: {(t3-t2)*1000:.1f}ms)")
+        
+        t_gen = time.time()
+        print(f"[PERF] Starting model.generate() with max_tokens={max_tokens}, temp=0.3")
+        try:
+            response = self.model.generate(prompt, max_tokens=max_tokens, temp=0.3)
+            t_gen_end = time.time()
+            gen_time = t_gen_end - t_gen
+            print(f"[PERF] Model generation completed: {gen_time:.2f}s ({len(response)} chars)")
+        except Exception as e:
+            print(f"[PERF] Model generation ERROR: {e}")
+            raise
+        
         return response
     
     def reset_conversation(self):

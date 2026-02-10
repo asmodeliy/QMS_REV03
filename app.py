@@ -155,8 +155,9 @@ try:
         interval_seconds=300,  # Check every 5 minutes
         full_index_interval_hours=12  # Full reindex every 12 hours
     )
-    # Index spec-center documents on startup
-    _rag_updater.index_spec_center_documents()
+    # Index spec-center documents on startup - DISABLED for performance
+    # Documents will be indexed incrementally during operation
+    # _rag_updater.index_spec_center_documents()
     _rag_updater.start()
     app_logger.info("RAG auto-updater started", {"interval_seconds": 300})
 except Exception as e:
@@ -202,7 +203,7 @@ app.include_router(rpmt_report_router, prefix="/rpmt", tags=["rpmt-reports"])
 
 app.include_router(svit_router, prefix="/svit", tags=["svit"])
 app.include_router(cits_router, prefix="/cits", tags=["cits"])
-app.include_router(product_info_router, tags=["product-info"])
+app.include_router(product_info_router, prefix="/product-info", tags=["product-info"])
 
 app.include_router(spec_center_module.router, tags=["spec-center"])
 app.include_router(db_browser_routes.router, tags=["db-browser"])

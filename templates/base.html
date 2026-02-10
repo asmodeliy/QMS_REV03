@@ -98,7 +98,6 @@
           {% endif %}
           {% elif path.startswith('/apqp') %}
           <a href="/apqp" class="nav-link {% if path.startswith('/apqp') %}active{% endif %}">APQP</a>
-          <a href="/apqp/help" class="nav-link nav-help {% if path.startswith('/apqp/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
           {% elif path.startswith('/cits') %}
           <a href="/cits" class="nav-link {% if path.startswith('/cits') %}active{% endif %}">CITS</a>
           <a href="/cits/help" class="nav-link nav-help {% if path.startswith('/cits/help') %}active{% endif %}">❓ {{ t("common.help") }}</a>
