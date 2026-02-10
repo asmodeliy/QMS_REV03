@@ -55,7 +55,7 @@ echo ""
 echo "[2/4] 다운로드 파일 확인..."
 ls -lh "$DOWNLOAD_DIR"
 
-if [ ! -f "$DOWNLOAD_DIR/llama-main-native-rocky8.10" ]; then
+if [ ! -f "$DOWNLOAD_DIR/llama-main-native-rocky8" ]; then
     echo "[WARNING] 바이너리 파일이 없습니다. GitHub Actions 빌드 페이지 확인:"
     echo "https://github.com/$GITHUB_USERNAME/$REPO_NAME/actions?query=tag%3A$GITHUB_TAG"
     echo ""
@@ -77,11 +77,11 @@ echo ""
 echo "[3/4] 파일 설치..."
 
 # 바이너리 설치
-if [ -f "$DOWNLOAD_DIR/llama-main-native-rocky8.10" ]; then
+if [ -f "$DOWNLOAD_DIR/llama-main-native-rocky8" ]; then
     mkdir -p "$INSTALL_PREFIX/bin"
-    cp "$DOWNLOAD_DIR/llama-main-native-rocky8.10" "$INSTALL_PREFIX/bin/"
-    chmod +x "$INSTALL_PREFIX/bin/llama-main-native-rocky8.10"
-    echo "✓ 바이너리 설치: $INSTALL_PREFIX/bin/llama-main-native-rocky8.10"
+    cp "$DOWNLOAD_DIR/llama-main-native-rocky8" "$INSTALL_PREFIX/bin/"
+    chmod +x "$INSTALL_PREFIX/bin/llama-main-native-rocky8"
+    echo "✓ 바이너리 설치: $INSTALL_PREFIX/bin/llama-main-native-rocky8"
 fi
 
 # wheel 설치

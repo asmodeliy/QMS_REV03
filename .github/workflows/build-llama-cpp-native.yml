@@ -25,11 +25,23 @@ jobs:
           cd /tmp
           git clone https://github.com/ggerganov/llama.cpp
           cd llama.cpp
-          make LLAMA_NATIVE=1 -j$(nproc)
           
-          # Copy binary for upload
-          cp ./main /tmp/llama-main-native-rocky8.10
-          echo "Build complete: $(ls -lh /tmp/llama-main-native-rocky8.10)"
+          # CMake으로 빌드 (NATIVE 최적화 활성화)
+          mkdir -p build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLLAMA_NATIVE=ON \
+            -DCMAKE_C_FLAGS="-march=native" \
+            -DCMAKE_CXX_FLAGS="-march=native"
+          
+          cmake --build . --config Release -j$(nproc)
+          
+          # 바이너리 복사
+          cp bin/llama-main /tmp/llama-main-native-rocky8 || cp bin/Release/llama-main /tmp/llama-main-native-rocky8
+          chmod +x /tmp/llama-main-native-rocky8
+          echo "Build complete:"
+          ls -lh /tmp/llama-main-native-rocky8
       
       - name: Build llama-cpp-python wheel
         run: |
@@ -49,9 +61,9 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: llama-cpp-native-rocky8.10
+          name: llama-cpp-native-rocky8
           path: |
-            /tmp/llama-main-native-rocky8.10
+            /tmp/llama-main-native-rocky8
             /tmp/wheels/*.whl
       
       - name: Create and Upload Release
@@ -59,7 +71,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            /tmp/llama-main-native-rocky8.10
+            /tmp/llama-main-native-rocky8
             /tmp/wheels/*.whl
           tag_name: ${{ github.ref_name }}
           name: llama.cpp NATIVE Build - ${{ github.ref_name }}
