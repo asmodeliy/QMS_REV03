@@ -38,6 +38,8 @@ jobs:
         env:
           CCACHE_DIR: ~/.ccache
           CCACHE_MAXSIZE: 2G
+          CXXFLAGS: "-march=native -lstdc++ -lstdc++fs"
+          LDFLAGS: "-lstdc++ -lstdc++fs"
         run: |
           ccache -z  # 통계 초기화
           cd /tmp
@@ -55,12 +57,34 @@ jobs:
             -DCMAKE_CXX_STANDARD=17 \
             -DCMAKE_CXX_STANDARD_REQUIRED=ON \
             -DCMAKE_C_FLAGS="-march=native" \
-            -DCMAKE_CXX_FLAGS="-march=native -lstdc++fs" \
-            -DCMAKE_SHARED_LINKER_FLAGS="-lstdc++fs" \
-            -DCMAKE_MODULE_LINKER_FLAGS="-lstdc++fs" \
-            -DCMAKE_EXE_LINKER_FLAGS="-lstdc++fs -Wl,--copy-dt-needed-entries"
+            -DCMAKE_CXX_FLAGS_INIT="-march=native -lstdc++ -lstdc++fs" \
+            -DCMAKE_CXX_FLAGS="-march=native -lstdc++ -lstdc++fs" \
+            -DCMAKE_SHARED_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--as-needed" \
+            -DCMAKE_MODULE_LINKER_FLAGS="-lstdc++ -lstdc++fs" \
+            -DCMAKE_EXE_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--copy-dt-needed-entries"
           
-          cmake --build . --config Release -j$(nproc) 2>&1 | tee build.log
+          cmake --build . --config Release -j$(nproc) 2>&1 | tee build.log || {
+            echo "Main build failed, trying without examples..."
+            # 다시 시도: examples 제외
+            cd ..
+            rm -rf build
+            mkdir build
+            cd build
+            cmake .. \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DLLAMA_NATIVE=ON \
+              -DGGML_NATIVE=ON \
+              -DGGML_CCACHE=ON \
+              -DCMAKE_CXX_STANDARD=17 \
+              -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+              -DCMAKE_C_FLAGS="-march=native" \
+              -DCMAKE_CXX_FLAGS_INIT="-march=native -lstdc++ -lstdc++fs" \
+              -DCMAKE_CXX_FLAGS="-march=native -lstdc++ -lstdc++fs" \
+              -DCMAKE_SHARED_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--as-needed" \
+              -DCMAKE_EXE_LINKER_FLAGS="-lstdc++ -lstdc++fs -Wl,--copy-dt-needed-entries"
+            
+            cmake --build . --config Release -j$(nproc) --target llama-main
+          }
           
           # 바이너리 복사
           if [ -f bin/llama-main ]; then
@@ -69,7 +93,7 @@ jobs:
             cp llama-main /tmp/llama-main-native-rocky8
           else
             echo "ERROR: llama-main binary not found!"
-            find . -name "llama-main" -o -name "llama" 2>/dev/null
+            find . -name "llama-main" 2>/dev/null || echo "No llama-main found"
             exit 1
           fi
           
