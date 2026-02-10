@@ -19,6 +19,9 @@ jobs:
         run: |
           dnf groupinstall "Development Tools" -y
           dnf install -y cmake git python3-pip python3-devel
+          
+          # Python 3.11 설치 (서버 환경에 맞춤)
+          dnf install -y python3.11 python3.11-devel python3.11-pip
       
       - name: Clone and build llama.cpp with NATIVE optimization
         run: |
@@ -32,13 +35,15 @@ jobs:
           cmake .. \
             -DCMAKE_BUILD_TYPE=Release \
             -DLLAMA_NATIVE=ON \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DCMAKE_CXX_STANDARD_REQUIRED=ON \
             -DCMAKE_C_FLAGS="-march=native" \
-            -DCMAKE_CXX_FLAGS="-march=native"
+            -DCMAKE_CXX_FLAGS="-march=native -lstdc++fs"
           
           cmake --build . --config Release -j$(nproc)
           
           # 바이너리 복사
-          cp bin/llama-main /tmp/llama-main-native-rocky8 || cp bin/Release/llama-main /tmp/llama-main-native-rocky8
+          cp bin/llama-main /tmp/llama-main-native-rocky8 || cp llama-main /tmp/llama-main-native-rocky8 || true
           chmod +x /tmp/llama-main-native-rocky8
           echo "Build complete:"
           ls -lh /tmp/llama-main-native-rocky8
@@ -49,13 +54,13 @@ jobs:
           git clone https://github.com/abetlen/llama-cpp-python
           cd llama-cpp-python
           
-          # Build with NATIVE optimization
-          CMAKE_ARGS="-DLLAMA_NATIVE=on" pip3 install . --no-cache-dir -v
+          # Python 3.11로 wheel 빌드 (서버 환경 맞춤)
+          CMAKE_ARGS="-DLLAMA_NATIVE=on" python3.11 -m pip install . --no-cache-dir -v
           
-          # Create wheel
-          pip3 wheel . --wheel-dir=/tmp/wheels --no-cache-dir
+          # Python 3.11 wheel 생성
+          python3.11 -m pip wheel . --wheel-dir=/tmp/wheels --no-cache-dir
           
-          echo "Wheel created:"
+          echo "Wheel created (Python 3.11):"
           ls -lh /tmp/wheels/
       
       - name: Upload artifacts
