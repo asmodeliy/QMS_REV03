@@ -14,10 +14,11 @@ ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "ramschip")
 
 # CORS and session security
-_cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
+_cors_raw = os.environ.get("CORS_ORIGINS", "http://210.117.32.72:58080").strip()
 CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()] if _cors_raw else []
 SESSION_HTTPS_ONLY = os.environ.get("SESSION_HTTPS_ONLY", "").lower() in ("1", "true", "yes")
 ENABLE_TEST_ENDPOINTS = os.environ.get("ENABLE_TEST_ENDPOINTS", "").lower() in ("1", "true", "yes")
+ACTIVITY_LOG_RETENTION_DAYS = int(os.environ.get("ACTIVITY_LOG_RETENTION_DAYS", "30"))
 
 OUTLOOK_EMAIL = os.environ.get("OUTLOOK_EMAIL", "")
 OUTLOOK_PASSWORD = os.environ.get("OUTLOOK_PASSWORD", "")

@@ -1,24 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 <main class="container spec-center-root">
-  <div class="spec-dashboard-header-section spec-center-header">
-    <div class="spec-dashboard-header-content">
-      <div>
-        <h1 class="spec-dashboard-title">{{ t('spec_center.title') }}</h1>
-        <p class="spec-dashboard-subtitle">{{ t('spec_center.subtitle') }}</p>
+  <header class="module-titlebar spec-titlebar" aria-label="Spec Center header">
+    <div class="module-titletop">
+      <div class="module-titleblock">
+        <p class="module-kicker">DOCUMENT CENTER</p>
+        <h1 class="module-title">{{ t('spec_center.title') }}</h1>
+        <p class="module-subtitle">{{ t('spec_center.subtitle') }}</p>
       </div>
       {% if is_admin %}
       <div class="spec-header-actions">
         <button class="spec-btn spec-btn-primary" onclick="openCreateCategoryModal()">
           <span>➕</span> {{ t('spec_center.new_category') }}
         </button>
-        <button id="spec-delete-cat-btn" class="spec-btn spec-btn-danger" onclick="deleteCategory()" style="display:none;">
+        <button id="spec-delete-cat-btn" class="spec-btn spec-btn-danger hidden" onclick="deleteCategory()">
           <span>🗑️</span> {{ t('spec_center.delete_category') }}
         </button>
       </div>
       {% endif %}
     </div>
-  </div>
+    <div class="module-titleline" aria-hidden="true"></div>
+  </header>
 
   <div class="spec-content-wrapper">
     <aside class="spec-sidebar">
@@ -39,18 +41,18 @@
         <input id="spec-file-search" type="text" class="spec-search-input" placeholder="🔎 Search files by name..." />
       </div>
 
-      <div id="spec-file-search-results" class="spec-file-search-results" style="display:none;"></div>
+      <div id="spec-file-search-results" class="spec-file-search-results hidden"></div>
 
-      <div id="spec-category-header" class="spec-category-header" style="display:none;">
+      <div id="spec-category-header" class="spec-category-header hidden">
         <div class="spec-category-title-section">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="spec-category-title-row">
             <span id="spec-category-icon" class="spec-category-icon">📁</span>
             <h2 id="spec-category-name" class="spec-category-name">Select a category</h2>
           </div>
           {% if is_admin %}
           <div class="spec-category-actions">
-            <button id="spec-upload-btn" class="spec-btn spec-btn-secondary" onclick="openUploadModal()" style="display:none;">
-              <span>📤</span> Upload File
+            <button id="spec-upload-btn" class="spec-btn spec-btn-secondary spec-upload-action hidden" onclick="openUploadModal()">
+              Upload
             </button>
           </div>
           {% endif %}
@@ -64,12 +66,12 @@
         <p>Select a category from the sidebar to view specifications</p>
       </div>
 
-      <div id="spec-files-section" class="spec-files-section" style="display:none;">
+      <div id="spec-files-section" class="spec-files-section hidden">
         <h2 class="spec-section-title">Files</h2>
         <div id="spec-files-list" class="spec-files-list"></div>
       </div>
 
-      <div id="spec-preview-section" class="spec-preview-section" style="display:none;">
+      <div id="spec-preview-section" class="spec-preview-section hidden">
         <div class="spec-preview-header">
           <h3>Preview</h3>
           <button class="spec-close-preview-btn" onclick="closePreview()">✕</button>
@@ -247,11 +249,9 @@ function selectDefaultCategory() {
 function renderCategoryNode(cat, depth = 0) {
   const li = document.createElement('li');
   li.className = 'spec-category-tree-item';
-  li.style.marginLeft = (depth * 16) + 'px';
+  li.style.marginLeft = (depth * 10) + 'px';
   
   const hasChildren = cat.children && cat.children.length > 0;
-  const hasFiles = cat.files && cat.files.length > 0;
-  
   // Category button
   const btn = document.createElement('button');
   btn.className = 'spec-category-tree-btn';
@@ -267,7 +267,6 @@ function renderCategoryNode(cat, depth = 0) {
   btn.innerHTML = `
     ${hasChildren ? '<span class="spec-tree-toggle">▼</span>' : '<span class="spec-tree-toggle-empty"></span>'}
     <span class="spec-category-label">${cat.name}</span>
-    ${hasFiles ? `<span class="spec-file-count">${cat.files.length}</span>` : ''}
   `;
   
   btn.onclick = (e) => {
@@ -323,26 +322,36 @@ async function showCategory(catId, catName, catDesc, catIcon, files) {
   }
   
   // Show header
-  document.getElementById('spec-category-header').style.display = 'block';
+  const header = document.getElementById('spec-category-header');
+  header.classList.remove('hidden');
+  header.style.display = '';
   document.getElementById('spec-category-icon').textContent = catIcon || '📁';
   document.getElementById('spec-category-name').textContent = catName;
-  document.getElementById('spec-category-description').textContent = catDesc || '';
+  const categoryDesc = document.getElementById('spec-category-description');
+  categoryDesc.textContent = catDesc || '';
+  categoryDesc.classList.toggle('hidden', !catDesc || !String(catDesc).trim());
   
   // Show admin buttons
   const uploadBtn = document.getElementById('spec-upload-btn');
   if (uploadBtn) {
-    uploadBtn.style.display = 'block';
+    uploadBtn.classList.remove('hidden');
+    uploadBtn.style.display = '';
   }
   const deleteCatBtn = document.getElementById('spec-delete-cat-btn');
   if (deleteCatBtn) {
-    deleteCatBtn.style.display = 'block';
+    deleteCatBtn.classList.remove('hidden');
+    deleteCatBtn.style.display = '';
   }
   
   // Hide empty state
-  document.getElementById('spec-empty-state').style.display = 'none';
+  const emptyState = document.getElementById('spec-empty-state');
+  emptyState.classList.add('hidden');
+  emptyState.style.display = 'none';
   
   // Show files section
-  document.getElementById('spec-files-section').style.display = 'block';
+  const filesSection = document.getElementById('spec-files-section');
+  filesSection.classList.remove('hidden');
+  filesSection.style.display = '';
   const filesList = document.getElementById('spec-files-list');
   filesList.innerHTML = '';
   
@@ -354,15 +363,15 @@ async function showCategory(catId, catName, catDesc, catIcon, files) {
   // Create table
   const table = document.createElement('table');
   table.className = 'spec-files-table';
-  const actionsWidth = IS_ADMIN ? 140 : 100;
+  const actionsClass = IS_ADMIN ? 'spec-col-actions is-admin' : 'spec-col-actions';
   
   // Table header
   table.innerHTML = `
     <thead>
       <tr>
-        <th style="width: 40px;"></th>
+        <th class="spec-col-icon"></th>
         <th>Name</th>
-        <th style="width: ${actionsWidth}px;">Actions</th>
+        <th class="${actionsClass}">Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -383,15 +392,15 @@ async function showCategory(catId, catName, catDesc, catIcon, files) {
     const fileIcon = getFileIcon(file.file_type);
     const safeName = encodeURIComponent(file.original_name || '');
     const deleteBtn = IS_ADMIN 
-      ? `<button class="spec-file-action-btn" title="Delete" onclick="deleteFile(${file.id}, decodeURIComponent('${safeName}'))">🗑️</button>` 
+      ? `<button class="spec-file-action-btn is-danger" title="Delete" onclick="deleteFile(${file.id}, decodeURIComponent('${safeName}'))">Delete</button>` 
       : '';
     
     row.innerHTML = `
-      <td class="spec-file-icon">${fileIcon}</td>
+      <td class="spec-file-icon-cell">${fileIcon}</td>
       <td class="spec-file-name" title="${file.original_name}">${file.original_name}</td>
       <td class="spec-file-actions">
-        <button class="spec-file-action-btn" title="Preview" onclick="previewFile(${file.id})">👁️</button>
-        <a href="/spec-center/serve/${encodeURIComponent(file.filename)}" class="spec-file-action-btn" title="Download" download="${file.original_name}">⬇️</a>
+        <button class="spec-file-action-btn" title="Preview" onclick="previewFile(${file.id})">Preview</button>
+        <a href="/spec-center/serve/${encodeURIComponent(file.filename)}" class="spec-file-action-btn" title="Download" download="${file.original_name}">Download</a>
         ${deleteBtn}
       </td>
     `;
@@ -500,9 +509,25 @@ async function deleteCategory() {
     }
     currentCategoryId = null;
     await fetchCategories({ preserveSelection: false });
-    document.getElementById('spec-category-header').style.display = 'none';
-    document.getElementById('spec-files-section').style.display = 'none';
-    document.getElementById('spec-empty-state').style.display = 'block';
+    const header = document.getElementById('spec-category-header');
+    header.classList.add('hidden');
+    header.style.display = 'none';
+    const filesSection = document.getElementById('spec-files-section');
+    filesSection.classList.add('hidden');
+    filesSection.style.display = 'none';
+    const emptyState = document.getElementById('spec-empty-state');
+    emptyState.classList.remove('hidden');
+    emptyState.style.display = 'block';
+    const deleteBtn = document.getElementById('spec-delete-cat-btn');
+    if (deleteBtn) {
+      deleteBtn.classList.add('hidden');
+      deleteBtn.style.display = 'none';
+    }
+    const uploadBtn = document.getElementById('spec-upload-btn');
+    if (uploadBtn) {
+      uploadBtn.classList.add('hidden');
+      uploadBtn.style.display = 'none';
+    }
   } catch (err) {
     console.error('Category delete error:', err);
     alert('삭제 실패: ' + err.message);
@@ -869,15 +894,15 @@ async function moveFiles(fileIds, targetCategoryId) {
 function getFileIcon(type) {
   const ext = type.toLowerCase();
   const icons = {
-    'pdf': '<div style="background: #DC3E15; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">PDF</div>',
-    'doc': '<div style="background: #2B579A; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">W</div>',
-    'docx': '<div style="background: #2B579A; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">W</div>',
-    'ppt': '<div style="background: #D24726; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">P</div>',
-    'pptx': '<div style="background: #D24726; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">P</div>',
-    'xls': '<div style="background: #217346; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">X</div>',
-    'xlsx': '<div style="background: #217346; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">X</div>'
+    'pdf': '<div class="spec-file-icon spec-file-icon-pdf">PDF</div>',
+    'doc': '<div class="spec-file-icon spec-file-icon-doc">W</div>',
+    'docx': '<div class="spec-file-icon spec-file-icon-doc">W</div>',
+    'ppt': '<div class="spec-file-icon spec-file-icon-ppt">P</div>',
+    'pptx': '<div class="spec-file-icon spec-file-icon-ppt">P</div>',
+    'xls': '<div class="spec-file-icon spec-file-icon-xls">X</div>',
+    'xlsx': '<div class="spec-file-icon spec-file-icon-xls">X</div>'
   };
-  return icons[ext] || '<div style="background: #6B7280; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 10px;">📄</div>';
+  return icons[ext] || '<div class="spec-file-icon spec-file-icon-file">📄</div>';
 }
 
 function formatFileSize(bytes) {

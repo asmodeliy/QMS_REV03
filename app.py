@@ -1,6 +1,6 @@
 from pathlib import Path
 from contextvars import ContextVar
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Form
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,9 +15,9 @@ try:
 except Exception:
     from services import compute_derived
 try:
-    from .core.config import BASE_DIR, SESSION_SECRET, APP_ENV, CORS_ORIGINS, SESSION_HTTPS_ONLY
+    from .core.config import BASE_DIR, SESSION_SECRET, APP_ENV, CORS_ORIGINS, SESSION_HTTPS_ONLY, GARAGE_ADMIN_EMAILS
 except Exception:
-    from core.config import BASE_DIR, SESSION_SECRET, APP_ENV, CORS_ORIGINS, SESSION_HTTPS_ONLY
+    from core.config import BASE_DIR, SESSION_SECRET, APP_ENV, CORS_ORIGINS, SESSION_HTTPS_ONLY, GARAGE_ADMIN_EMAILS
 try:
     from .core.middleware import RequestLoggingMiddleware
 except Exception:
@@ -90,6 +90,7 @@ async def set_locale_middleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
+
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 app.mount("/uploads", StaticFiles(directory=str(BASE_DIR / "uploads")), name="uploads")
 app.mount("/img", StaticFiles(directory=str(BASE_DIR / "img")), name="img")
@@ -100,20 +101,18 @@ try:
     from .modules.routes.help_routes import router as help_router, set_templates as set_help_templates
     from .modules.routes.profile_routes import router as profile_router, set_templates as set_profile_templates
     from .modules.routes.admin_dashboard_routes import router as admin_dashboard_router, set_templates as set_admin_dashboard_templates
+    from .modules.routes.admin_insights_routes import router as admin_insights_router, set_templates as set_admin_insights_templates
     from .modules.routes.notification_routes import router as notification_router
     from .modules.routes.garage_routes import router as garage_router, set_templates as set_garage_templates
-
-    from .modules.routes.admin_routes import router as legacy_admin_router, set_templates as set_legacy_admin_templates
 except Exception:
     from modules.routes.auth_routes import router as auth_router, set_templates as set_auth_templates
     from modules.routes.main_routes import router as main_router, set_templates as set_main_templates
     from modules.routes.help_routes import router as help_router, set_templates as set_help_templates
     from modules.routes.profile_routes import router as profile_router, set_templates as set_profile_templates
     from modules.routes.admin_dashboard_routes import router as admin_dashboard_router, set_templates as set_admin_dashboard_templates
+    from modules.routes.admin_insights_routes import router as admin_insights_router, set_templates as set_admin_insights_templates
     from modules.routes.notification_routes import router as notification_router
     from modules.routes.garage_routes import router as garage_router, set_templates as set_garage_templates
-
-    from modules.routes.admin_routes import router as legacy_admin_router, set_templates as set_legacy_admin_templates
 
 try:
     from .modules.rpmt.routes import (
@@ -125,6 +124,12 @@ try:
     )
 
     from .modules.svit import router as svit_router, set_templates as set_svit_templates
+    from .modules.svit.routes.main import (
+        admin_register_page as svit_admin_register_page,
+        admin_register_shuttle as svit_admin_register_shuttle,
+        delete_mpw as svit_delete_mpw,
+        update_mpw as svit_update_mpw,
+    )
 
     from .modules.cits import router as cits_router, set_templates as set_cits_templates
 
@@ -143,6 +148,12 @@ except Exception:
     )
 
     from modules.svit import router as svit_router, set_templates as set_svit_templates
+    from modules.svit.routes.main import (
+        admin_register_page as svit_admin_register_page,
+        admin_register_shuttle as svit_admin_register_shuttle,
+        delete_mpw as svit_delete_mpw,
+        update_mpw as svit_update_mpw,
+    )
 
     from modules.cits import router as cits_router, set_templates as set_cits_templates
 
@@ -192,9 +203,8 @@ set_report_templates(templates)
 set_svit_templates(templates)
 set_cits_templates(templates)
 set_admin_dashboard_templates(templates)
+set_admin_insights_templates(templates)
 set_product_info_templates(templates)
-
-set_legacy_admin_templates(templates)
 
 set_spec_center_templates = getattr(spec_center_module, 'set_templates', None)
 if set_spec_center_templates:
@@ -209,12 +219,12 @@ app.include_router(profile_router, tags=["profile"])
 
 app.include_router(help_router, tags=["help"])
 app.include_router(admin_dashboard_router, tags=["admin-dashboard"])
-app.include_router(legacy_admin_router, tags=["admin"])
+app.include_router(admin_insights_router, tags=["admin-insights"])
 app.include_router(notification_router, tags=["notifications"]) 
 app.include_router(garage_router, prefix="/api/garage", tags=["garage"])
 app.include_router(rpmt_dashboard_router, prefix="/rpmt", tags=["rpmt-dashboard"])
 app.include_router(rpmt_projects_router, prefix="/rpmt", tags=["rpmt-projects"])
-app.include_router(rpmt_admin_router, prefix="/rpmt", tags=["rpmt-admin"])
+app.include_router(rpmt_admin_router, prefix="/admin/rpmt", tags=["rpmt-admin"])
 app.include_router(rpmt_weekly_router, prefix="/rpmt", tags=["rpmt-weekly"])
 app.include_router(rpmt_report_router, prefix="/rpmt", tags=["rpmt-reports"])
 
@@ -226,6 +236,80 @@ app.include_router(spec_center_module.router, tags=["spec-center"])
 app.include_router(db_browser_routes.router, tags=["db-browser"])
 app.include_router(mcp_router, tags=["mcp"])
 app.include_router(gpt4all_router, tags=["gpt4all"])
+
+
+@app.get("/admin/svit/register")
+def svit_admin_register_page_canonical(request: Request):
+    return svit_admin_register_page(request)
+
+
+@app.post("/admin/svit/register")
+def svit_admin_register_submit_canonical(
+    request: Request,
+    shuttle_id: str = Form(...),
+    ip_ic: str = Form(...),
+    node: str = Form(default=""),
+    family: str = Form(default=""),
+    power_1: str = Form(default=""),
+    power_2: str = Form(default=""),
+    power_3: str = Form(default=""),
+    power_4: str = Form(default=""),
+    power_5: str = Form(default=""),
+    power_6: str = Form(default=""),
+    power_7: str = Form(default=""),
+):
+    return svit_admin_register_shuttle(
+        request,
+        shuttle_id,
+        ip_ic,
+        node,
+        family,
+        power_1,
+        power_2,
+        power_3,
+        power_4,
+        power_5,
+        power_6,
+        power_7,
+    )
+
+
+@app.post("/admin/svit/delete-mpw/{mpw_id}")
+def svit_delete_mpw_canonical(mpw_id: int, request: Request):
+    return svit_delete_mpw(mpw_id, request)
+
+
+@app.post("/admin/svit/update-mpw")
+def svit_update_mpw_canonical(
+    request: Request,
+    mpw_db_id: int = Form(...),
+    shuttle_id: str = Form(default=""),
+    ip_ic: str = Form(default=""),
+    node: str = Form(default=""),
+    family: str = Form(default=""),
+    power_1: str = Form(default=""),
+    power_2: str = Form(default=""),
+    power_3: str = Form(default=""),
+    power_4: str = Form(default=""),
+    power_5: str = Form(default=""),
+    power_6: str = Form(default=""),
+    power_7: str = Form(default=""),
+):
+    return svit_update_mpw(
+        request,
+        mpw_db_id,
+        shuttle_id,
+        ip_ic,
+        node,
+        family,
+        power_1,
+        power_2,
+        power_3,
+        power_4,
+        power_5,
+        power_6,
+        power_7,
+    )
 
 @app.get("/ai-chat")
 def ai_chat_page(request: Request):
@@ -248,12 +332,23 @@ def ai_chat_page(request: Request):
     app_logger.info(f"AI-Chat accessed by {email} (role: {role})")
     return templates.TemplateResponse("ai_chat.html", {"request": request})
 
+
+def _require_admin_session(request: Request):
+    sess = getattr(request, "session", None)
+    if not sess or not sess.get("is_authenticated"):
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    email = (sess.get("email", "") or "").lower()
+    role = (sess.get("role", "") or "").lower()
+    if role == "admin" or (email and email in GARAGE_ADMIN_EMAILS):
+        return
+    raise HTTPException(status_code=403, detail="Admin access required")
+
 @app.get("/debug/session")
 def debug_session(request: Request):
     """Debug endpoint - show current session (admin only for security)"""
+    _require_admin_session(request)
     sess = getattr(request, 'session', None)
-    if not sess or not sess.get('is_authenticated'):
-        return {"error": "Not authenticated"}
     
     return {
         "authenticated": sess.get('is_authenticated'),

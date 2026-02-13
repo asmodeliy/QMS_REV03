@@ -105,13 +105,6 @@ jobs:
           cp /tmp/wheels/*.whl /tmp/out/
           ls -lh /tmp/out
 
-      - name: Bundle outputs (optional)
-        run: |
-          set -euxo pipefail
-          # 파일이 많아도 Release에 한 번에 올리기 쉽게 tgz로 묶어둠(원하면 사용)
-          tar -C /tmp/out -czf /tmp/llama_5950x_bundle.tgz .
-          ls -lh /tmp/llama_5950x_bundle.tgz
-
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1

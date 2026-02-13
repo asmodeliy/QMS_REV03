@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <main class="container apqp-root">
-  <div class="dashboard-header-section">
-    <h1 class="dashboard-title">{{ t('apqp.title') }}</h1>
-    <p class="dashboard-subtitle">{{ t('apqp.subtitle') }}</p>
-  </div>
+  <header class="module-titlebar apqp-titlebar" aria-label="APQP header">
+    <div class="module-titleblock">
+      <p class="module-kicker">QUALITY FLOW</p>
+      <h1 class="module-title">{{ t('apqp.title') }}</h1>
+      <p class="module-subtitle">{{ t('apqp.subtitle') }}</p>
+    </div>
+    <div class="module-titleline" aria-hidden="true"></div>
+  </header>
 
   <div class="cards">
     <div class="card apqp-card">

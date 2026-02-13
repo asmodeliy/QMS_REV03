@@ -17,7 +17,7 @@
       <div class="pi-matrix-cell">
         <div class="pi-matrix-head">{{ node }}</div>
         {% if is_admin %}
-        <select class="pi-status-select" data-node="{{ node }}" onchange="updateStatus('{{ ip_name }}', '{{ node }}', this.value)">
+        <select class="pi-status-select" data-node="{{ node }}" onchange="updateStatus('{{ ip_name }}', '{{ node }}', this.value, this)">
           <option value="" {% if not status %}selected{% endif %}>Not Set</option>
           <option value="mass" {% if status == 'mass' %}selected{% endif %}>Mass Production</option>
           <option value="proven" {% if status == 'proven' %}selected{% endif %}>Silicon Proven</option>

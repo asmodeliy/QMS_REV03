@@ -10,40 +10,46 @@
       </div>
 
       <div class="wk2-filters" role="toolbar" aria-label="{{ t('weekly.filter', locale) }}">
-        <button class="btn toggle active" data-status="all">{{ t('weekly.all', locale) }}</button>
-        <button class="btn toggle" data-status="In-progress">{{ t('dashboard.in_progress', locale) }}</button>
-        <button class="btn toggle" data-status="Complete">{{ t('task.complete', locale) }}</button>
-        <button class="btn toggle" data-status="Not Started">{{ t('dashboard.not_started', locale) }}</button>
-        <button class="btn toggle" data-status="N/A">{{ t('dashboard.na', locale) }}</button>
-        <input class="inp" id="wk2-search" type="text" placeholder="{{ t('weekly.search_project', locale) }}"/>
-        <form method="get" action="/rpmt/weekly" style="display:flex;gap:8px;align-items:center">
-          <input class="inp" type="date" name="start" value="{{ start_monday.isoformat() }}" style="width:140px"/>
-          <select class="sel" name="weeks" style="width:100px">
+        <div class="wk2-statuses">
+          <button class="btn toggle active" data-status="all">{{ t('weekly.all', locale) }}</button>
+          <button class="btn toggle" data-status="In-progress">{{ t('dashboard.in_progress', locale) }}</button>
+          <button class="btn toggle" data-status="Complete">{{ t('task.complete', locale) }}</button>
+          <button class="btn toggle" data-status="Not Started">{{ t('dashboard.not_started', locale) }}</button>
+          <button class="btn toggle" data-status="N/A">{{ t('dashboard.na', locale) }}</button>
+        </div>
+
+        <div class="wk2-search-wrap">
+          <input class="inp" id="wk2-search" type="text" placeholder="{{ t('weekly.search_project', locale) }}"/>
+        </div>
+
+        <form method="get" action="/rpmt/weekly" class="wk2-form">
+          <input class="inp wk2-date" type="date" name="start" value="{{ start_monday.isoformat() }}" />
+          <select class="sel wk2-weeks" name="weeks">
             {% for n in range(1,13) %}
               <option value="{{n}}" {% if n==weeks %}selected{% endif %}>{{n}}{{ t('weekly.weeks_display', locale) }}</option>
             {% endfor %}
           </select>
-          <button class="btn primary" style="width:60px">{{ t('weekly.query', locale) }}</button>
-          <a href="/rpmt/weekly/calendar" class="btn ghost" style="margin-left:8px;white-space:nowrap">
+          <button class="btn primary wk2-submit">{{ t('weekly.query', locale) }}</button>
+          <a href="/rpmt/weekly/calendar" class="btn ghost wk2-calendar-link">
             {{ t('weekly.calendar_link', locale) if t('weekly.calendar_link', locale) != 'weekly.calendar_link' else 'Calendar View' }}
           </a>
         </form>
       </div>
     </div>
 
-    <div class="wk2-grid" style="--cols: {{ projects|length }}">
-      <div class="cell head wcol"><span style="color:var(--muted)">주간</span></div>
+    <div class="wk2-grid" data-cols="{{ projects|length }}">
+      <div class="cell head wcol"><span class="wk2-muted">주간</span></div>
 
       {% for prj in projects %}
       <div class="cell head pcol variant-{{ variants[prj.id] }}">
-        <div style="display:flex;flex-direction:column; gap:6px;">
-          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
-            <strong class="clamp-1" style="color:var(--pc)">{{ prj.code }}</strong>
+        <div class="wk2-project-meta">
+          <div class="wk2-project-head">
+            <strong class="clamp-1 wk2-project-code">{{ prj.code }}</strong>
           </div>
           <div class="prj-meta" aria-hidden="false">
             {% for v in [prj.process, prj.metal_option, prj.pdk_ver, prj.ip_code, prj.tech] %}
               {% if v %}
-                <span class="chip" style="background:var(--pc-50);border-color:var(--pc-200);color:var(--pc)">{{ v }}</span>
+                <span class="chip wk2-chip">{{ v }}</span>
               {% endif %}
             {% endfor %}
           </div>
@@ -54,27 +60,27 @@
       {% for (yy,ww,ws,we) in week_rows %}
       {% set end_incl = ws + timedelta(days=6) %}
       <div class="cell wcol">
-        <div style="font-weight:700;color:#0b1933">W{{ "%02d"|format(ww) }}</div>
-        <div style="color:var(--muted);font-size:12px;margin-top:2px">{{ ws.strftime('%m-%d') }} ~ {{ end_incl.strftime('%m-%d') }}</div>
-        <div style="color:var(--muted);font-size:12px">{{ yy }}</div>
+        <div class="wk2-week-title">W{{ "%02d"|format(ww) }}</div>
+        <div class="wk2-week-dates">{{ ws.strftime('%m-%d') }} ~ {{ end_incl.strftime('%m-%d') }}</div>
+        <div class="wk2-week-year">{{ yy }}</div>
       </div>
 
       {% for prj in projects %}
         {% set items = pivot.get((yy,ww), {}).get(prj.id, []) %}
         <div class="cell body pcol variant-{{ variants[prj.id] }}" data-week="{{ yy }}-W{{ "%02d"|format(ww) }}" data-project="{{ prj.code }}">
           {% if items|length == 0 %}
-            <div style="color:var(--muted);text-align:center;padding:20px 0">—</div>
+            <div class="wk2-empty">—</div>
           {% else %}
-            <ul style="list-style:none;margin:0;padding:0">
+            <ul class="wk2-task-list">
               {% for t in items %}
               <li class="wk2-task" data-status="{{ (t.status and t.status.value) or 'N/A' }}" data-text="{{ (t.cat2 or t.cat1 or '').lower() }}" data-task-id="{{ t.id }}">
                 <div class="tit">{{ t.cat2 or t.cat1 or '(제목 없음)' }}</div>
                 <div class="meta">
                   {% set st = (t.status and t.status.value) or 'N/A' %}
-                  <span class="chip" style="font-size:10px">{{ st }}</span>
-                  <span class="chip" style="font-size:10px">마감 {{ t.due_date.strftime('%m-%d') if t.due_date else '미설정' }}</span>
+                  <span class="chip chip-sm">{{ st }}</span>
+                  <span class="chip chip-sm">마감 {{ t.due_date.strftime('%m-%d') if t.due_date else '미설정' }}</span>
                   {% if t.dept_from or t.dept_to %}
-                  <span class="chip" style="font-size:10px">{{ t.dept_from or '—' }} → {{ t.dept_to or '—' }}</span>
+                  <span class="chip chip-sm">{{ t.dept_from or '—' }} → {{ t.dept_to or '—' }}</span>
                   {% endif %}
                   <button class="wk2-quick-status" type="button" aria-label="Quick status change">⋯</button>
                 </div>
@@ -99,6 +105,10 @@
       let curStatus = 'all';
       const bar = document.querySelector('.wk2-filters');
       const search = document.getElementById('wk2-search');
+      const grid = document.querySelector('.wk2-grid');
+      if (grid && grid.dataset.cols) {
+        grid.style.setProperty('--cols', grid.dataset.cols);
+      }
 
       function apply(){
         const term = (search?.value || '').trim().toLowerCase();
@@ -107,13 +117,13 @@
           const txt = (task.getAttribute('data-text') || '').trim();
           const passStatus = (curStatus === 'all' || st === curStatus);
           const passQuery = (!term || txt.includes(term));
-          task.style.display = (passStatus && passQuery) ? '' : 'none';
+          task.classList.toggle('is-hidden', !(passStatus && passQuery));
         });
 
         document.querySelectorAll('.cell.body').forEach(cell=>{
           const ul = cell.querySelector('ul');
           if(!ul) return;
-          const anyVisible = Array.from(ul.querySelectorAll('.wk2-task')).some(n=>n.style.display!=='none');
+          const anyVisible = Array.from(ul.querySelectorAll('.wk2-task')).some(n=>!n.classList.contains('is-hidden'));
           let placeholder = cell.querySelector('.__empty');
           if(!anyVisible){
             if(!placeholder){
@@ -122,10 +132,10 @@
               placeholder.textContent='필터 결과: 표시할 항목 없음';
               cell.appendChild(placeholder);
             }
-            ul.style.display = 'none';
+            ul.classList.add('is-hidden');
           } else {
             if(placeholder) placeholder.remove();
-            ul.style.display = '';
+            ul.classList.remove('is-hidden');
           }
         });
       }
@@ -179,7 +189,7 @@
           if (!val || !menuTarget) return;
           const taskId = menuTarget.getAttribute('data-task-id');
           try {
-            const res = await fetch(`/api/tasks/${taskId}/status`, {
+            const res = await fetch(`/rpmt/projects/api/tasks/${taskId}/status`, {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify({ status: val })

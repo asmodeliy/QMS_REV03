@@ -1,15 +1,70 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="main-page">
-  <div class="gradient-bg"></div>
-  <div class="gradient-top-section">
-    <h1 class="welcome-title top-logo">
-      <span class="brand-name">RAMSCHIP QMS</span>
-    </h1>
-  </div>
-  
+<div class="main-page neo">
+  <div class="flare-bg"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="grid-glow"></div>
+
   <div class="main-container">
+    <section class="hero">
+      <div class="hero-left">
+        <div class="hero-badge">QUALITY SYSTEM</div>
+        <h1 class="hero-title">
+          <span class="hero-title-main">RAMSCHIP</span>
+          <span class="hero-title-sub">Quality Management Suite</span>
+        </h1>
+        <p class="hero-subtitle">
+          Precision workflows, real-time traceability, and audit-ready documentation in one system.
+        </p>
+        <div class="hero-chips">
+          <span class="hero-chip">Verification</span>
+          <span class="hero-chip">Issue Tracking</span>
+          <span class="hero-chip">Spec Control</span>
+          <span class="hero-chip">Customer Insights</span>
+        </div>
+        {% if not request.session.get("is_authenticated") %}
+        <div class="hero-cta-wrap">
+          <a class="hero-cta" href="#login-panel">Sign in to continue</a>
+          <span class="hero-cta-note">Use your Ramschip account credentials.</span>
+        </div>
+        {% endif %}
+      </div>
+      <div class="hero-right">
+        <div class="hero-panel">
+          <div class="panel-title">System Overview</div>
+          <div class="panel-row">
+            <span class="panel-label">Modules</span>
+            <span class="panel-value">6 active</span>
+          </div>
+          <div class="panel-row">
+            <span class="panel-label">Status</span>
+            <span class="panel-value">Operational</span>
+          </div>
+          <div class="panel-row">
+            <span class="panel-label">Data Sync</span>
+            <span class="panel-value">Live</span>
+          </div>
+        </div>
+        <div class="hero-panel hero-panel-alt">
+          <div class="panel-title">Module Summary</div>
+          <div class="panel-row">
+            <span class="panel-label">RPMT</span>
+            <span class="panel-value">Project Management</span>
+          </div>
+          <div class="panel-row">
+            <span class="panel-label">SVIT</span>
+            <span class="panel-value">Issue Tracking</span>
+          </div>
+          <div class="panel-row">
+            <span class="panel-label">Spec Center</span>
+            <span class="panel-value">Specification Management</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     {% if request.session.get("is_authenticated") %}
     <div class="welcome-section">
       <div class="welcome-header">
@@ -134,7 +189,7 @@
       </a>
     </div>
     {% else %}
-    <div class="login-card-section">
+    <div class="login-card-section" id="login-panel">
       <div class="login-card-wrapper">
         <div class="login-form-container">
           <h2 class="login-form-title">{{ t('login.login_button', locale) }}</h2>

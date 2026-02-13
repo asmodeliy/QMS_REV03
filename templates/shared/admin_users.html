@@ -6,11 +6,11 @@
     <div class="brand">
       <a href="/">{{ t('common.previous') }}</a>
     </div>
-    <div style="flex:1; text-align:center;">
-      <h1 style="margin:0; font-size:1.5rem; color:#333;">{{ t('admin.user_approval') }}</h1>
+    <div class="admin-top-center">
+      <h1 class="admin-top-title">{{ t('admin.user_approval') }}</h1>
     </div>
-    <div style="width:220px; display:flex; gap:8px; justify-content:flex-end;">
-      <a href="/admin-dashboard" style="padding:8px 14px; background:#2563eb; color:white; border-radius:4px; text-decoration:none; font-size:0.85rem; white-space:nowrap;">📊 Dashboard</a>
+    <div class="admin-top-actions">
+      <a href="/admin" class="admin-top-link">📊 Dashboard</a>
     </div>
   </div>
 
@@ -19,7 +19,7 @@
       <h2>{{ t('admin.pending_users') }} ({{ pending_users|length }})</h2>
       
       {% if pending_users %}
-      <div class="users-table">
+      <div class="users-table users-table-pending">
         <div class="table-header">
           <div class="col-id">{{ t('register.english_name') }}</div>
           <div class="col-email">{{ t('register.email') }}</div>
@@ -55,7 +55,7 @@
       <h2>{{ t('admin.approved_users') }} ({{ approved_users|length }})</h2>
       
       {% if approved_users %}
-      <div class="users-table">
+      <div class="users-table users-table-approved">
         <div class="table-header">
           <div class="col-id">{{ t('register.english_name') }}</div>
           <div class="col-email">{{ t('register.email') }}</div>
@@ -95,7 +95,7 @@
       <h2>{{ t('admin.rejected_users') }} ({{ rejected_users|length }})</h2>
       
       {% if rejected_users %}
-      <div class="users-table">
+      <div class="users-table users-table-rejected">
         <div class="table-header">
           <div class="col-id">{{ t('register.english_name') }}</div>
           <div class="col-email">{{ t('register.email') }}</div>
@@ -138,7 +138,7 @@ async function approveUser(userId) {
   formData.append('role', role);
 
   try {
-    const res = await fetch(`/main/admin/users/${userId}/approve`, {
+    const res = await fetch(`/admin/users/${userId}/approve`, {
       method: 'POST',
       body: formData
     });
@@ -164,7 +164,7 @@ async function updateUserRole(userId) {
   formData.append('role', role);
 
   try {
-    const res = await fetch(`/main/admin/users/${userId}/update-role`, {
+    const res = await fetch(`/admin/users/${userId}/update-role`, {
       method: 'POST',
       body: formData
     });
@@ -185,7 +185,7 @@ async function rejectUser(userId) {
   if (!confirm('정말 거부하시겠습니까?')) return;
 
   try {
-    const res = await fetch(`/main/admin/users/${userId}/reject`, {
+    const res = await fetch(`/admin/users/${userId}/reject`, {
       method: 'POST'
     });
 
@@ -204,7 +204,7 @@ async function rejectUser(userId) {
 
 async function loadFeedbacks() {
   try {
-    const res = await fetch(`/main/admin/feedback.json`);
+    const res = await fetch(`/admin/feedback.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const feedbacks = await res.json();
     
@@ -231,7 +231,7 @@ async function loadFeedbacks() {
           <button class="btn btn-small" onclick="markFeedbackAs('${f.id}', 'Resolved')">{{ t('feedback.mark_resolved') }}</button>
           <button class="btn btn-small" onclick="toggleReplyBox('${f.id}')">{{ t('feedback.reply') }}</button>
         </div>
-        <div id="reply-box-${f.id}" class="reply-box" style="display:none;">
+        <div id="reply-box-${f.id}" class="reply-box hidden">
           <textarea placeholder="{{ t('feedback.reply_message') }}" id="reply-text-${f.id}"></textarea>
           <button class="btn" onclick="sendReply('${f.id}')">{{ t('feedback.send_reply') }}</button>
         </div>
@@ -245,12 +245,12 @@ async function loadFeedbacks() {
 
 function toggleReplyBox(feedbackId) {
   const box = document.getElementById(`reply-box-${feedbackId}`);
-  if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
+  if (box) box.classList.toggle('hidden');
 }
 
 async function markFeedbackAs(feedbackId, status) {
   try {
-    const res = await fetch(`/main/admin/feedback/${feedbackId}/status`, {
+    const res = await fetch(`/admin/feedback/${feedbackId}/status`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({status: status})
@@ -274,7 +274,7 @@ async function sendReply(feedbackId) {
   }
   
   try {
-    const res = await fetch(`/main/admin/feedback/${feedbackId}/reply`, {
+    const res = await fetch(`/admin/feedback/${feedbackId}/reply`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({reply: text})

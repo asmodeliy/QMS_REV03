@@ -32,6 +32,19 @@ def ensure_authenticated(request: Request):
     return None
 
 
+@router.get("/help", response_class=HTMLResponse)
+def cits_help(request: Request):
+    auth_check = ensure_authenticated(request)
+    if auth_check:
+        return auth_check
+
+    locale = get_locale(request)
+    return templates.TemplateResponse("modules/cits/help.html", {
+        "request": request,
+        "locale": locale,
+    })
+
+
 @router.get("/", response_class=HTMLResponse)
 def customer_main(request: Request, status: str = None):
                                                                      

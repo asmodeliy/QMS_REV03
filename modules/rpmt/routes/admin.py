@@ -50,7 +50,7 @@ def ensure_admin_api (request :Request )->Optional [RedirectResponse ]:
     return None 
 
 
-@router.get("/admin/system/status",response_class =JSONResponse )
+@router.get("/system/status",response_class =JSONResponse )
 def admin_system_status (request :Request ,db :Session =Depends (get_db )):
     ensure_admin_api (request )
 
@@ -80,7 +80,7 @@ def admin_system_status (request :Request ,db :Session =Depends (get_db )):
     }
 
 
-@router.get("/admin",response_class =HTMLResponse )
+@router.get("/",response_class =HTMLResponse )
 def admin_home (request :Request ,db :Session =Depends (get_db )):
     r =ensure_admin_html (request )
     if r :
@@ -107,7 +107,7 @@ def admin_home (request :Request ,db :Session =Depends (get_db )):
     })
 
 
-@router.get("/admin/archive",response_class =HTMLResponse )
+@router.get("/archive",response_class =HTMLResponse )
 def admin_archive (request :Request ,db :Session =Depends (get_db )):
     r =ensure_admin_html (request )
     if r :
@@ -132,7 +132,7 @@ def admin_archive (request :Request ,db :Session =Depends (get_db )):
     })
 
 
-@router.post("/admin/projects/{pid}/restore")
+@router.post("/projects/{pid}/restore")
 def admin_project_restore (pid :int ,request :Request ,db :Session =Depends (get_db )):
     ensure_admin_api (request )
     p =db .get (Project ,pid )
@@ -140,10 +140,10 @@ def admin_project_restore (pid :int ,request :Request ,db :Session =Depends (get
         raise HTTPException (status_code =404 ,detail ="Project not found")
     p .active =True 
     db .commit ()
-    return RedirectResponse (build_redirect_url ("/rpmt/admin/archive",request ),status_code =303 )
+    return RedirectResponse (build_redirect_url ("/admin/rpmt/archive",request ),status_code =303 )
 
 
-@router.get("/admin/projects/{pid}/tasks",response_class =HTMLResponse )
+@router.get("/projects/{pid}/tasks",response_class =HTMLResponse )
 def admin_tasks (pid :int ,request :Request ,db :Session =Depends (get_db )):
     ensure_admin_api (request )
 
@@ -181,7 +181,7 @@ def admin_tasks (pid :int ,request :Request ,db :Session =Depends (get_db )):
     })
 
 
-@router.post("/admin/projects/create")
+@router.post("/projects/create")
 def admin_project_create (
 request :Request ,
 code :str =Form (...),
@@ -222,9 +222,9 @@ db :Session =Depends (get_db )
             ))
 
     db .commit ()
-    return RedirectResponse (url =build_redirect_url (f"/rpmt/admin?focus={p .id }",request ),status_code =303 )
+    return RedirectResponse (url =build_redirect_url (f"/admin/rpmt?focus={p .id }",request ),status_code =303 )
 
-@router.post("/admin/projects/{pid}/update")
+@router.post("/projects/{pid}/update")
 def admin_project_update (
 request :Request ,
 pid :int ,
@@ -244,10 +244,10 @@ db :Session =Depends (get_db )
     p .ip_code =ip_code 
     p .pdk_ver =pdk_ver 
     db .commit ()
-    return RedirectResponse (build_redirect_url (f"/rpmt/admin?focus={pid }",request ),status_code =303 )
+    return RedirectResponse (build_redirect_url (f"/admin/rpmt?focus={pid }",request ),status_code =303 )
 
 
-@router.post("/admin/projects/{pid}/archive")
+@router.post("/projects/{pid}/archive")
 def admin_project_archive (
 pid :int ,
 request :Request ,
@@ -259,17 +259,17 @@ db :Session =Depends (get_db ),
         raise HTTPException (status_code =404 ,detail ="Project not found")
     p .active =False 
     db .commit ()
-    return RedirectResponse (build_redirect_url ("/rpmt/admin",request ),status_code =303 )
+    return RedirectResponse (build_redirect_url ("/admin/rpmt",request ),status_code =303 )
 
-@router.post("/admin/projects/{pid}/delete")
+@router.post("/projects/{pid}/delete")
 def admin_project_delete (pid :int ,request :Request ,db :Session =Depends (get_db )):
     ensure_admin_api (request )
     p =db .get (Project ,pid )
     if p :
         db .delete (p );db .commit ()
-    return RedirectResponse (build_redirect_url ("/rpmt/admin",request ),status_code =303 )
+    return RedirectResponse (build_redirect_url ("/admin/rpmt",request ),status_code =303 )
 
-@router.post("/admin/tasks/create")
+@router.post("/tasks/create")
 def admin_task_create (
 request :Request ,
 project_id :int =Form (...),
@@ -311,9 +311,9 @@ db :Session =Depends (get_db ),
     ord =ord_val if ord_val is not None else next_ord (db ,project_id ,cat1 or "")
     )
     db .add (t );db .commit ()
-    return RedirectResponse (build_redirect_url (f"/rpmt/admin?focus={project_id }",request ),status_code =303 )
+    return RedirectResponse (build_redirect_url (f"/admin/rpmt?focus={project_id }",request ),status_code =303 )
 
-@router.post("/admin/tasks/{tid}/update")
+@router.post("/tasks/{tid}/update")
 def admin_task_update (
 request :Request ,tid :int ,
 cat1 :str =Form (None ),
@@ -354,19 +354,19 @@ db :Session =Depends (get_db ),
             t .ord =next_ord (db ,t .project_id ,new_cat1 )
 
     db .commit ()
-    return RedirectResponse (build_redirect_url (f"/rpmt/admin?focus={pid_for_focus }",request ),status_code =303 )
+    return RedirectResponse (build_redirect_url (f"/admin/rpmt?focus={pid_for_focus }",request ),status_code =303 )
 
-@router.post("/admin/tasks/{tid}/delete")
+@router.post("/tasks/{tid}/delete")
 def admin_task_delete (tid :int ,request :Request ,db :Session =Depends (get_db )):
     ensure_admin_api (request )
     t =db .get (Task ,tid )
     pid_for_focus =t .project_id if t else None 
     if t :
         db .delete (t );db .commit ()
-    url ="/rpmt/admin"if not pid_for_focus else f"/rpmt/admin?focus={pid_for_focus }"
+    url ="/admin/rpmt"if not pid_for_focus else f"/admin/rpmt?focus={pid_for_focus }"
     return RedirectResponse (build_redirect_url (url ,request ),status_code =303 )
 
-@router.post("/admin/tasks/{tid}/insert-below")
+@router.post("/tasks/{tid}/insert-below")
 def admin_task_insert_below (
 request :Request ,
 tid :int ,
@@ -407,10 +407,10 @@ db :Session =Depends (get_db ),
     db .add (new_task )
     db .commit ()
 
-    focus_url =f"/rpmt/admin?focus={pid }"
+    focus_url =f"/admin/rpmt?focus={pid }"
     return RedirectResponse (build_redirect_url (focus_url ,request ),status_code =303 )
 
-@router.get("/admin/backup")
+@router.get("/backup")
 def admin_backup (request :Request ):
     ensure_admin_api (request )
     if not DB_PATH .exists ():
@@ -420,7 +420,7 @@ def admin_backup (request :Request ):
     shutil .copyfile (DB_PATH ,out )
     return FileResponse (path =str (out ),filename =out .name ,media_type ="application/octet-stream")
 
-@router.post("/admin/restore")
+@router.post("/restore")
 def admin_restore (request :Request ,file :UploadFile ):
     ensure_admin_api (request )
     if not file :
@@ -444,10 +444,10 @@ def admin_restore (request :Request ,file :UploadFile ):
         shutil .move (tmp ,DB_PATH )
     finally :
         pass 
-    return RedirectResponse (build_redirect_url ("/rpmt/admin",request ),status_code =303 )
+    return RedirectResponse (build_redirect_url ("/admin/rpmt",request ),status_code =303 )
 
 
-@router.post("/admin/test/simple-post")
+@router.post("/test/simple-post")
 async def test_simple_post(request: Request):
     """Ultra simple test - no auth, no validation"""
     logger.info("[TEST-SIMPLE] POST called!")
@@ -462,14 +462,14 @@ async def test_simple_post(request: Request):
 
 
 
-@router.post("/admin/test-simple-post", response_class=JSONResponse)
+@router.post("/test-simple-post", response_class=JSONResponse)
 def test_simple(project_id: int = None, category: str = None):
     if not project_id or not category:
         return {"ok": False, "error": "Missing parameters"}
     return {"ok": True, "message": "테스트 성공", "received": {"project_id": project_id, "category": category}}
 
 
-@router.post("/admin/api/pdkdk/save", response_class=JSONResponse)
+@router.post("/api/pdkdk/save", response_class=JSONResponse)
 async def save_pdkdk(request: Request, db: Session = Depends(get_db)):
     """새로운 PDKDK 항목 생성"""
     try:
@@ -504,7 +504,7 @@ async def save_pdkdk(request: Request, db: Session = Depends(get_db)):
 
 
 
-@router.post("/admin/pdkdk/{entry_id}",response_class =JSONResponse )
+@router.post("/pdkdk/{entry_id}",response_class =JSONResponse )
 async def update_pdkdk_entry (entry_id :int ,request :Request ,db :Session =Depends (get_db )):
     ensure_admin_api (request )
     
@@ -559,7 +559,7 @@ async def update_pdkdk_entry (entry_id :int ,request :Request ,db :Session =Depe
 
 
 
-@router.post("/admin/pdkdk/create", response_class=JSONResponse)
+@router.post("/pdkdk/create", response_class=JSONResponse)
 async def create_pdkdk_entry(request: Request, db: Session = Depends(get_db)):
     """Create a new PDK/DK entry"""
     try:
@@ -585,7 +585,7 @@ async def create_pdkdk_entry(request: Request, db: Session = Depends(get_db)):
         return {"ok": False, "error": str(e)}
 
 
-@router.delete("/rpmt/admin/pdkdk/{entry_id}", response_class=JSONResponse)
+@router.delete("/pdkdk/{entry_id}", response_class=JSONResponse)
 def delete_pdkdk_entry(entry_id: int, request: Request, db: Session = Depends(get_db)):
     """Delete a PDK/DK entry"""
     ensure_admin_api(request)

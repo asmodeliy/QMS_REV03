@@ -25,17 +25,19 @@
 
 <main class="container svit-main svit-root">
   
-  <div class="dashboard-header-section svit-header">
-    <div class="dashboard-header-content">
-      <div>
-        <h1 class="dashboard-title">SVIT</h1>
-        <p class="dashboard-subtitle">RAMSCHIP SILICON VERIFICATION ISSUE TRACKING</p>
+  <header class="module-titlebar svit-titlebar" aria-label="SVIT header">
+    <div class="module-titletop">
+      <div class="module-titleblock">
+        <p class="module-kicker">ISSUE TRACKING</p>
+        <h1 class="module-title">SVIT</h1>
+        <p class="module-subtitle">RAMSCHIP SILICON VERIFICATION ISSUE TRACKING</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-primary" onclick="openNewIssueModal()">{{ t("svit.new_issue") }}</button>
       </div>
     </div>
-  </div>
+    <div class="module-titleline" aria-hidden="true"></div>
+  </header>
 
   
   <div class="stats-section">
@@ -124,8 +126,8 @@
             </td>
             <td>{{ issue.shuttle_id or '—' }}</td>
             <td>{{ issue.node or '—' }}</td>
-            <td>{{ issue.ip_ic or '—' }}</td>
-            <td class="desc-cell">{{ issue.issue_phenomenon[:80] or '—' }}{% if issue.issue_phenomenon and issue.issue_phenomenon|length > 80 %}...{% endif %}</td>
+            <td class="ip-cell" title="{{ issue.ip_ic or '' }}">{{ issue.ip_ic or '—' }}</td>
+            <td class="desc-cell phen-cell">{{ issue.issue_phenomenon[:80] or '—' }}{% if issue.issue_phenomenon and issue.issue_phenomenon|length > 80 %}...{% endif %}</td>
             <td class="date-cell">
               {%- if issue.report_date %}
                 {% if issue.report_date.__class__.__name__ == 'datetime' %}
@@ -171,14 +173,16 @@
                     {% else %}
                       {% set clean = ('uploads/' + file).replace('\\','/') %}
                     {% endif %}
-                    {% set lname = clean.split('/')[-1].lower() %}
+                    {% set file_name = clean.split('/')[-1] %}
+                    {% set lname = file_name.lower() %}
+                    {% set short_name = (file_name[:22] ~ '...') if file_name|length > 22 else file_name %}
                     {% if lname.endswith('.png') or lname.endswith('.jpg') or lname.endswith('.jpeg') or lname.endswith('.gif') or lname.endswith('.webp') %}
                       <a href="/{{ clean.lstrip('/') }}" target="_blank" class="attach-thumb-link" title="{{ lname }}">
                         <img src="/{{ clean.lstrip('/') }}" class="attach-thumb" alt="{{ lname }}"/>
                       </a>
                     {% else %}
-                      <a href="/{{ clean.lstrip('/') }}" target="_blank" class="attach-link" title="Download">
-                        📎 {{ clean.split('/')[-1] }}
+                      <a href="/{{ clean.lstrip('/') }}" target="_blank" class="attach-link" title="{{ file_name }}">
+                        📎 {{ short_name }}
                       </a>
                     {% endif %}
                   {% endif %}

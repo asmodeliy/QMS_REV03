@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container admin-page">
+  <h1 class="admin-title">Module KPIs</h1>
+  <p class="admin-subtitle">Auto refresh every {{ refresh_seconds }} seconds.</p>
+
+  <div class="admin-grid admin-grid--kpi">
+    <div class="admin-card">
+      <h3 class="admin-card-title">RPMT</h3>
+      <div id="kpi-rpmt" class="admin-kpi">Loading...</div>
+    </div>
+    <div class="admin-card">
+      <h3 class="admin-card-title">SVIT</h3>
+      <div id="kpi-svit" class="admin-kpi">Loading...</div>
+    </div>
+    <div class="admin-card">
+      <h3 class="admin-card-title">CITS</h3>
+      <div id="kpi-cits" class="admin-kpi">Loading...</div>
+    </div>
+    <div class="admin-card">
+      <h3 class="admin-card-title">Spec-Center</h3>
+      <div id="kpi-spec" class="admin-kpi">Loading...</div>
+    </div>
+  </div>
+
+  <div class="admin-back">
+    <a class="btn btn-secondary" href="/admin">Back</a>
+  </div>
+</main>
+
+<script>
+  const refreshMs = {{ refresh_seconds }} * 1000;
+
+  function formatRpmt(data) {
+    return `Projects: ${data.projects_total} (active: ${data.projects_active})<br>` +
+           `Tasks: ${data.tasks_total} (completed: ${data.tasks_completed})`;
+  }
+
+  function formatSvit(data) {
+    return `Issues: ${data.issues_total}<br>` +
+           `NEW: ${data.new}, IN_PROGRESS: ${data.in_progress}, PENDING: ${data.pending}, RESOLVED: ${data.resolved}`;
+  }
+
+  function formatCits(data) {
+    return `Issues: ${data.issues_total}<br>` +
+           `OPEN: ${data.open}, PENDING: ${data.pending}, CLOSE: ${data.close}`;
+  }
+
+  function formatSpec(data) {
+    return `Files: ${data.files_total}<br>` +
+           `Categories: ${data.categories_total}`;
+  }
+
+  async function loadMetrics() {
+    try {
+      const res = await fetch('/admin/metrics/data');
+      if (!res.ok) {
+        throw new Error('Failed to load metrics');
+      }
+      const data = await res.json();
+      document.getElementById('kpi-rpmt').innerHTML = formatRpmt(data.rpmt);
+      document.getElementById('kpi-svit').innerHTML = formatSvit(data.svit);
+      document.getElementById('kpi-cits').innerHTML = formatCits(data.cits);
+      document.getElementById('kpi-spec').innerHTML = formatSpec(data.spec_center);
+    } catch (err) {
+      document.getElementById('kpi-rpmt').textContent = 'Failed to load';
+      document.getElementById('kpi-svit').textContent = 'Failed to load';
+      document.getElementById('kpi-cits').textContent = 'Failed to load';
+      document.getElementById('kpi-spec').textContent = 'Failed to load';
+    }
+  }
+
+  loadMetrics();
+  setInterval(loadMetrics, refreshMs);
+</script>
+{% endblock %}

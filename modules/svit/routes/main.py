@@ -419,10 +419,10 @@ power_7 :str =Form (default =""),
             db .add (shuttle )
 
         db .commit ()
-        return RedirectResponse (url ="/svit/admin/register?success=true",status_code =303 )
+        return RedirectResponse (url ="/admin/svit/register?success=true",status_code =303 )
 
     except Exception:
-        return RedirectResponse (url ="/svit/admin/register?error=true",status_code =303 )
+        return RedirectResponse (url ="/admin/svit/register?error=true",status_code =303 )
     finally :
         db .close ()
 
@@ -440,10 +440,10 @@ def delete_mpw (mpw_id :int ,request :Request ):
         if shuttle :
             db .delete (shuttle )
             db .commit ()
-        return RedirectResponse (url ="/svit/admin/register?success=true",status_code =303 )
+        return RedirectResponse (url ="/admin/svit/register?success=true",status_code =303 )
 
     except Exception:
-        return RedirectResponse (url ="/svit/admin/register?error=true",status_code =303 )
+        return RedirectResponse (url ="/admin/svit/register?error=true",status_code =303 )
     finally :
         db .close ()
 
@@ -472,13 +472,13 @@ power_7 :str =Form (default =""),
     try :
         shuttle =db .query (Shuttle ).filter (Shuttle .id ==mpw_db_id ).first ()
         if not shuttle :
-            return RedirectResponse (url ="/svit/admin/register?error=true",status_code =303 )
+            return RedirectResponse (url ="/admin/svit/register?error=true",status_code =303 )
 
 
         if shuttle_id and shuttle_id != shuttle.shuttle_id:
             conflict = db.query(Shuttle).filter(Shuttle.shuttle_id == shuttle_id).first()
             if conflict:
-                return RedirectResponse(url ="/svit/admin/register?error=true",status_code =303 )
+                return RedirectResponse(url ="/admin/svit/register?error=true",status_code =303 )
             shuttle.shuttle_id = shuttle_id
 
         shuttle .ip_ic =ip_ic or shuttle .ip_ic 
@@ -496,9 +496,9 @@ power_7 :str =Form (default =""),
 
         db .add (shuttle )
         db .commit ()
-        return RedirectResponse (url ="/svit/admin/register?success=true",status_code =303 )
+        return RedirectResponse (url ="/admin/svit/register?success=true",status_code =303 )
     except Exception :
-        return RedirectResponse (url ="/svit/admin/register?error=true",status_code =303 )
+        return RedirectResponse (url ="/admin/svit/register?error=true",status_code =303 )
     finally :
         db .close ()
 

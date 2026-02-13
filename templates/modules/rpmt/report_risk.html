@@ -8,14 +8,14 @@
       <p class="muted">최근 {{ weeks }}주 동안의 마감 현황을 부서 기준으로 요약합니다.</p>
     </div>
     <div class="page-head-right">
-      <form method="get" action="/reports/risk" class="gf-row inline" style="gap:8px;align-items:center">
+      <form method="get" action="/rpmt/reports/risk" class="gf-row inline rpmt-inline-form">
         <label class="gf-label" for="weeks">기간</label>
-        <select id="weeks" name="weeks" class="sel" style="width:90px">
+        <select id="weeks" name="weeks" class="sel rpmt-select-sm">
           {% for w in [2,4,8,12] %}
             <option value="{{ w }}" {% if w == weeks %}selected{% endif %}>{{ w }}주</option>
           {% endfor %}
         </select>
-        <span class="muted" style="font-size:12px">{{ start_date }} ~ {{ end_date }}</span>
+        <span class="muted muted-sm">{{ start_date }} ~ {{ end_date }}</span>
         <button class="btn small ghost" type="submit">적용</button>
       </form>
     </div>
@@ -42,14 +42,14 @@
     </article>
   </section>
 
-  <section class="admin-panel" style="margin-top:24px">
+  <section class="admin-panel rpmt-section-spaced">
     <div class="panel-head">
       <h2>By Department</h2>
       <p class="muted">지연 건수가 많은 부서(dept_to) 순으로 정렬됩니다.</p>
     </div>
 
     
-    <div class="dept-bars" style="margin-bottom:20px">
+    <div class="dept-bars rpmt-dept-bars">
       {% set max_delayed = 0 %}
       {% for dept, info in by_dept %}
         {% set d = info.detail %}
@@ -65,7 +65,7 @@
       <div class="dept-row">
         <div class="dept-label">{{ dept }}</div>
         <div class="dept-bar-track">
-          <div class="dept-bar-fill" style="width:{{ width|round(1) }}%"></div>
+          <div class="dept-bar-fill" data-width="{{ width|round(1) }}"></div>
         </div>
         <div class="dept-metric">{{ delayed }} / {{ total }}</div>
       </div>
@@ -101,5 +101,11 @@
     </div>
   </section>
 </main>
+
+<script>
+  document.querySelectorAll('.dept-bar-fill[data-width]').forEach(bar => {
+    bar.style.width = `${bar.dataset.width || 0}%`;
+  });
+</script>
 
 {% endblock %}

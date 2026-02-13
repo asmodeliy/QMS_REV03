@@ -21,9 +21,9 @@
       <div id="quick-start" class="help-section rpmt-help-section">
         <div class="page-head">
           <h2>🚀 {{ t('help.quick_start', locale) }}</h2>
-          <div class="head-actions">
-              <button id="btn-feedback" class="btn nav rpmt-help-head-actions" style="margin-left:auto">{{ t('help.send_feedback', locale) }}</button>
-          </div>
+            <div class="head-actions">
+              <button id="btn-feedback" class="btn nav rpmt-help-head-actions">{{ t('help.send_feedback', locale) }}</button>
+            </div>
         </div>
         {% if locale == 'ko' %}
           <p><strong>RAMSCHIP RPMT</strong>는 프로젝트의 일정, 진행도, 피드백을 한곳에서 관리하는 웹 기반 프로젝트 관리 도구입니다.</p>
@@ -71,17 +71,17 @@
       </div>
 
       
-      <div class="help-screenshot-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <div class="help-screenshot-section">
         <h3>📸 화면 예시</h3>
-        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">RPMT 대시보드와 주간 타임라인</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-          <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
-            <img src="/img/dashboard.png" alt="대시보드" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
-            <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ 프로젝트 대시보드</div>
+        <p class="help-screenshot-lead">RPMT 대시보드와 주간 타임라인</p>
+        <div class="help-screenshot-grid">
+          <div class="help-screenshot-card">
+            <img src="/img/dashboard.png" alt="대시보드" class="help-screenshot-img" onerror="this.style.display='none'">
+            <div class="help-screenshot-caption">✓ 프로젝트 대시보드</div>
           </div>
-          <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
-            <img src="/img/weekly_overall.png" alt="주간 타임라인" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
-            <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ 주간 타임라인</div>
+          <div class="help-screenshot-card">
+            <img src="/img/weekly_overall.png" alt="주간 타임라인" class="help-screenshot-img" onerror="this.style.display='none'">
+            <div class="help-screenshot-caption">✓ 주간 타임라인</div>
           </div>
         </div>
       </div>
@@ -525,30 +525,30 @@
   
   <div id="feedback-modal" class="rpmt-help-modal-backdrop" aria-hidden="true">
     <div class="rpmt-help-modal-card" role="dialog" aria-modal="true" aria-labelledby="rpmt-feedback-title">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
-        <h3 id="rpmt-feedback-title" style="margin:0">{{ t('feedback.send_reply', locale) }}</h3>
+      <div class="feedback-modal-header">
+        <h3 id="rpmt-feedback-title" class="feedback-modal-title">{{ t('feedback.send_reply', locale) }}</h3>
         <button id="btn-modal-close" class="icon-btn" title="{{ t('common.close', locale) }}">✕</button>
       </div>
 
-      <p style="margin:0 0 16px; color:#475569; font-size:13px; line-height:1.6">
+      <p class="feedback-modal-desc">
         {{ t('feedback.describe_detailed', locale) }}
       </p>
 
-      <form id="feedback-form" style="display:grid; gap:12px">
-        <select id="feedback-type" class="inp" style="padding:10px; border:1px solid var(--divider); border-radius:8px">
+      <form id="feedback-form" class="feedback-form">
+        <select id="feedback-type" class="inp">
           <option value="bug">{{ t('feedback.bug', locale) }}</option>
           <option value="feature">{{ t('feedback.feature', locale) }}</option>
           <option value="other">{{ t('feedback.other', locale) }}</option>
         </select>
 
-        <input id="feedback-email" type="email" class="inp" placeholder="{{ t('feedback.email', locale) }}" required style="padding:10px; border:1px solid var(--divider); border-radius:8px"/>
+        <input id="feedback-email" type="email" class="inp" placeholder="{{ t('feedback.email', locale) }}" required />
 
-        <textarea id="feedback-message" class="inp" placeholder="{{ t('feedback.describe_detailed', locale) }}" required rows="6" style="padding:10px; border:1px solid var(--divider); border-radius:8px; resize:vertical"></textarea>
+        <textarea id="feedback-message" class="inp" placeholder="{{ t('feedback.describe_detailed', locale) }}" required rows="6"></textarea>
 
-        <div id="feedback-status" style="margin:0; color:#059669; font-size:13px; display:none"></div>
+        <div id="feedback-status" class="feedback-status"></div>
 
-        <div style="display:flex; gap:8px; justify-content:flex-end">
-          <button id="btn-form-close" type="button" class="btn rpmt-help-cancel" style="background:var(--bg-secondary)">{{ t('common.cancel', locale) }}</button>
+        <div class="feedback-actions">
+          <button id="btn-form-close" type="button" class="btn rpmt-help-cancel feedback-cancel">{{ t('common.cancel', locale) }}</button>
           <button type="submit" class="btn primary">{{ t('feedback.send', locale) }}</button>
         </div>
       </form>

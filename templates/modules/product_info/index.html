@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <main class="container pi-root">
-  <div class="dashboard-header-section">
-    <div>
-      <h1 class="dashboard-title">{{ t('product_info.title', locale) }}</h1>
-      <p class="dashboard-subtitle">{{ t('product_info.subtitle', locale) }}</p>
+  <header class="module-titlebar pi-titlebar" aria-label="Product Info header">
+    <div class="module-titletop">
+      <div class="module-titleblock">
+        <p class="module-kicker">PRODUCT MATRIX</p>
+        <h1 class="module-title">{{ t('product_info.title', locale) }}</h1>
+        <p class="module-subtitle">{{ t('product_info.subtitle', locale) }}</p>
+      </div>
+      {% if is_admin %}
+      <div class="header-actions">
+        <a href="/product-info/admin" class="pi-btn">{{ t('product_info.manage_table', locale) }}</a>
+      </div>
+      {% endif %}
     </div>
-    {% if is_admin %}
-    <div class="header-actions">
-      <a href="/product-info/admin" class="pi-btn">{{ t('product_info.manage_table', locale) }}</a>
-    </div>
-    {% endif %}
-  </div>
+    <div class="module-titleline" aria-hidden="true"></div>
+  </header>
 
   {% if not matrix_rows %}
   <div class="pi-empty">
@@ -34,7 +38,7 @@
         <div class="item"><span class="pi-dot plan" title={{ t('product_info.legend_plan', locale) | tojson }}></span><span class="label">{{ t('product_info.legend_plan', locale) }}</span></div>
       </div>
     </div>
-    <div class="pi-matrix">
+    <div class="pi-matrix" style="--pi-cols: {{ matrix_nodes|length + 1 }};">
       <div class="pi-matrix-head pi-matrix-sticky">IP</div>
       {% for node in matrix_nodes %}
       <div class="pi-matrix-head">{{ node }}</div>

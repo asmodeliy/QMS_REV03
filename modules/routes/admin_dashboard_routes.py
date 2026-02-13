@@ -2,8 +2,8 @@ from fastapi import APIRouter ,Request ,Depends
 from fastapi .responses import HTMLResponse ,RedirectResponse 
 from sqlalchemy .orm import Session 
 
-from models import User 
-from core .db import get_db 
+from core.auth.db import get_auth_db
+from core.auth.models import User
 from core .utils import get_visit_token 
 from core .i18n import get_locale 
 
@@ -20,13 +20,15 @@ def set_templates (tmpl ):
 def ensure_admin (request :Request ):
     if not request .session .get ("is_authenticated"):
         return RedirectResponse (url ="/auth/login",status_code =303 )
-    if request .session .get ("role")!="Admin":
+    role = (request.session.get("role") or "").lower()
+    if role != "admin":
         return RedirectResponse (url ="/main",status_code =303 )
     return None 
 
 
-@router .get ("/admin-dashboard",response_class =HTMLResponse )
-def admin_dashboard (request :Request ,db :Session =Depends (get_db )):
+@router .get ("/admin",response_class =HTMLResponse )
+@router .get ("/admin/dashboard",response_class =HTMLResponse )
+def admin_dashboard (request :Request ,db :Session =Depends (get_auth_db )):
     r =ensure_admin (request )
     if r :
         return r 
@@ -43,3 +45,12 @@ def admin_dashboard (request :Request ,db :Session =Depends (get_db )):
     "admin_user":admin_user ,
     "visit":get_visit_token (request ),
     })
+
+@router.get("/admin/svit")
+def admin_module_svit_redirect(request: Request):
+    return RedirectResponse(url="/admin/svit/register", status_code=303)
+
+
+@router.get("/admin/garage")
+def admin_module_garage_redirect(request: Request):
+    return RedirectResponse(url="/api/garage/upload", status_code=303)

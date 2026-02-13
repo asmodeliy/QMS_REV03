@@ -2,18 +2,20 @@
 {% block content %}
 
 <main class="container cits-root">
-  <div class="dashboard-header-section cits-header">
-    <div class="dashboard-header-content">
-      <div>
-        <h1 class="dashboard-title">{{ t('cits.title') }}</h1>
-        <p class="dashboard-subtitle">{{ t('cits.name') }}</p>
+  <header class="module-titlebar cits-titlebar" aria-label="CITS header">
+    <div class="module-titletop">
+      <div class="module-titleblock">
+        <p class="module-kicker">ISSUE TRACKING</p>
+        <h1 class="module-title">{{ t('cits.title') }}</h1>
+        <p class="module-subtitle">{{ t('cits.name') }}</p>
       </div>
-        <div class="header-actions">
+      <div class="header-actions">
         <button class="cits-btn ghost" onclick="openCustomerModal()">{{ t('cits.manage_customers') }}</button>
         <button class="cits-btn cits-btn-primary" onclick="openNewCitsIssueModal()">{{ t('cits.new_issue') }}</button>
       </div>
     </div>
-  </div>
+    <div class="module-titleline" aria-hidden="true"></div>
+  </header>
 
   <div class="stats-section">
     <div class="stat-card">

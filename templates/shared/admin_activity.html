@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container admin-page">
+  <h1 class="admin-title">User Activity ({{ days }} days)</h1>
+  <p class="admin-subtitle">Top usage and recent activity.</p>
+
+  <div class="admin-grid admin-grid--kpi">
+    <div class="admin-card">
+      <h3 class="admin-card-title">Top Modules</h3>
+      <ul class="admin-list">
+        {% for name, count in summary.top_modules %}
+        <li>{{ name }} - {{ count }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="admin-card">
+      <h3 class="admin-card-title">Top Paths</h3>
+      <ul class="admin-list">
+        {% for name, count in summary.top_paths %}
+        <li>{{ name }} - {{ count }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="admin-card">
+      <h3 class="admin-card-title">Top Users</h3>
+      <ul class="admin-list">
+        {% for name, count in summary.top_users %}
+        <li>{{ name }} - {{ count }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="table-responsive admin-table-block">
+    <h3 class="admin-table-title">Recent Activity</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>User</th>
+          <th>Module</th>
+          <th>Path</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in summary.recent %}
+        <tr>
+          <td>{{ row.timestamp }}</td>
+          <td>{{ row.user }}</td>
+          <td>{{ row.module }}</td>
+          <td>{{ row.path }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-back">
+    <a class="btn btn-secondary" href="/admin">Back</a>
+  </div>
+</main>
+{% endblock %}

@@ -63,7 +63,7 @@
           </div>
 
           <aside class="side-col">
-            <div style="margin-bottom:12px">
+            <div class="side-field svit-side-block">
               <label>IP/IC</label>
               <input type="text" id="displayIpIc" class="form-input" readonly />
             </div>
@@ -75,11 +75,10 @@
               <label>Family</label>
               <input type="text" id="displayFamily" class="form-input" readonly />
             </div>
-            <div class="side-field">
-            <div style="margin-top:6px">
+            <div class="side-field svit-attach-block">
               <label>Attachments</label>
               <input type="file" id="logAttach" name="log_attach" class="file-input" multiple />
-            <div class="attachments-area">
+              <div id="fileList" class="attachments-area"></div>
             </div>
           </aside>
         </div>
@@ -171,8 +170,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const div = document.createElement('div'); div.className='file-item';
       const nameSpan = document.createElement('span'); nameSpan.className='fname'; nameSpan.textContent = `📎 ${f.name}`;
       const sizeSpan = document.createElement('span'); sizeSpan.className='fsize'; sizeSpan.textContent = `(${Math.round(f.size/1024)} KB)`;
-      const removeBtn = document.createElement('button'); removeBtn.type='button'; removeBtn.className='btn btn-link'; removeBtn.textContent='✕';
-      removeBtn.style.marginLeft = '8px'; removeBtn.style.border = 'none'; removeBtn.style.background = 'transparent'; removeBtn.style.cursor='pointer';
+      const removeBtn = document.createElement('button'); removeBtn.type='button'; removeBtn.className='btn btn-link file-remove-btn'; removeBtn.textContent='✕';
       removeBtn.addEventListener('click', function(){
         const newDt = new DataTransfer();
         Array.from(dt.files).forEach((ff, i)=>{ if(i!==idx) newDt.items.add(ff); });

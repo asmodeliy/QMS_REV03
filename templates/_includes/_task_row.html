@@ -35,28 +35,28 @@
           {% set is_image = ext in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}
           {% set is_doc = ext in ['xlsx', 'xls', 'docx', 'doc', 'pdf', 'pptx', 'ppt'] %}
           
-          <div style="margin-bottom:4px;">
+          <div class="task-attachment">
             {% if is_image %}
-              <a class="attach-item" href="{{ file_url }}" target="_blank" title="View Image" style="color: #2563eb; text-decoration: underline;">
+              <a class="attach-item attach-link" href="{{ file_url }}" target="_blank" title="View Image">
                 🖼️ {{ display_name }}
               </a>
             {% else %}
-              <a class="attach-item" href="{{ file_url }}" target="_blank" title="Download File" style="color: #2563eb; text-decoration: underline;">
+              <a class="attach-item attach-link" href="{{ file_url }}" target="_blank" title="Download File">
                 📎 {{ display_name }}
               </a>
               
                     {% if is_doc %}
-                  <button type="button" class="btn-preview" 
+                  <button type="button" class="btn-preview btn-preview--inline" 
                     onclick="openPreview('{{ filename_only }}', '{{ display_name }}')"
                     title="Preview"
-                    style="margin-left: 4px;">
+                    >
               🔍
                   </button>
               {% else %}
-                  <button type="button" class="btn-preview" 
+                  <button type="button" class="btn-preview btn-preview--inline" 
                     onclick="viewFileAsText('{{ filename_only }}', '{{ display_name }}')"
                     title="View File Content"
-                    style="margin-left: 4px;">
+                    >
               📖
                   </button>
               {% endif %}
@@ -64,9 +64,9 @@
           </div>
         {% endfor %}
       {% endif %}
-      <div class="file-input-wrapper" style="display:inline-block;">
+      <div class="file-input-wrapper">
         <input type="file" class="js-file" data-tid="{{ t.id }}" multiple/>
-        <label class="file-input-label" onclick="this.previousElementSibling.click();" style="cursor:pointer;">+ Add</label>
+        <label class="file-input-label" onclick="this.previousElementSibling.click();">+ Add</label>
       </div>
     </div>
   </td>

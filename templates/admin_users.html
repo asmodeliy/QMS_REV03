@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<main class="container" style="max-width: 1100px; margin: 0 auto; padding: 24px 0;">
-  <h1 style="margin-bottom: 16px;">Admin Users</h1>
+<main class="container admin-page admin-page--narrow">
+  <h1 class="admin-title admin-title--lg">Admin Users</h1>
 
-  <section style="margin-bottom: 32px;">
-    <h2 style="margin-bottom: 12px;">Pending Users</h2>
+  <section class="admin-section">
+    <h2 class="admin-section-title">Pending Users</h2>
     {% if pending_users %}
     <div class="table-responsive">
       <table class="table">
@@ -13,7 +13,7 @@
             <th>Email</th>
             <th>Name</th>
             <th>Department</th>
-            <th style="width: 240px;">Actions</th>
+            <th class="admin-col-actions">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -23,15 +23,15 @@
             <td>{{ p.english_name }}</td>
             <td>{{ p.department }}</td>
             <td>
-              <form method="post" action="/main/admin/users/{{ p.id }}/approve" style="display: inline-block;">
-                <select name="role" style="margin-right: 8px;">
+              <form method="post" action="/admin/users/{{ p.id }}/approve" class="form-inline">
+                <select name="role" class="form-inline-select">
                   <option value="User">User</option>
                   <option value="Manager">Manager</option>
                   <option value="Admin">Admin</option>
                 </select>
                 <button class="btn btn-success" type="submit">Approve</button>
               </form>
-              <form method="post" action="/main/admin/users/{{ p.id }}/reject" style="display: inline-block; margin-left: 6px;">
+              <form method="post" action="/admin/users/{{ p.id }}/reject" class="form-inline form-inline--ml-6">
                 <button class="btn btn-danger" type="submit">Reject</button>
               </form>
             </td>
@@ -45,8 +45,8 @@
     {% endif %}
   </section>
 
-  <section style="margin-bottom: 32px;">
-    <h2 style="margin-bottom: 12px;">Recently Approved</h2>
+  <section class="admin-section">
+    <h2 class="admin-section-title">Recently Approved</h2>
     {% if approved_users %}
     <div class="table-responsive">
       <table class="table">
@@ -80,7 +80,7 @@
   </section>
 
   <section>
-    <h2 style="margin-bottom: 12px;">Rejected</h2>
+    <h2 class="admin-section-title">Rejected</h2>
     {% if rejected_users %}
     <div class="table-responsive">
       <table class="table">

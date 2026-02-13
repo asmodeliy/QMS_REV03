@@ -18,25 +18,25 @@ def set_templates (tmpl ):
     templates =tmpl 
 
 def ensure_admin_html (request :Request ):
+    if not request.session.get("is_authenticated"):
+        return RedirectResponse(url="/auth/login", status_code=303)
 
+    role = (request.session.get("role") or "").lower()
+    if role == "admin":
+        return None
 
-    if request .session .get ("role")=="Admin":
-        return None 
-
-    return None 
+    return ("access_denied",)
 
 def ensure_admin_api (request :Request ):
-    if request .session .get ("role")!="Admin":
-        raise HTTPException (status_code =401 ,detail ="Not authenticated")
+    if not request.session.get("is_authenticated"):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    role = (request.session.get("role") or "").lower()
+    if role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
 
 @router .get ("/main",response_class =HTMLResponse )
 def main (request :Request ):
-    session_param = request.query_params.get("session")
-    if session_param:
-        response = RedirectResponse(url="/main", status_code=303)
-        response.set_cookie("rams_sess", session_param, max_age=30*60, path="/", httponly=True)
-        return response
-
     locale =get_locale (request )
     visit =get_visit_token (request )
     user_email = request.session.get("user_email", "anonymous")
@@ -110,7 +110,7 @@ def download_page(request: Request):
 
 
 
-@router .get ("/main/admin",response_class =HTMLResponse )
+@router .get ("/admin/users",response_class =HTMLResponse )
 def admin_users_page (request :Request ,db :Session =Depends (get_auth_db )):
     r =ensure_admin_html (request )
     if r :
@@ -124,7 +124,7 @@ def admin_users_page (request :Request ,db :Session =Depends (get_auth_db )):
         return r 
 
     user_email = request.session.get("user_email", "admin")
-    app_logger.log_request("GET", "/main/admin", user_email)
+    app_logger.log_request("GET", "/admin/users", user_email)
     locale =get_locale (request )
     pending_users =db .execute (
     select (PendingUser ).where (PendingUser .status =="Pending").order_by (PendingUser .created_at .desc ())
@@ -161,7 +161,7 @@ def admin_users_page (request :Request ,db :Session =Depends (get_auth_db )):
     })
 
 
-@router .post ("/main/admin/users/{user_id}/approve")
+@router .post ("/admin/users/{user_id}/approve")
 def approve_user (user_id :int ,request :Request ,role :str =Form ("User"),db :Session =Depends (get_auth_db )):
     ensure_admin_api (request )
     
@@ -205,7 +205,7 @@ def approve_user (user_id :int ,request :Request ,role :str =Form ("User"),db :S
     return JSONResponse ({"ok":True ,"message":"사용자가 승인되었습니다"})
 
 
-@router .post ("/main/admin/users/{user_id}/reject")
+@router .post ("/admin/users/{user_id}/reject")
 def reject_user (user_id :int ,request :Request ,db :Session =Depends (get_auth_db )):
     ensure_admin_api (request )
     
@@ -227,7 +227,7 @@ def reject_user (user_id :int ,request :Request ,db :Session =Depends (get_auth_
     return JSONResponse ({"ok":True ,"message":"사용자가 거부되었습니다"})
 
 
-@router .post ("/main/admin/users/{user_id}/update-role")
+@router .post ("/admin/users/{user_id}/update-role")
 def update_user_role (user_id :int ,request :Request ,role :str =Form ("User"),db :Session =Depends (get_auth_db )):
     ensure_admin_api (request )
 
@@ -246,19 +246,19 @@ def update_user_role (user_id :int ,request :Request ,role :str =Form ("User"),d
 
 
 
-@router .get ("/main/admin/feedback")
+@router .get ("/admin/feedback")
 def feedback_page (request :Request ):
     if request .session .get ("role")!="Admin":
-        return RedirectResponse (url ="/auth/login?next=/main/admin/feedback",status_code =303 )
+        return RedirectResponse (url ="/auth/login?next=/admin/feedback",status_code =303 )
 
     locale =get_locale (request )
     visit =get_visit_token (request )
-    return templates .TemplateResponse (
-    "modules/rpmt/feedback.html",
-    {"request":request ,"visit":visit ,"locale":locale }
+    return templates .TemplateResponse(
+        "shared/feedback.html",
+        {"request": request, "visit": visit, "locale": locale}
     )
 
-@router .get ("/main/admin/feedback.json")
+@router .get ("/admin/feedback.json")
 def feedback_list (request :Request ):
     if request .session .get ("role")!="Admin":
         raise HTTPException (status_code =401 ,detail ="Not authenticated")
@@ -269,7 +269,7 @@ def feedback_list (request :Request ):
     return feedbacks 
 
 
-@router .get ("/main/admin/feedback/unread-count")
+@router .get ("/admin/feedback/unread-count")
 def unread_feedback_count (request :Request ):
     if request .session .get ("role")!="Admin":
         raise HTTPException (status_code =401 ,detail ="Not authenticated")
@@ -280,7 +280,7 @@ def unread_feedback_count (request :Request ):
     return {"count":count }
 
 
-@router .post ("/main/admin/feedback/{feedback_id}/status")
+@router .post ("/admin/feedback/{feedback_id}/status")
 async def update_feedback_status (feedback_id :int ,request :Request ):
     if request .session .get ("role")!="Admin":
         raise HTTPException (status_code =401 ,detail ="Not authenticated")
@@ -305,7 +305,7 @@ async def update_feedback_status (feedback_id :int ,request :Request ):
         return {"ok":False ,"error":str (e )}
 
 
-@router .post ("/main/admin/feedback/{feedback_id}/reply")
+@router .post ("/admin/feedback/{feedback_id}/reply")
 async def reply_feedback (feedback_id :int ,request :Request ):
     if request .session .get ("role")!="Admin":
         raise HTTPException (status_code =401 ,detail ="Not authenticated")

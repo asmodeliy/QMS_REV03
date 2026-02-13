@@ -3,14 +3,14 @@
 
   <main class="container wide rpmt-root">
     
-    <div class="dashboard-header-section rpmt-header">
-      <div class="dashboard-header-content">
-        <div>
-          <h1 class="dashboard-title">RPMT</h1>
-          <p class="dashboard-subtitle">RAMSCHIP PROJECT MANAGEMENT TOOL</p>
-        </div>
+    <header class="rpmt-titlebar" aria-label="RPMT header">
+      <div class="rpmt-titleblock">
+        <p class="rpmt-kicker">PROJECT HUB</p>
+        <h1 class="rpmt-title">RPMT</h1>
+        <p class="rpmt-subtitle">Ramschip Project Management Tool</p>
       </div>
-    </div>
+      <div class="rpmt-titleline" aria-hidden="true"></div>
+    </header>
 
     
     <section class="cards" id="projectCards">
@@ -29,7 +29,7 @@
 
         <div class="percent">
           <div class="percent-num">{{ (row.percent*100)|round(0) }}%</div>
-          <div class="bar"><div class="bar-fill" style="width:{{ (row.percent*100)|round(0) }}%"></div></div>
+          <div class="bar"><div class="bar-fill" data-width="{{ (row.percent*100)|round(0) }}"></div></div>
         </div>
 
         <div class="meta-split">
@@ -58,33 +58,39 @@
     </section>
 
     
-    <div class="week-head">
-      <div class="week-filters" id="statusFilters">
-        <button class="btn toggle active" data-v="all">{{ t('weekly.all', locale) }}</button>
-        <button class="btn toggle" data-v="In-progress">{{ t('dashboard.in_progress', locale) }}</button>
-        <button class="btn toggle" data-v="Complete">{{ t('task.complete', locale) }}</button>
-        <button class="btn toggle" data-v="Not Started">{{ t('dashboard.not_started', locale) }}</button>
-        <button class="btn toggle" data-v="N/A">{{ t('dashboard.na', locale) }}</button>
+    <div class="rpmt-filters">
+      <div class="rpmt-filter-group">
+        <div class="rpmt-filter-title">Status</div>
+        <div class="week-filters" id="statusFilters">
+          <button class="btn toggle active" data-v="all">{{ t('weekly.all', locale) }}</button>
+          <button class="btn toggle" data-v="In-progress">{{ t('dashboard.in_progress', locale) }}</button>
+          <button class="btn toggle" data-v="Complete">{{ t('task.complete', locale) }}</button>
+          <button class="btn toggle" data-v="Not Started">{{ t('dashboard.not_started', locale) }}</button>
+          <button class="btn toggle" data-v="N/A">{{ t('dashboard.na', locale) }}</button>
+        </div>
       </div>
-      <div class="week-filters-right">
-        <div class="gf-row">
-          <label class="gf-label">{{ t('dashboard.process', locale) if t('dashboard.process', locale) != 'dashboard.process' else 'Process' }}</label>
-          <select id="gfProcess" class="sel gf-select">
-            <option value="">{{ t('common.all', locale) if t('common.all', locale) != 'common.all' else 'All' }}</option>
-            {% for proc in projects|map(attribute='process')|reject('equalto','')|unique|list %}
-              <option value="{{ proc }}">{{ proc }}</option>
-            {% endfor %}
-          </select>
+      <div class="rpmt-filter-group">
+        <div class="rpmt-filter-title">Project</div>
+        <div class="week-filters-right">
+          <div class="gf-row">
+            <label class="gf-label">{{ t('dashboard.process', locale) if t('dashboard.process', locale) != 'dashboard.process' else 'Process' }}</label>
+            <select id="gfProcess" class="sel gf-select">
+              <option value="">{{ t('common.all', locale) if t('common.all', locale) != 'common.all' else 'All' }}</option>
+              {% for proc in projects|map(attribute='process')|reject('equalto','')|unique|list %}
+                <option value="{{ proc }}">{{ proc }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="gf-row">
+            <label class="gf-label">Dept</label>
+            <input id="gfDept" class="inp gf-input" placeholder="검색"/>
+          </div>
+          <label class="gf-checkbox">
+            <input type="checkbox" id="gfDelayedOnly" />
+            <span>{{ t('dashboard.only_delayed', locale) if t('dashboard.only_delayed', locale) != 'dashboard.only_delayed' else 'Delayed' }}</span>
+          </label>
+          <button type="button" class="btn small ghost" id="gfReset">{{ t('dashboard.reset_filters', locale) if t('dashboard.reset_filters', locale) != 'dashboard.reset_filters' else 'Reset' }}</button>
         </div>
-        <div class="gf-row">
-          <label class="gf-label">Dept</label>
-          <input id="gfDept" class="inp gf-input" placeholder="검색"/>
-        </div>
-        <label class="gf-checkbox">
-          <input type="checkbox" id="gfDelayedOnly" />
-          <span>{{ t('dashboard.only_delayed', locale) if t('dashboard.only_delayed', locale) != 'dashboard.only_delayed' else 'Delayed' }}</span>
-        </label>
-        <button type="button" class="btn small ghost" id="gfReset">{{ t('dashboard.reset_filters', locale) if t('dashboard.reset_filters', locale) != 'dashboard.reset_filters' else 'Reset' }}</button>
       </div>
     </div>
 
@@ -111,7 +117,7 @@
                   {% set v = (it.project.id % 8) + 1 %}
                   <div class="week-item colored variant-{{ v }}" data-status="{{ it.task.status.value if it.task.status else 'N/A' }}" data-task-id="{{ it.task.id }}" {% if it.signal == '지연중' or it.signal == 'Overdue' %}data-delayed="true"{% endif %}>
                     <div><strong><a href="/rpmt/projects/{{ it.project.id }}">{{ it.project.code }}</a></strong> · {{ it.task.cat1 }}</div>
-                    <div class="muted" style="font-size:12px">{{ it.task.cat2 }}</div>
+                    <div class="muted muted-sm">{{ it.task.cat2 }}</div>
                     <div class="meta-line">
                       {% if it.code == 'overdue' %}
                         <span class="chip danger pulse">{{ t('task.overdue', locale) }}</span>
@@ -235,6 +241,10 @@
       window.location.href = `/api/set-language/${lang}`;
     }
 
+    document.querySelectorAll('.bar-fill[data-width]').forEach(bar => {
+      bar.style.width = `${bar.dataset.width || 0}%`;
+    });
+
     // ===== Global Filters for project cards =====
     (function(){
       const $cards = document.getElementById('projectCards');
@@ -259,7 +269,7 @@
           if(dept && !d.includes(dept)) ok = false;
           if(delayedOnly && !hasDelayed) ok = false;
 
-          card.style.display = ok ? '' : 'none';
+          card.classList.toggle('is-hidden', !ok);
         });
       }
 
@@ -294,15 +304,15 @@
       const apply = () => {
         document.querySelectorAll('.week-item').forEach(it => {
           const st = it.getAttribute('data-status') || 'N/A';
-          it.style.display = (current === 'all' || st === current) ? '' : 'none';
+          it.classList.toggle('is-hidden', !(current === 'all' || st === current));
         });
         document.querySelectorAll('.big-week').forEach(card=>{
-          const any = Array.from(card.querySelectorAll('.week-item')).some(n => n.style.display !== 'none');
+          const any = Array.from(card.querySelectorAll('.week-item')).some(n => !n.classList.contains('is-hidden'));
           const ghost = card.querySelector('.__empty');
           if(!any){
             if(!ghost){
               const n = document.createElement('div');
-              n.className='__empty chip'; n.textContent='{{ t("message.no_data", locale) }}'; n.style.marginTop='6px';
+              n.className='__empty chip'; n.textContent='{{ t("message.no_data", locale) }}';
               card.querySelector('.week-list').appendChild(n);
             }
           }else if(ghost){ ghost.remove(); }
@@ -356,7 +366,7 @@
           if (!val || !target) return;
           const taskId = target.getAttribute('data-task-id');
           try {
-            const res = await fetch(`/api/tasks/${taskId}/status`, {
+            const res = await fetch(`/rpmt/projects/api/tasks/${taskId}/status`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ status: val })
@@ -451,6 +461,14 @@
 
         function openModal(){ if(!modalWrap) ensure(); overlay.style.display='block'; modalWrap.style.display='flex'; }
         function closeModal(){ if(overlay) overlay.style.display='none'; if(modalWrap) modalWrap.style.display='none'; }
+        function renderLoadError(message){
+          ensure();
+          const title = card.querySelector('.modal-head strong');
+          const list = card.querySelector('.delay-list');
+          title.textContent = 'Notification';
+          list.innerHTML = `<li class="delay-item overdue"><div class="tit"><span class="cat">${message}</span></div></li>`;
+          openModal();
+        }
 
         document.addEventListener('click', async (e)=>{
           const btn = e.target.closest('.kpi-btn');
@@ -460,7 +478,10 @@
           const kind = btn.dataset.kind;
           try{
             const res = await fetch(`/rpmt/projects/${pid}/kpi.json?kind=${encodeURIComponent(kind)}`);
-            if(!res.ok) return alert(`Load error: ${res.status}`);
+            if(!res.ok) {
+              renderLoadError(`Load error: ${res.status}`);
+              return;
+            }
             const data = await res.json();
             ensure();
             const title = card.querySelector('.modal-head strong');
@@ -496,7 +517,10 @@
               list.appendChild(li);
             }
             openModal();
-          }catch(err){ console.error('kpi modal load', err); alert('Load error'); }
+          }catch(err){
+            console.error('kpi modal load', err);
+            renderLoadError('Load error');
+          }
         });
 
         window.__rpmt_openKpiModal = openModal;

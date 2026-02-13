@@ -9,14 +9,14 @@
 <body class="bg">
 <header class="header">
   <div class="container admin-top">
-    <div class="brand"><a href="/rpmt/admin?v={{ visit }}">&lt; Previous</a></div>
+    <div class="brand"><a href="/admin">&lt; Previous</a></div>
   </div>
 </header>
 
-<main class="container rpmt-root">
+<main class="container admin-page admin-feedback-page">
   <div class="fb-wrap">
     <div class="fb-head">
-      <div style="display:flex;align-items:center;gap:8px">
+      <div class="fb-title">
         <strong>Feedback List</strong>
         <span class="chip" id="countChip">0 items</span>
       </div>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="fb-list" id="fbList">
-      <div style="color:var(--muted); text-align:center; padding:20px">Loading...</div>
+      <div class="fb-empty">Loading...</div>
     </div>
   </div>
 </main>
@@ -40,12 +40,12 @@
   
   async function load() {
     try {
-      const url = `/rpmt/admin/feedback.json?v=${visit}`;
+      const url = `/admin/feedback.json?v=${visit}`;
       const res = await fetch(url);
       
       if (!res.ok) {
         if (res.status === 401) {
-          window.location.href = '/auth/login?next=/rpmt/admin/feedback';
+          window.location.href = '/auth/login?next=/admin/feedback';
           return;
         }
         throw new Error(`HTTP ${res.status}`);
@@ -90,7 +90,7 @@
               <div class="fb-timestamp">${timestamp}</div>
               <div class="fb-type ${typeClass}">${it.type || 'Other'}</div>
               <div class="fb-status ${statusClass}">${it.status || 'New'}</div>
-              ${it.email ? `<div class="fb-email">📧 ${escapeHtml(it.email)}</div>` : '<div style="color:#9ca3af">익명</div>'}
+              ${it.email ? `<div class="fb-email">📧 ${escapeHtml(it.email)}</div>` : '<div class="fb-muted">익명</div>'}
             </div>
             
             <div class="fb-message">${escapeHtml(it.message || '')}</div>
@@ -109,9 +109,9 @@
               ${it.status !== 'Resolved' ? `<button class="btn small ghost" onclick="markAsResolved(${it.id})">Mark as Resolved</button>` : ''}
             </div>
             
-            <div class="reply-box" id="reply-${it.id}" style="display:none">
+            <div class="reply-box hidden" id="reply-${it.id}">
               <textarea id="reply-text-${it.id}" placeholder="Enter your reply..."></textarea>
-              <div class="actions">
+              <div class="fb-reply-actions">
                 <button class="btn small primary" onclick="sendReply(${it.id})">📧 Send</button>
                 <button class="btn small ghost" onclick="toggleReply(${it.id})">Cancel</button>
               </div>
@@ -121,7 +121,7 @@
       }
 
       document.getElementById('fbList').innerHTML = items.join('') || 
-        '<div style="color:var(--muted); text-align:center; padding:20px">No items to display.</div>';
+        '<div class="fb-empty">No items to display.</div>';
       document.getElementById('countChip').textContent = cnt + ' items';
     } catch (err) {
       console.error('Failed to load feedback:', err);
@@ -130,7 +130,7 @@
   
   async function updateUnreadCount() {
     try {
-      const url = `/rpmt/admin/feedback/unread-count?v=${visit}`;
+      const url = `/admin/feedback/unread-count?v=${visit}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -154,15 +154,17 @@
   function toggleReply(id) {
     const box = document.getElementById(`reply-${id}`);
     if(currentReplyId && currentReplyId !== id){
-      document.getElementById(`reply-${currentReplyId}`).style.display = 'none';
+      const prevBox = document.getElementById(`reply-${currentReplyId}`);
+      if (prevBox) prevBox.classList.add('hidden');
     }
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    currentReplyId = box.style.display === 'block' ? id : null;
+    if (!box) return;
+    box.classList.toggle('hidden');
+    currentReplyId = box.classList.contains('hidden') ? null : id;
   }
 
   async function markAsRead(id) {
     try {
-      const res = await fetch(`/rpmt/admin/feedback/${id}/status?v=${encodeURIComponent(visit)}`, {
+      const res = await fetch(`/admin/feedback/${id}/status?v=${encodeURIComponent(visit)}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({status: 'Read'})
@@ -181,7 +183,7 @@
   async function markAsResolved(id) {
     if(!confirm('Mark this feedback as resolved?')) return;
     try {
-      const res = await fetch(`/rpmt/admin/feedback/${id}/status?v=${encodeURIComponent(visit)}`, {
+      const res = await fetch(`/admin/feedback/${id}/status?v=${encodeURIComponent(visit)}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({status: 'Resolved'})
@@ -207,7 +209,7 @@
     if(!confirm('Send the email?')) return;
     
     try {
-      const res = await fetch(`/rpmt/admin/feedback/${id}/reply?v=${encodeURIComponent(visit)}`, {
+      const res = await fetch(`/admin/feedback/${id}/reply?v=${encodeURIComponent(visit)}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({reply: text})

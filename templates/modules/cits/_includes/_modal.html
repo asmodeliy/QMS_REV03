@@ -2,16 +2,16 @@
   <div class="modal-overlay" onclick="closeNewCitsIssueModal()"></div>
   <div class="modal-dialog">
     <div class="modal-content">
-      <div style="display: flex; align-items: center; margin-bottom: 16px;">
+      <div class="cits-modal-header">
         <h2 class="modal-title">New Customer Issue</h2>
         <button class="modal-close" onclick="closeNewCitsIssueModal()" aria-label="Close">×</button>
       </div>
 
       <form id="citsIssueForm" method="post" action="/cits/issue/create" enctype="multipart/form-data">
         <div class="modal-body">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div>
-              <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Customer</label>
+          <div class="cits-modal-grid">
+            <div class="cits-field">
+              <label class="form-label">Customer</label>
               <select name="customer" id="customerSelect" class="form-input" onchange="loadCustomerIPs()">
                 <option value="">-- Select customer --</option>
                 {% for c in customers %}
@@ -19,21 +19,21 @@
                 {% endfor %}
               </select>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">IP/IC</label>
+            <div class="cits-field">
+              <label class="form-label">IP/IC</label>
               <select name="ip_ic" id="ipSelect" class="form-input" disabled>
                 <option value="">-- Select customer first --</option>
               </select>
             </div>
           </div>
 
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Title*</label>
+          <div class="cits-modal-block cits-field">
+            <label class="form-label">Title*</label>
             <input type="text" name="title" class="form-input" required />
           </div>
 
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px;">Tag</label>
+          <div class="cits-modal-block cits-field">
+            <label class="form-label">Tag</label>
             <select name="tag" class="form-input">
               <option value="">—</option>
               <option value="Technical Support">Technical Support</option>

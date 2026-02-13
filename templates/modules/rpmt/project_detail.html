@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <main class="container wide detail-shell variant-{{ (p.id % 8) + 1 }} rpmt-root">
-  <div class="page-head">
-    <h1 class="title">{{ p.code }} · USER INPUT</h1>
-  </div>
+  <header class="rpmt-detail-head" aria-label="Project detail header">
+    <h1 class="rpmt-detail-title">{{ p.code }} · USER INPUT</h1>
+  </header>
 
-  <div id="upload-complete-modal" class="modal" aria-hidden="true">
+  <div id="upload-complete-modal" class="modal hidden" aria-hidden="true">
     <div class="modal-backdrop" onclick="hideUploadModal(false)"></div>
     <div class="modal-panel">
       <div class="modal-body">
@@ -59,9 +59,9 @@
     </div>
 
     <div class="ps-progress">
-      <div class="lab" style="margin:0 0 6px">Overall Progress</div>
-      <div class="ps-bar"><i style="width:{{ percent|round(0) }}%"></i></div>
-      <div class="lab" style="margin-top:6px">{{ percent|round(0) }}% ({{ ns.done }}/{{ ns.total }})</div>
+      <div class="lab ps-lab ps-lab-top">Overall Progress</div>
+      <div class="ps-bar"><i class="ps-bar-fill" data-width="{{ percent|round(0) }}"></i></div>
+      <div class="lab ps-lab ps-lab-bottom">{{ percent|round(0) }}% ({{ ns.done }}/{{ ns.total }})</div>
     </div>
 
     <div class="ps-kv">
@@ -73,8 +73,8 @@
       <div class="k">생성일</div><div>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
     </div>
 
-    <div style="padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.08);">
-      <button type="button" class="btn btn-secondary" style="width: 100%; padding: 10px 12px; font-size: 13px;" onclick="openPDKDKModal()">📋 PDK/DK Information</button>
+    <div class="ps-actions">
+      <button type="button" class="btn btn-secondary ps-action-btn" onclick="openPDKDKModal()">PDK/DK Information</button>
     </div>
 
   </aside>
@@ -83,13 +83,13 @@
     <div class="cat variant-{{ v }}">
       <table class="task-table">
         <colgroup>
-          <col style="width:20%">
-          <col style="width:8%">
-          <col style="width:8%">
-          <col style="width:12%">
-          <col style="width:12%">
-          <col style="width:16%">
-          <col style="width:24%">
+          <col class="col-task">
+          <col class="col-from">
+          <col class="col-to">
+          <col class="col-due">
+          <col class="col-status">
+          <col class="col-remark">
+          <col class="col-attachment">
         </colgroup>
         <thead>
           <tr>
@@ -161,27 +161,27 @@
                         </a>
 
                           {% if is_image %}
-                          <button type="button" class="btn-preview" 
+                          <button type="button" class="btn-preview is-image" 
                                   onclick="viewImage('{{ file_url }}', '{{ display_name }}')"
                                   title="View Image">
-                            🖼️
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 12h14v-2.2l-3.3-3.3a1 1 0 0 0-1.4 0l-1.9 1.9-2.8-2.8a1 1 0 0 0-1.4 0L5 13.2V17Zm4.2-6.4a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/></svg>
                           </button>
                           {% elif is_doc %}
-                          <button type="button" class="btn-preview" 
+                          <button type="button" class="btn-preview is-doc" 
                                   onclick="openPreview('{{ filename_only }}', '{{ display_name }}')"
                                   title="Preview">
-                            🔍
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h5l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2Zm6 1.5V9h4.5"/><path d="M11 14a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm2.1-.4 1.9 1.9"/></svg>
                           </button>
                           {% else %}
-                          <button type="button" class="btn-preview" 
+                          <button type="button" class="btn-preview is-text" 
                                   onclick="viewFileAsText('{{ filename_only }}', '{{ display_name }}')"
                                   title="View File Content">
-                            📖
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm3 4h7m-7 4h7m-7 4h5"/></svg>
                           </button>
                           {% endif %}
 
                           {% if request.session.get('is_authenticated') and request.session.get('role') == 'Admin' %}
-                          <button type="button" class="btn-delete" onclick="confirmDelete({{ t.id }}, '{{ file_url }}', this)" title="Delete">🗑️</button>
+                          <button type="button" class="btn-delete" onclick="confirmDelete({{ t.id }}, '{{ file_url }}', this)" title="Delete"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1 2h4v2H4V6h4l1-2Zm1 6v7m4-7v7M7 8l1 12h8l1-12"/></svg></button>
                           {% endif %}
                       </div>
                     {% endfor %}
@@ -211,10 +211,10 @@ function postJSON(url, data){
 function openPreview(filename, displayName) {
   const ext = filename.split('.').pop().toLowerCase();
   if (ext === 'pdf') {
-    window.open(`/uploads/${filename}`, '_blank');
+    window.open(`/uploads/rpmt/${encodeURIComponent(filename)}`, '_blank');
   }
   else if (['docx', 'doc', 'pptx', 'ppt', 'xlsx', 'xls'].includes(ext)) {
-    window.open(`/files/preview/${filename}`, '_blank');
+    window.open(`/rpmt/projects/files/preview/${encodeURIComponent(filename)}`, '_blank');
   }
 }
 
@@ -222,7 +222,7 @@ function viewFileAsText(filename, displayName) {
   const ext = filename.split('.').pop().toLowerCase();
   
   if (['txt', 'md', 'log', 'csv'].includes(ext)) {
-    window.open(`/files/preview/${filename}`, '_blank');
+    window.open(`/rpmt/projects/files/preview/${encodeURIComponent(filename)}`, '_blank');
   }
 }
 
@@ -248,17 +248,12 @@ async function viewImage(imageUrl, imageName) {
     <head>
       <meta charset="utf-8">
       <title>${imageName}</title>
-      <style>
-        body { margin: 0; padding: 20px; background: #f5f7fb; font-family: sans-serif; }
-        .img-container { text-align: center; background: white; padding: 20px; border-radius: 8px; }
-        img { max-width: 100%; height: auto; }
-        .img-title { margin-bottom: 15px; color: #1f2937; font-weight: 600; }
-      </style>
+      <link rel="stylesheet" href="/static/shared.css" />
     </head>
-    <body>
-      <div class="img-container">
-        <div class="img-title">📷 ${imageName}</div>
-        <img src="${imgUrl}" alt="${imageName}">
+    <body class="img-viewer-body">
+      <div class="img-viewer-container">
+        <div class="img-viewer-title">📷 ${imageName}</div>
+        <img class="img-viewer-img" src="${imgUrl}" alt="${imageName}">
       </div>
     </body>
     </html>
@@ -295,7 +290,7 @@ function bindRow(row){
   const tid = row.getAttribute('data-tid');
   console.log('bindRow for tid=', tid);
   const $ = sel => row.querySelector(sel);
-  const save = (payload)=>postJSON(`/tasks/${tid}/update-json`, payload);
+  const save = (payload)=>postJSON(`/rpmt/projects/tasks/${tid}/update-json`, payload);
 
   $('.js-status')?.addEventListener('change', e=>save({status:e.target.value}));
   $('.js-reason')?.addEventListener('blur', e=>save({reason:e.target.value}));
@@ -316,16 +311,16 @@ function bindRow(row){
           label.textContent = 'Uploading...';
 
           console.log('Starting fetch for upload tid=', tid, 'size=', Array.from(files).reduce((s,f)=>s+f.size,0));
-          const response = await fetch(`/tasks/${tid}/upload`, {method:'POST', body:formData});
+          const response = await fetch(`/rpmt/projects/tasks/${tid}/upload`, {method:'POST', body:formData});
           let res = null;
           try { res = await response.json(); } catch(e){ res = null; }
 
           if(response.ok && res && res.ok){
-            showUploadModal('업로드가 완료되었습니다.');
+            showUploadModal('업로드가 완료되었습니다.', 'success');
           } else {
             const msg = (res && res.detail) ? res.detail : (`HTTP ${response.status} ${response.statusText}`);
             console.error('Upload failed:', response, res);
-            showUploadModal('업로드 실패: ' + msg);
+            showUploadModal('업로드 실패: ' + msg, 'error');
           }
           label.classList.remove('loading');
           label.textContent = oldLabel;
@@ -333,7 +328,7 @@ function bindRow(row){
           console.error('Upload error:', error);
           label.classList.remove('loading');
           label.textContent = '+ Add';
-          showUploadModal('업로드 중 오류가 발생했습니다.');
+          showUploadModal('업로드 중 오류가 발생했습니다.', 'error');
         }
       }
       fileInput.value = '';
@@ -348,30 +343,40 @@ async function confirmDelete(tid, filePath, btn){
   const fd = new FormData();
   fd.append('path', filePath);
   try{
-    const res = await fetch(`/tasks/${tid}/file-delete`, { method: 'POST', body: fd });
+    const res = await fetch(`/rpmt/projects/tasks/${tid}/file-delete`, { method: 'POST', body: fd });
     const j = await res.json();
     if(res.ok && j.ok){
       const container = btn.closest('div');
       if(container) container.remove();
       else location.reload();
     } else {
-      alert('삭제 실패: ' + (j.detail || JSON.stringify(j)));
+      showUploadModal('삭제 실패: ' + (j.detail || JSON.stringify(j)), 'error');
     }
   }catch(e){
     console.error(e);
-    alert('삭제 중 오류가 발생했습니다.');
+    showUploadModal('삭제 중 오류가 발생했습니다.', 'error');
   }
 }
 
-function showUploadModal(message){
+function showUploadModal(message, type='info'){
   const modal = document.getElementById('upload-complete-modal');
+  const title = modal.querySelector('.modal-title');
   const txt = modal.querySelector('.modal-message');
+  modal.classList.remove('upload-modal--success', 'upload-modal--error', 'upload-modal--info');
+  modal.classList.add(`upload-modal--${type}`);
+  if (title) {
+    if (type === 'success') title.textContent = '완료';
+    else if (type === 'error') title.textContent = '오류';
+    else title.textContent = '안내';
+  }
   txt.textContent = message || '업로드 완료';
+  modal.classList.remove('hidden');
   modal.classList.add('open');
 }
 function hideUploadModal(reload){
   const modal = document.getElementById('upload-complete-modal');
   modal.classList.remove('open');
+  modal.classList.add('hidden');
   if(reload) location.reload();
 }
 
@@ -396,7 +401,7 @@ function closePDKDKModal(){
 }
 
 function openEditPDKDKModal(entryId, projectId){
-  fetch(`/rpmt/admin/projects/${projectId}/tasks?v=None`)
+  fetch(`/admin/rpmt/projects/${projectId}/tasks?v=None`)
     .then(res => res.text())
     .then(html => {
       const parser = new DOMParser();
@@ -419,5 +424,13 @@ function openEditPDKDKModal(entryId, projectId){
     })
     .catch(err => console.error('Failed to load admin view:', err));
 }
+
+document.querySelectorAll('.ps-bar-fill[data-width]').forEach(bar => {
+  const value = bar.getAttribute('data-width');
+  const num = Number(value);
+  if (!Number.isNaN(num)) {
+    bar.style.width = `${Math.min(Math.max(num, 0), 100)}%`;
+  }
+});
 </script>
 {% endblock %}

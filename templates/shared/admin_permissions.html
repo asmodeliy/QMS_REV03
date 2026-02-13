@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container admin-page">
+  <h1 class="admin-title">Module Role Matrix</h1>
+  <p class="admin-subtitle">Assign per-module roles for each user.</p>
+
+  <form method="post" action="/admin/permissions">
+    <div class="table-responsive">
+      <table class="table admin-table-wide">
+        <thead>
+          <tr>
+            <th class="admin-col-user">User</th>
+            {% for key, label in modules %}
+            <th class="admin-col-module">{{ label }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>
+              <div class="admin-user-name">{{ u.english_name or '-' }}</div>
+              <div class="admin-user-email">{{ u.email }}</div>
+            </td>
+            {% for key, label in modules %}
+            {% set current = perm_map.get((u.id, key), 'None') %}
+            <td>
+              <select name="perm_{{ u.id }}_{{ key }}" class="admin-select-full">
+                {% for role in roles %}
+                <option value="{{ role }}" {% if role == current %}selected{% endif %}>{{ role }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="admin-actions">
+      <button class="btn btn-primary" type="submit">Save Changes</button>
+      <a class="btn btn-secondary" href="/admin">Back</a>
+    </div>
+  </form>
+</main>
+{% endblock %}

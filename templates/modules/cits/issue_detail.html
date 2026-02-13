@@ -163,6 +163,106 @@
 
 <script>
 let conversations = [];
+const RESIZE_STORE_PREFIX = 'qms-resize:cits:';
+
+function hashString(value) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) - hash) + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return String(hash);
+}
+
+function getResizeKey(src) {
+  return RESIZE_STORE_PREFIX + hashString(src || '');
+}
+
+function storeResizeSize(key, width, height) {
+  if (!key) return;
+  try {
+    localStorage.setItem(key, JSON.stringify({ w: width, h: height }));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+function applyStoredSize(el) {
+  const key = el?.dataset?.key;
+  if (!key) return;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data?.w) el.style.width = `${data.w}px`;
+    if (data?.h) el.style.height = `${data.h}px`;
+    if (data?.w) el.dataset.w = String(data.w);
+    if (data?.h) el.dataset.h = String(data.h);
+  } catch (e) {
+    // ignore
+  }
+}
+
+const resizableObserver = new ResizeObserver(entries => {
+  entries.forEach(entry => {
+    const el = entry.target;
+    el.dataset.w = String(Math.round(entry.contentRect.width));
+    el.dataset.h = String(Math.round(entry.contentRect.height));
+    storeResizeSize(el.dataset.key, el.dataset.w, el.dataset.h);
+  });
+});
+
+function observeResizable(el) {
+  if (!el) return;
+  resizableObserver.observe(el);
+}
+
+function applyResizableSizes(root) {
+  (root || document).querySelectorAll('.resizable').forEach(el => {
+    if (!el.dataset.key) {
+      const img = el.querySelector('img');
+      if (img && img.src) el.dataset.key = getResizeKey(img.src);
+    }
+    applyStoredSize(el);
+    observeResizable(el);
+  });
+}
+
+function updateResizableDataset(root) {
+  (root || document).querySelectorAll('.resizable').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.width) el.dataset.w = String(Math.round(rect.width));
+    if (rect.height) el.dataset.h = String(Math.round(rect.height));
+  });
+}
+
+function serializeContentWithSizes(root) {
+  updateResizableDataset(root);
+  const clone = root.cloneNode(true);
+  clone.querySelectorAll('.resizable').forEach(el => {
+    el.style.width = '';
+    el.style.height = '';
+  });
+  return clone.innerHTML.trim();
+}
+
+function createResizableImageNode(src, alt) {
+  const wrap = document.createElement('div');
+  wrap.className = 'inline-attach';
+  const resizable = document.createElement('div');
+  resizable.className = 'resizable';
+  resizable.dataset.key = getResizeKey(src);
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = alt || 'Image';
+  resizable.appendChild(img);
+  wrap.appendChild(resizable);
+  requestAnimationFrame(() => {
+    applyStoredSize(resizable);
+    observeResizable(resizable);
+  });
+  return wrap;
+}
 
 // Build customer map (from modal logic)
 const customerIdByName = {
@@ -226,7 +326,7 @@ function renderContentWithImages(content) {
     // data URL이 아니면 그대로 둠
     return match;
   });
-  
+
   return html;
 }
 
@@ -292,6 +392,7 @@ function renderConversations() {
   
   html += '</div>';
   container.innerHTML = html;
+  applyResizableSizes(container);
 }
 
 function addConversation() {
@@ -343,8 +444,8 @@ function saveNewConversation() {
   // Get text content (not HTML)
   let content = contentDiv.textContent.trim();
   
-  // Also get HTML with images
-  const contentHtml = contentDiv.innerHTML.trim();
+  // Also get HTML with images and persisted sizes
+  const contentHtml = serializeContentWithSizes(contentDiv);
   
   // Check if there's any content (text or images)
   const hasText = content.length > 0;
@@ -386,16 +487,8 @@ function setupPasteHandler(elementId) {
         const blob = items[i].getAsFile();
         const reader = new FileReader();
         reader.onload = function(event) {
-          // Create resizable wrapper
-          const wrap = document.createElement('div');
-          wrap.className = 'inline-attach';
-          const resizable = document.createElement('div');
-          resizable.className = 'resizable';
-          const img = document.createElement('img');
-          img.src = event.target.result;
-          resizable.appendChild(img);
-          wrap.appendChild(resizable);
-          element.appendChild(wrap);
+          const node = createResizableImageNode(event.target.result, 'Image');
+          element.appendChild(node);
         };
         reader.readAsDataURL(blob);
         return;
@@ -474,12 +567,8 @@ function handleNewConvImage(event) {
   if (file && file.type.startsWith('image/')) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.style.maxWidth = '100%';
-      img.style.height = 'auto';
-      img.style.margin = '8px 0';
-      document.getElementById('newConvContent').appendChild(img);
+      const node = createResizableImageNode(e.target.result, 'Image');
+      document.getElementById('newConvContent').appendChild(node);
     };
     reader.readAsDataURL(file);
   }
@@ -569,12 +658,8 @@ function handleReplyImage(event, inquiryId) {
   if (file && file.type.startsWith('image/')) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.style.maxWidth = '100%';
-      img.style.height = 'auto';
-      img.style.margin = '8px 0';
-      document.getElementById(`newReplyContent_${inquiryId}`).appendChild(img);
+      const node = createResizableImageNode(e.target.result, 'Image');
+      document.getElementById(`newReplyContent_${inquiryId}`).appendChild(node);
     };
     reader.readAsDataURL(file);
   }
@@ -612,18 +697,6 @@ function editConversation(convId, originalContent, pairIndex, isReply) {
   editDiv.className = 'conv-edit-div';
   editDiv.id = `conv-edit-div-${convId}`;
   editDiv.contentEditable = 'true';
-  editDiv.style.minHeight = '200px';
-  editDiv.style.padding = '12px';
-  editDiv.style.border = '2px solid #3b82f6';
-  editDiv.style.borderRadius = '6px';
-  editDiv.style.fontFamily = '"Menlo", "Monaco", "Courier New", monospace';
-  editDiv.style.fontSize = '14px';
-  editDiv.style.lineHeight = '1.6';
-  editDiv.style.whiteSpace = 'pre-wrap';
-  editDiv.style.wordWrap = 'break-word';
-  editDiv.style.overflowWrap = 'break-word';
-  editDiv.style.outline = 'none';
-  editDiv.style.backgroundColor = 'white';
   
   // Set initial content with rendered images
   editDiv.innerHTML = renderContentWithImages(originalContent);
@@ -640,26 +713,17 @@ function editConversation(convId, originalContent, pairIndex, isReply) {
         const blob = items[i].getAsFile();
         const reader = new FileReader();
         reader.onload = function(event) {
-          // Insert img tag with base64 data
-          const img = document.createElement('img');
-          img.src = event.target.result;
-          img.style.maxWidth = '100%';
-          img.style.height = 'auto';
-          img.style.margin = '8px 0';
-          img.style.borderRadius = '4px';
-          img.style.display = 'block';
-          
-          // Insert at cursor position or append
+          const node = createResizableImageNode(event.target.result, 'Image');
           const selection = window.getSelection();
           if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            range.insertNode(img);
-            range.setStartAfter(img);
+            range.insertNode(node);
+            range.setStartAfter(node);
             range.collapse(true);
             selection.removeAllRanges();
             selection.addRange(range);
           } else {
-            editDiv.appendChild(img);
+            editDiv.appendChild(node);
           }
         };
         reader.readAsDataURL(blob);
@@ -670,34 +734,15 @@ function editConversation(convId, originalContent, pairIndex, isReply) {
   editDiv.addEventListener('paste', handlePaste);
   
   function saveEdit() {
-    // Convert contenteditable div back to markdown format
-    const html = editDiv.innerHTML;
-    let markdown = '';
-    
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    
-    // Convert img tags back to markdown format
-    const images = tempDiv.querySelectorAll('img');
-    images.forEach(img => {
-      const dataUrl = img.src;
-      img.replaceWith(`![image](${dataUrl})`);
-    });
-    
-    // Get text content and clean up
-    markdown = tempDiv.textContent;
-    
-    // Also preserve any remaining HTML structure
-    let content = markdown.trim();
-    if (!content) content = html;
-    
-    if (content === originalContent) {
+    const htmlContent = serializeContentWithSizes(editDiv);
+    const normalizedOriginal = renderContentWithImages(originalContent);
+    if (htmlContent === normalizedOriginal) {
       cancelEdit(convId);
       return;
     }
     
     const formData = new FormData();
-    formData.append('content', content);
+    formData.append('content', htmlContent);
     
     fetch(`/cits/issue/conversations/${convId}/update`, {
       method: 'POST',

@@ -12,7 +12,7 @@
     <div class="header-actions">
       <a href="/product-info" class="pi-btn pi-btn-secondary">{{ t('product_info.back_to_list', locale) }}</a>
       <button id="addRowBtn" class="pi-btn" onclick="addNewRow()">{{ t('product_info.add_new_row', locale) }}</button>
-      <button id="addMatrixBtn" class="pi-btn" onclick="addMatrixRow()" style="display: none;">Add IP</button>
+      <button id="addMatrixBtn" class="pi-btn is-hidden" onclick="addMatrixRow()">Add IP</button>
     </div>
   </div>
 
@@ -34,7 +34,7 @@
           <tr data-rowid="{{ row.__rowid__ }}">
             <td class="pi-cell">
               <span class="view-mode">{{ row.get('ip_name', '') }}</span>
-              <select class="edit-mode ip-select" style="display:none;">
+              <select class="edit-mode ip-select is-hidden">
                 <option value="" disabled {% if not row.get('ip_name') %}selected{% endif %}>-- Select IP --</option>
                 {% for ip in ip_list %}
                 <option value="{{ ip }}" {% if row.get('ip_name') == ip %}selected{% endif %}>{{ ip }}</option>
@@ -44,7 +44,7 @@
             {% for col in columns %}
             <td data-col="{{ col }}" class="pi-cell">
               <span class="view-mode">{{ row[col] if row[col] is not none else '' }}</span>
-              <input class="edit-mode" type="text" value="{{ row[col] if row[col] is not none else '' }}" style="display:none;">
+              <input class="edit-mode is-hidden" type="text" value="{{ row[col] if row[col] is not none else '' }}">
             </td>
             {% endfor %}
             <td class="pi-actions">
@@ -61,13 +61,13 @@
                   <path d="M10 11v6M14 11v6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
               </button>
-              <button class="pi-btn icon save-btn" onclick="saveRow(this)" title="저장" style="display:none;">
+              <button class="pi-btn icon save-btn is-hidden" onclick="saveRow(this)" title="저장">
                 <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
                   <path d="M9.5 13l1.7 1.7L15.5 10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
               </button>
-              <button class="pi-btn icon pi-btn-secondary cancel-btn" onclick="cancelEdit(this)" title="취소" style="display:none;">
+              <button class="pi-btn icon pi-btn-secondary cancel-btn is-hidden" onclick="cancelEdit(this)" title="취소">
                 <svg class="pi-action-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="12" cy="12" r="9" stroke-width="1.6"></circle>
                   <path d="M15 9l-6 6M9 9l6 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -101,7 +101,7 @@
             <tr data-ip="{{ row.ip }}">
               <td class="matrix-ip-name">
                 <span class="view-mode">{{ row.ip }}</span>
-                <input class="edit-mode" type="text" value="{{ row.ip }}" style="display:none;">
+                <input class="edit-mode is-hidden" type="text" value="{{ row.ip }}">
               </td>
               {% for node in matrix_nodes %}
               <td class="matrix-status">
@@ -120,7 +120,7 @@
                       <span class="pi-dot empty" data-status="" title="Not Set"></span>
                     {% endif %}
                   </span>
-                  <select class="edit-mode status-select" style="display:none;" data-node="{{ node }}">
+                  <select class="edit-mode status-select is-hidden" data-node="{{ node }}">
                     <option value="" {% if not row.statuses.get(node) %}selected{% endif %}>Not Set</option>
                     <option value="mass" {% if row.statuses.get(node) == 'mass' %}selected{% endif %}>Mass Production</option>
                     <option value="proven" {% if row.statuses.get(node) == 'proven' %}selected{% endif %}>Silicon Proven</option>
@@ -144,17 +144,17 @@
                       <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
                     </svg>
                   </button>
-                  <button type="button" class="pi-btn save-matrix-btn" onclick="saveMatrixRow(this); return false;" title="Save" style="display:none;">
+                  <button type="button" class="pi-btn save-matrix-btn is-hidden" onclick="saveMatrixRow(this); return false;" title="Save">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
                       <path d="M5 13l4 4L19 7"></path>
                     </svg>
                   </button>
-                  <button type="button" class="pi-btn pi-btn-secondary cancel-matrix-btn" onclick="cancelMatrixEdit(this); return false;" title="Cancel" style="display:none;">
+                  <button type="button" class="pi-btn pi-btn-secondary cancel-matrix-btn is-hidden" onclick="cancelMatrixEdit(this); return false;" title="Cancel">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
                       <path d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                   </button>
-                  <span class="save-status" style="display:none;">Saved</span>
+                  <span class="save-status is-hidden">Saved</span>
                 </div>
               </td>
             </tr>
@@ -212,7 +212,7 @@ function addNewRow() {
     const ipList = {{ ip_list|tojson }};
     let newRow = '<tr data-rowid="">';
     
-    newRow += '<td class="pi-cell"><span class="view-mode"></span><select class="edit-mode ip-select" style="display:none;"><option value="" disabled selected>-- Select IP --</option>';
+    newRow += '<td class="pi-cell"><span class="view-mode"></span><select class="edit-mode ip-select is-hidden"><option value="" disabled selected>-- Select IP --</option>';
     ipList.forEach(ip => {
       newRow += `<option value="${ip}">${ip}</option>`;
     });
@@ -221,7 +221,7 @@ function addNewRow() {
     columns.forEach(col => {
       newRow += `<td data-col="${col}" class="pi-cell">
         <span class="view-mode"></span>
-        <input class="edit-mode" type="text" value="" style="display:none;">
+        <input class="edit-mode is-hidden" type="text" value="">
       </td>`;
     });
     newRow += `<td class="pi-actions">
@@ -398,7 +398,7 @@ function addMatrixRow() {
 
   // IP name cell
   let rowHtml = `<td class="matrix-ip-name">
-      <span class="view-mode" style="display:none;"></span>
+      <span class="view-mode is-hidden"></span>
       <input class="edit-mode" type="text" placeholder="Enter IP name">
     </td>`;
 
@@ -406,8 +406,8 @@ function addMatrixRow() {
   nodes.forEach(node => {
     rowHtml += `<td class="matrix-status">
       <div class="cell-inner">
-        <span class="view-mode" style="display:none;"></span>
-        <select class="edit-mode status-select" style="display:block;" data-node="${node}">
+        <span class="view-mode is-hidden"></span>
+        <select class="edit-mode status-select" data-node="${node}">
           <option value="" selected>Not Set</option>
           <option value="mass">Mass Production</option>
           <option value="proven">Silicon Proven</option>
@@ -673,8 +673,8 @@ function saveMatrixRow(btn) {
       nodes.forEach(node => {
         insertHtml += `<td class="matrix-status">
           <div class="cell-inner">
-            <span class="view-mode" style="display:none;"></span>
-            <select class="edit-mode status-select" style="display:none;" data-node="${node}">
+            <span class="view-mode is-hidden"></span>
+            <select class="edit-mode status-select is-hidden" data-node="${node}">
               <option value="" ${'' === '' ? 'selected' : ''}>Not Set</option>
               <option value="mass">Mass Production</option>
               <option value="proven">Silicon Proven</option>

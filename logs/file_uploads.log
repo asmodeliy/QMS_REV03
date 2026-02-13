@@ -1,0 +1,5 @@
+2026-02-11 19:10:42,940	INFO	Entry KPI handler project=2 url=http://localhost:8000/rpmt/projects/2/kpi.json?kind=progress method=GET client=127.0.0.1 headers={'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:8000/rpmt/dashboard', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'}
+2026-02-11 19:10:42,950	INFO	Content-Length header: None
+2026-02-11 19:10:42,952	INFO	Session info for project=2: {'is_authenticated': True, 'email': 'swlee@ramschip.com', 'role': 'Admin'}
+2026-02-12 17:50:05,441	INFO	Receiving upload task=2 name=diagram-2.png size=66415
+2026-02-12 17:50:05,445	INFO	Uploaded task=2 name=diagram-2.png -> C:\Users\이상원\Downloads\QMS_SERVER\uploads\rpmt\2_1770886205_diagram-2.png size=66415

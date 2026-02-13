@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <a class="btn primary" href="/rpmt/admin/archive?v={{ visit }}" style="margin-bottom: 12px; width: 100%; text-align: center;">
+      <a class="btn primary rpmt-admin-archive-btn" href="/admin/rpmt/archive?v={{ visit }}">
         {{ t('admin.view_archived_projects') }}
       </a>
 
@@ -37,7 +37,7 @@
             title="{{ prj.code }} {{ prj.process or '' }}">
           <div class="row">
             <span class="code clamp-1">{{ prj.code }}</span>
-            <div style="display:flex; gap:4px; flex-wrap:wrap">
+            <div class="rpmt-pill-row">
               {% if prj.process %}<span class="pill">{{ prj.process }}</span>{% endif %}
               {% if prj.metal_option %}<span class="pill">{{ prj.metal_option }}</span>{% endif %}
               {% if prj.ip_code %}<span class="pill">{{ prj.ip_code }}</span>{% endif %}
@@ -45,9 +45,9 @@
             </div>
           </div>
           <form method="post"
-                action="/rpmt/admin/projects/{{ prj.id }}/delete?v={{ visit }}"
+                action="/admin/rpmt/projects/{{ prj.id }}/delete?v={{ visit }}"
                 onsubmit="return confirm('Delete this project?\nThis action cannot be undone.');"
-                style="display:contents">
+                class="form-contents">
             <button class="btn small danger" type="submit" title="{{ t('common.delete') }}">✕</button>
           </form>
         </div>
@@ -56,7 +56,7 @@
 
       <hr class="soft">
 
-      <form class="create-form" method="post" action="/rpmt/admin/projects/create?v={{ visit }}">
+      <form class="create-form" method="post" action="/admin/rpmt/projects/create?v={{ visit }}">
         <div class="title-sm">{{ t('admin.new_project') }}</div>
         <input class="inp" name="code" placeholder="{{ t('project.code') }}" required maxlength="50">
         <input class="inp" name="process" placeholder="{{ t('project.process') }} (optional)" maxlength="50">
@@ -88,7 +88,7 @@
       pane.innerHTML = '<div class="loading">⏳ Loading…</div>';
       
       try {
-        const res = await fetch(`/rpmt/admin/projects/${pid}/tasks?v=${encodeURIComponent(VISIT)}`);
+        const res = await fetch(`/admin/rpmt/projects/${pid}/tasks?v=${encodeURIComponent(VISIT)}`);
         if(!res.ok) throw new Error(`HTTP ${res.status}`);
         pane.innerHTML = await res.text();
       } catch(e) {
@@ -122,7 +122,7 @@
     })();
 
     document.getElementById('btn-backup').addEventListener('click', () => {
-      location.href = `/rpmt/admin/backup?v=${encodeURIComponent(VISIT)}`;
+      location.href = `/admin/rpmt/backup?v=${encodeURIComponent(VISIT)}`;
     });
 
     document.getElementById('btn-restore').addEventListener('click', () => {
@@ -139,7 +139,7 @@
       fd.append('file', file);
       
       try {
-        const res = await fetch(`/rpmt/admin/restore?v=${encodeURIComponent(VISIT)}`, {
+        const res = await fetch(`/admin/rpmt/restore?v=${encodeURIComponent(VISIT)}`, {
           method:'POST',
           body:fd
         });
@@ -159,7 +159,7 @@
       if(!ok) return;
 
       try {
-        const r = await fetch(`/rpmt/admin/vacuum?v=${encodeURIComponent(VISIT)}`, {method:'POST'});
+        const r = await fetch(`/admin/rpmt/vacuum?v=${encodeURIComponent(VISIT)}`, {method:'POST'});
         const msg = await r.text();
         alert(msg || '✓ Optimization Complete');
       } catch(e) {
@@ -173,7 +173,7 @@
       pane.innerHTML = '<div class="loading">⏳ Loading system status…</div>';
 
       try {
-        const res = await fetch(`/rpmt/admin/system/status?v=${encodeURIComponent(VISIT)}`);
+        const res = await fetch(`/admin/rpmt/system/status?v=${encodeURIComponent(VISIT)}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const s = await res.json();
 
@@ -216,13 +216,16 @@
       if(event) event.preventDefault();
       const modal = document.getElementById('pdk-dk-modal');
       if(modal) {
-        modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+        const isHidden = modal.classList.contains('hidden');
+        modal.classList.toggle('hidden', !isHidden);
+        modal.style.display = isHidden ? 'flex' : 'none';
       }
     }
 
     function closePDKDKModal(){
       const modal = document.getElementById('pdk-dk-modal');
       if(modal) {
+        modal.classList.add('hidden');
         modal.style.display = 'none';
       }
     }
@@ -233,13 +236,13 @@
       
       if(!span || !input) return;
       
-      if(span.style.display !== 'none'){
-        span.style.display = 'none';
-        input.style.display = 'inline-block';
+      if(input.classList.contains('hidden')){
+        span.classList.add('hidden');
+        input.classList.remove('hidden');
         input.focus();
       } else {
-        span.style.display = 'inline-block';
-        input.style.display = 'none';
+        span.classList.remove('hidden');
+        input.classList.add('hidden');
       }
     }
 
@@ -249,7 +252,7 @@
         const data = {};
         data[fieldName] = value;
         
-        const res = await fetch(`/rpmt/admin/pdkdk/${entryId}`, {
+        const res = await fetch(`/admin/rpmt/pdkdk/${entryId}`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(data)
@@ -278,13 +281,13 @@
       
       if(!select) return;
       
-      if(select.style.display === 'none'){
-        span.style.display = 'none';
-        select.style.display = 'inline-block';
+      if(select.classList.contains('hidden')){
+        span.classList.add('hidden');
+        select.classList.remove('hidden');
         select.focus();
       } else {
-        span.style.display = 'inline-block';
-        select.style.display = 'none';
+        span.classList.remove('hidden');
+        select.classList.add('hidden');
       }
     }
     
@@ -298,9 +301,12 @@
         if(span && select){
           const displayValue = value === 'PDK' ? 'PDK' : (value === 'DK' ? 'DK' : '-');
           span.textContent = displayValue;
-          span.style.background = value === 'PDK' ? '#eff6ff' : (value === 'DK' ? '#fef3c7' : '#f5f5f5');
-          span.style.display = 'inline-block';
-          select.style.display = 'none';
+          span.classList.remove('pdk-type-pdk', 'pdk-type-dk', 'pdk-type-none');
+          if(value === 'PDK') span.classList.add('pdk-type-pdk');
+          else if(value === 'DK') span.classList.add('pdk-type-dk');
+          else span.classList.add('pdk-type-none');
+          span.classList.remove('hidden');
+          select.classList.add('hidden');
         }
       }
     }
@@ -362,7 +368,7 @@
           }
           
           if(Object.keys(data).length > 0){
-            const updateRes = await fetch('/rpmt/admin/pdkdk/' + entryId, {
+            const updateRes = await fetch('/admin/rpmt/pdkdk/' + entryId, {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify(data)
@@ -427,7 +433,7 @@
       
       const row = document.createElement('tr');
       row.setAttribute('data-entry-id', tempId);
-      row.style.cssText = 'border: 1px solid #d1d5db; background: #fff3cd;';
+      row.className = 'pdk-row pdk-row-new';
       
       const allCategories = [...pdkCategories, ...dkCategories];
       const datalistId = 'category-list-' + tempId;
@@ -436,19 +442,19 @@
         '</datalist>';
       
       const cells = [
-        '<td style="padding: 8px; font-weight: 600; border: 1px solid #d1d5db; background: #fff3cd;"><select id="type-' + tempId + '" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"><option value="">선택...</option><option value="PDK">PDK</option><option value="DK">DK</option></select></td>',
-        '<td style="padding: 8px; border: 1px solid #d1d5db; background: #fff3cd;"><input type="text" id="category-' + tempId + '" list="' + datalistId + '" placeholder="카테고리 입력" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;" disabled/>' + datalistHtml + '</td>',
-        '<td onclick="toggleEdit(this, \'eng-ver-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-eng-ver-ko-' + tempId + '">-</span><input type="text" id="eng-ver-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'b2b-date-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-b2b-date-ko-' + tempId + '">-</span><input type="text" id="b2b-date-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'match-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-match-ko-' + tempId + '">-</span><input type="text" id="match-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'check-date-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-check-date-ko-' + tempId + '">-</span><input type="text" id="check-date-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'qa-check-ko-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-qa-check-ko-' + tempId + '">-</span><input type="text" id="qa-check-ko-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'eng-ver-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-eng-ver-tweek-' + tempId + '">-</span><input type="text" id="eng-ver-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'b2b-date-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-b2b-date-tweek-' + tempId + '">-</span><input type="text" id="b2b-date-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'match-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-match-tweek-' + tempId + '">-</span><input type="text" id="match-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'check-date-tweek-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-check-date-tweek-' + tempId + '">-</span><input type="text" id="check-date-tweek-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td onclick="toggleEdit(this, \'reason-' + tempId + '\')" style="padding: 8px; border: 1px solid #d1d5db; cursor: pointer;"><span id="display-reason-' + tempId + '">-</span><input type="text" id="reason-' + tempId + '" value="" style="display: none; width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"/></td>',
-        '<td style="padding: 8px; text-align: center; border: 1px solid #d1d5db;"><button type="button" onclick="deleteNewRow(this)" class="btn small danger">✕</button></td>'
+        '<td class="pdk-cell pdk-cell-strong pdk-cell-warn"><select id="type-' + tempId + '" class="pdk-select"><option value="">선택...</option><option value="PDK">PDK</option><option value="DK">DK</option></select></td>',
+        '<td class="pdk-cell pdk-cell-warn"><input type="text" id="category-' + tempId + '" list="' + datalistId + '" placeholder="카테고리 입력" class="pdk-input" disabled/>' + datalistHtml + '</td>',
+        '<td onclick="toggleEdit(this, \'eng-ver-ko-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-eng-ver-ko-' + tempId + '" class="pdk-display pdk-display-md">-</span><input type="text" id="eng-ver-ko-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'b2b-date-ko-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-b2b-date-ko-' + tempId + '" class="pdk-display pdk-display-sm">-</span><input type="text" id="b2b-date-ko-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'match-ko-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-match-ko-' + tempId + '" class="pdk-display pdk-display-sm">-</span><input type="text" id="match-ko-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'check-date-ko-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-check-date-ko-' + tempId + '" class="pdk-display pdk-display-sm">-</span><input type="text" id="check-date-ko-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'qa-check-ko-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-qa-check-ko-' + tempId + '" class="pdk-display pdk-display-sm">-</span><input type="text" id="qa-check-ko-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'eng-ver-tweek-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-eng-ver-tweek-' + tempId + '" class="pdk-display pdk-display-md">-</span><input type="text" id="eng-ver-tweek-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'b2b-date-tweek-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-b2b-date-tweek-' + tempId + '" class="pdk-display pdk-display-sm">-</span><input type="text" id="b2b-date-tweek-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'match-tweek-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-match-tweek-' + tempId + '" class="pdk-display pdk-display-sm">-</span><input type="text" id="match-tweek-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'check-date-tweek-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-check-date-tweek-' + tempId + '" class="pdk-display pdk-display-sm">-</span><input type="text" id="check-date-tweek-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td onclick="toggleEdit(this, \'reason-' + tempId + '\')" class="pdk-cell pdk-cell-click"><span id="display-reason-' + tempId + '" class="pdk-display pdk-display-lg">-</span><input type="text" id="reason-' + tempId + '" value="" class="pdk-input hidden"/></td>',
+        '<td class="pdk-cell pdk-cell-center"><button type="button" onclick="deleteNewRow(this)" class="btn small danger">✕</button></td>'
       ];
       
       row.innerHTML = cells.join('');
@@ -478,7 +484,7 @@
       }
       
       try {
-        const res = await fetch(`/rpmt/admin/pdkdk/${entryId}`, {
+        const res = await fetch(`/admin/rpmt/pdkdk/${entryId}`, {
           method: 'DELETE'
         });
         

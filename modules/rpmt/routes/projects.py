@@ -592,111 +592,104 @@ async def preview_file (filename :str ,request :Request ):
         raise HTTPException (404 ,"File not found")
 
     if filename .lower ().endswith ('.pdf'):
-        return RedirectResponse (url =f"/uploads/{filename}",status_code =303 )
+        return RedirectResponse(url=f"/uploads/rpmt/{filename}", status_code=303)
 
     try :
         html =get_file_preview (file_path )
 
-        html_content = """<!DOCTYPE html>
+        html_content ="""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>파일 미리보기 - {filename}</title>
     <style>
-        body {{ 
-            margin: 0; 
-            padding: 20px; 
-            font-family: system-ui, -apple-system, sans-serif;
-            background:
+        body {{
+            margin:0;
+            padding:24px;
+            font-family:'Sora','Pretendard','Noto Sans KR',system-ui,-apple-system,'Segoe UI',sans-serif;
+            background:#f3f7ff;
+            color:#1f2a3d;
         }}
         .preview-container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width:1200px;
+            margin:0 auto;
+            background:#ffffff;
+            border:1px solid #dbe4f2;
+            border-radius:14px;
+            box-shadow:0 14px 32px rgba(15,23,42,0.12);
+            overflow:hidden;
         }}
         .preview-header {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            padding:14px 18px;
+            border-bottom:1px solid #e4eaf5;
+            background:#f9fbff;
         }}
         .preview-title {{
-            font-size: 18px;
-            font-weight: 600;
-            color:
+            font-size:15px;
+            font-weight:700;
+            color:#0f172a;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
         }}
         .btn-close {{
-            padding: 8px 16px;
-            background:
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            padding:7px 12px;
+            background:#2e5bff;
+            color:#ffffff;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:12px;
+            font-weight:700;
         }}
-        .btn-close:hover {{
-            background:
+        .btn-close:hover {{ background:#254bd2; }}
+        .preview-content {{ padding:18px; }}
+        .preview-content pre {{
+            margin:0;
+            padding:14px;
+            border-radius:10px;
+            border:1px solid #243552;
+            background:#111a2b;
+            color:#dbe7f8;
+            overflow:auto;
+            line-height:1.52;
+            font-size:12px;
+            font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;
         }}
-        table {{
-            border-collapse: collapse;
-            width: 100%;
-            margin: 10px 0;
-            font-size: 13px;
+        .preview-content code {{
+            font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;
         }}
-        th, td {{
-            border: 1px solid
-            padding: 8px 12px;
-            text-align: left;
+        .preview-content table {{
+            border-collapse:collapse;
+            width:100%;
+            font-size:12px;
         }}
-        th {{
-            background:
-            font-weight: 600;
+        .preview-content th, .preview-content td {{
+            border:1px solid #dbe4f2;
+            padding:8px 10px;
+            text-align:left;
         }}
-        .slide {{
-            margin: 20px 0;
-            padding: 20px;
-            border: 1px solid
-            border-radius: 8px;
-            background:
+        .preview-content th {{
+            background:#f4f8ff;
+            font-weight:700;
+            color:#1f2a3d;
         }}
-        .slide-title {{
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color:
-        }}
-        .pdf-page {{
-            margin: 20px 0;
-            padding: 15px;
-            background: white;
-            border: 1px solid
-            border-radius: 8px;
-        }}
-        .page-number {{
-            font-weight: 600;
-            color:
-            margin-bottom: 10px;
-        }}
-        h1, h2, h3 {{ color:
-        p {{ color:
+        .preview-content h1, .preview-content h2, .preview-content h3 {{ color:#0f172a; }}
+        .preview-content p {{ color:#334155; }}
     </style>
 </head>
 <body>
     <div class="preview-container">
         <div class="preview-header">
-            <div class="preview-title">파일 {filename}</div>
+            <div class="preview-title">파일 미리보기 · {filename}</div>
             <button class="btn-close" onclick="window.close()">닫기</button>
         </div>
-        <div class="preview-content">
-            {html}
-        </div>
+        <div class="preview-content">{html}</div>
     </div>
 </body>
 </html>"""

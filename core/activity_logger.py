@@ -52,6 +52,7 @@ class ActionType:
     ADMIN_USER_REJECT = "admin_user_reject"
     ADMIN_USER_DELETE = "admin_user_delete"
     ADMIN_SETTINGS_UPDATE = "admin_settings_update"
+    PAGE_VIEW = "page_view"
 
 
 class UserActivityLogger:
@@ -79,6 +80,26 @@ class UserActivityLogger:
             )
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
+
+        self._cleanup_old_logs()
+
+    def _cleanup_old_logs(self):
+        try:
+            from core.config import ACTIVITY_LOG_RETENTION_DAYS
+        except Exception:
+            ACTIVITY_LOG_RETENTION_DAYS = 30
+
+        cutoff = datetime.now().date()
+        for p in LOGS_DIR.glob("user_activity_*.log"):
+            try:
+                date_part = p.stem.replace("user_activity_", "")
+                if len(date_part) != 8:
+                    continue
+                log_date = datetime.strptime(date_part, "%Y%m%d").date()
+                if (cutoff - log_date).days > ACTIVITY_LOG_RETENTION_DAYS:
+                    p.unlink(missing_ok=True)
+            except Exception:
+                continue
     
     def log_action(
         self,

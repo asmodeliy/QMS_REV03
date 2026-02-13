@@ -23,7 +23,7 @@
     <div class="registration-section">
       <div class="form-card">
         <h2 class="form-title">🆕 {{ t('svit.register_mpw') or 'Register New MPW' }}</h2>
-        <form method="post" action="/svit/admin/register" class="registration-form">
+        <form method="post" action="/admin/svit/register" class="registration-form">
           <div class="form-row">
             <div class="form-group">
               <label>{{ t('svit.mpw_id') or 'MPW ID' }} *</label>
@@ -130,10 +130,10 @@
   </div>
 
   
-  <div id="editModal" class="modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; z-index:1200;">
-    <div class="modal-card" style="background:#fff; border-radius:10px; padding:18px; width:720px; max-width:95%; box-shadow:0 20px 50px rgba(2,6,23,0.3);">
+  <div id="editModal" class="modal-backdrop svit-admin-modal">
+    <div class="modal-card svit-admin-modal-card">
       <h3 id="editTitle">Edit MPW</h3>
-      <form id="editForm" method="post" action="/svit/admin/update-mpw">
+      <form id="editForm" method="post" action="/admin/svit/update-mpw">
         <input type="hidden" name="mpw_db_id" id="mpw_db_id" value="" />
         <div class="form-row">
           <div class="form-group">
@@ -166,7 +166,7 @@
           </div>
         </div>
 
-        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+        <div class="modal-actions">
           <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
           <button type="submit" class="btn btn-primary">Save</button>
         </div>
@@ -208,7 +208,7 @@ function deleteShuttle(mpwId) {
     // Create a form and submit it
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/svit/admin/delete-mpw/' + mpwId;
+    form.action = '/admin/svit/delete-mpw/' + mpwId;
     document.body.appendChild(form);
     form.submit();
   }

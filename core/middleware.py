@@ -2,6 +2,8 @@ import logging
 import time
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
+from core.activity_logger import get_activity_logger, ActionType
+from core.utils import get_client_ip
 
 logger = logging.getLogger("rpmt")
 
@@ -53,5 +55,33 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             app_logger.warning(f"Client error: {request.method} {request.url.path}", context)
         else:
             app_logger.error(f"Server error: {request.method} {request.url.path}", context)
+
+        if request.method == "GET" and 200 <= response.status_code < 400:
+            path = request.url.path or ""
+            if not self._should_skip_activity(path):
+                module_name = self._module_from_path(path)
+                activity_logger = get_activity_logger()
+                activity_logger.log_action(
+                    user_email=user_email,
+                    action=ActionType.PAGE_VIEW,
+                    module=module_name,
+                    details={"path": path, "method": request.method},
+                    ip_address=get_client_ip(request),
+                    success=True
+                )
         
         return response 
+
+    def _should_skip_activity(self, path: str) -> bool:
+        skip_prefixes = ("/static", "/img", "/uploads", "/favicon", "/health", "/api", "/gpt4all")
+        return path.startswith(skip_prefixes)
+
+    def _module_from_path(self, path: str) -> str:
+        if not path or path == "/":
+            return "main"
+        seg = path.strip("/").split("/")[0]
+        mapping = {
+            "spec-center": "spec_center",
+            "product-info": "product_info",
+        }
+        return mapping.get(seg, seg)

@@ -305,6 +305,93 @@
 
 <script>
 let isEditMode = false;
+const ISSUE_ID = document.getElementById('issue-id')?.value || '';
+const getIssueId = () => ISSUE_ID || (location.pathname.match(/\/(?:issue|phenomenon)\/(\d+)/) || [])[1] || '';
+const RESIZE_STORE_PREFIX = 'qms-resize:svit:';
+
+function hashString(value) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) - hash) + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return String(hash);
+}
+
+function getResizeKey(src) {
+  return RESIZE_STORE_PREFIX + hashString(src || '');
+}
+
+function storeResizeSize(key, width, height) {
+  if (!key) return;
+  try {
+    localStorage.setItem(key, JSON.stringify({ w: width, h: height }));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+function applyStoredSize(el) {
+  const key = el?.dataset?.key;
+  if (!key) return;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data?.w) el.style.width = `${data.w}px`;
+    if (data?.h) el.style.height = `${data.h}px`;
+    if (data?.w) el.dataset.w = String(data.w);
+    if (data?.h) el.dataset.h = String(data.h);
+  } catch (e) {
+    // ignore
+  }
+}
+
+const resizableObserver = new ResizeObserver(entries => {
+  entries.forEach(entry => {
+    const el = entry.target;
+    el.dataset.w = String(Math.round(entry.contentRect.width));
+    el.dataset.h = String(Math.round(entry.contentRect.height));
+    storeResizeSize(el.dataset.key, el.dataset.w, el.dataset.h);
+  });
+});
+
+function observeResizable(el) {
+  if (!el) return;
+  resizableObserver.observe(el);
+}
+
+function applyResizableSizes(root) {
+  (root || document).querySelectorAll('.resizable').forEach(el => {
+    if (!el.dataset.key) {
+      const img = el.querySelector('img');
+      if (img && img.src) el.dataset.key = getResizeKey(img.src);
+    }
+    applyStoredSize(el);
+    observeResizable(el);
+  });
+}
+
+function createResizableWrap(src, alt) {
+  const wrap = document.createElement('div');
+  wrap.className = 'inline-attach';
+  const inner = document.createElement('div');
+  inner.className = 'attach-wrap';
+  const resizable = document.createElement('div');
+  resizable.className = 'resizable';
+  resizable.dataset.key = getResizeKey(src);
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = alt || 'Image';
+  resizable.appendChild(img);
+  inner.appendChild(resizable);
+  wrap.appendChild(inner);
+  requestAnimationFrame(() => {
+    applyStoredSize(resizable);
+    observeResizable(resizable);
+  });
+  return wrap;
+}
 
 // Clipboard paste-to-upload handler (inlined into main script block)
 document.addEventListener('paste', async function(e){
@@ -327,7 +414,7 @@ document.addEventListener('paste', async function(e){
       if(isExpected){ fd.append('expected_from_paste', '1'); }
       if(isCounter){ fd.append('countermeasure_from_paste', '1'); }
       // determine issue id from hidden input or url fallback
-      const issueId = document.getElementById('issue-id')?.value || (location.pathname.match(/\/(?:issue|phenomenon)\/(\d+)/)||[])[1] || '';
+      const issueId = getIssueId();
       try{
         const res = await fetch(`/svit/issue/update/${issueId}`, {method:'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}, redirect: 'manual', body: fd});
         if(res.redirected || res.status === 303 || res.type === 'opaqueredirect'){
@@ -338,10 +425,9 @@ document.addEventListener('paste', async function(e){
             // place quick preview into the pending preview area to avoid creating a permanent duplicate in the main display
             const pendingTarget = isExpected ? document.getElementById('expectedPendingPreview') : (isCounter ? document.getElementById('countermeasurePendingPreview') : null);
             const mainTarget = isExpected ? document.getElementById('expectedRootDisplay') : (isCounter ? document.getElementById('countermeasureDisplay') : document.getElementById('phenDisplay'));
-            const wrap = document.createElement('div');
-            wrap.className = 'inline-attach pending';
+            const wrap = createResizableWrap(reader.result, file.name);
+            wrap.classList.add('pending');
             wrap.setAttribute('data-pending','1');
-            wrap.innerHTML = `<div class="attach-wrap"><div class="resizable"><img src="${reader.result}" alt="${file.name}"/></div></div>`;
             if(pendingTarget){
               pendingTarget.appendChild(wrap);
             } else if(mainTarget){
@@ -374,6 +460,10 @@ document.addEventListener('paste', async function(e){
       }
     }
   }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyResizableSizes(document);
 });
 
 function toggleEditMode() {
@@ -491,6 +581,12 @@ function toggleEditMode() {
 
 function saveAllChanges(issueId) {
   const formData = new FormData();
+
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.classList.add('is-loading');
+  }
   
   formData.append('issue_phenomenon', document.getElementById('phenEdit').value);
   
@@ -594,6 +690,12 @@ function saveAllChanges(issueId) {
   .catch(error => {
     console.error('Error:', error);
     alert('Error saving changes');
+  })
+  .finally(() => {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.classList.remove('is-loading');
+    }
   });
 }
 
@@ -607,7 +709,12 @@ function updateStatus(issueId, status) {
     headers: {'X-Requested-With': 'XMLHttpRequest'},
     body: formData
   })
-  .then(res => res.json())
+  .then(async res => {
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) return res.json();
+    if (res.ok) return { ok: true };
+    return { ok: false };
+  })
   .then(json => { if (!json || !json.ok) alert('Failed to update status'); })
   .catch(error => {
     console.error('Error:', error);
@@ -625,7 +732,12 @@ function updateSeverity(issueId, severity) {
     headers: {'X-Requested-With': 'XMLHttpRequest'},
     body: formData
   })
-  .then(res => res.json())
+  .then(async res => {
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) return res.json();
+    if (res.ok) return { ok: true };
+    return { ok: false };
+  })
   .then(json => { if (!json || !json.ok) alert('Failed to update severity'); })
   .catch(error => {
     console.error('Error:', error);
@@ -675,6 +787,7 @@ function uploadFile(issueId) {
       console.debug('uploadFile: server response', json);
       // Resync inline attachments to reflect newly uploaded files without full reload
       syncInlineAttachments();
+      if (fileInput) fileInput.value = '';
       alert('파일 업로드 성공');
     } else {
       console.debug('uploadFile: server response error', json);
@@ -866,7 +979,10 @@ function syncInlineAttachments(){
           const inner = document.createElement('div'); inner.className='attach-wrap';
           const resz = document.createElement('div'); resz.className='resizable';
           const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
+          resz.dataset.key = getResizeKey(href);
           resz.appendChild(img);
+          applyStoredSize(resz);
+          observeResizable(resz);
           inner.appendChild(resz);
           // delete button
           const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
@@ -902,7 +1018,10 @@ function syncInlineAttachments(){
           const inner = document.createElement('div'); inner.className='attach-wrap';
           const resz = document.createElement('div'); resz.className='resizable';
           const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
+          resz.dataset.key = getResizeKey(href);
           resz.appendChild(img);
+          applyStoredSize(resz);
+          observeResizable(resz);
           inner.appendChild(resz);
           const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
           del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path, wrap); });
@@ -937,7 +1056,10 @@ function syncInlineAttachments(){
           const inner = document.createElement('div'); inner.className='attach-wrap';
           const resz = document.createElement('div'); resz.className='resizable';
           const img = document.createElement('img'); img.src = href; img.alt = path.split('/').pop();
+          resz.dataset.key = getResizeKey(href);
           resz.appendChild(img);
+          applyStoredSize(resz);
+          observeResizable(resz);
           inner.appendChild(resz);
           const del = document.createElement('button'); del.className='delete-btn'; del.textContent='✕';
           del.addEventListener('click', (ev)=>{ ev.stopPropagation(); deleteAttachment(document.getElementById('issue-id')?.value, path, wrap); });
@@ -957,11 +1079,9 @@ function syncInlineAttachments(){
         }
       });
     }
+    applyResizableSizes(document);
   }catch(e){console.error('syncInlineAttachments', e)}
 }
-
-// sanity check: confirm script parsed
-try{ console.debug('svit script loaded OK'); }catch(e){/*ignore*/}
 
 // Countermeasure pending files and handlers
 let pendingCounterFiles = [];

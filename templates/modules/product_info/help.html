@@ -46,7 +46,7 @@
       <div class="page-head">
         <h2>🚀 {% if locale == 'ko' %}빠른 시작{% else %}Quick Start{% endif %}</h2>
         <div class="head-actions">
-          <button id="btn-feedback" class="btn nav product-info-help-head-actions" style="margin-left:auto">{% if locale == 'ko' %}피드백 보내기{% else %}Send Feedback{% endif %}</button>
+          <button id="btn-feedback" class="btn nav product-info-help-head-actions">{% if locale == 'ko' %}피드백 보내기{% else %}Send Feedback{% endif %}</button>
         </div>
       </div>
 
@@ -87,17 +87,17 @@
         <li>{% if locale == 'ko' %}\ucc3e\uc740 IP \uc774\ub984\uc744 \ud074\ub9ad\ud558\uc5ec \uc0c1\uc138 \uc815\ubcf4\ub97c \ubd05\ub2c8\ub2e4.{% else %}Click found IP name to see details.{% endif %}</li>
       </ul>
 
-    <div class="help-screenshot-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <div class="help-screenshot-section">
       <h3>📸 {% if locale == 'ko' %}사용 화면{% else %}Screenshots{% endif %}</h3>
-      <p style="color: #666; font-size: 14px; margin-bottom: 15px;">{% if locale == 'ko' %}Product-Info\ub97c \uc0ac\uc6a9\ud55c IP \ub9e4\ud2b8\ub9ad\uc2a4 \oc1c\ub78c{% else %}IP matrix viewing using Product-Info{% endif %}</p>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
-          <img src="/img/help/product_info_screen_01_dashboard.png" alt="Product-Info 대시보드" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
-          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ {% if locale == 'ko' %}\ub300\ub2dc\ubcf4\ub4dc{% else %}Dashboard{% endif %}</div>
+        <p class="help-screenshot-lead">{% if locale == 'ko' %}Product-Info\ub97c \uc0ac\uc6a9\ud55c IP \ub9e4\ud2b8\ub9ad\uc2a4 \oc1c\ub78c{% else %}IP matrix viewing using Product-Info{% endif %}</p>
+      <div class="help-screenshot-grid">
+        <div class="help-screenshot-card">
+          <img src="/img/help/product_info_screen_01_dashboard.png" alt="Product-Info 대시보드" class="help-screenshot-img" onerror="this.style.display='none'">
+          <div class="help-screenshot-caption">✓ {% if locale == 'ko' %}\ub300\ub2dc\ubcf4\ub4dc{% else %}Dashboard{% endif %}</div>
         </div>
-        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
-          <img src="/img/help/product_info_screen_02_product_detail.png" alt="Product-Info 제품 상세" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
-          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ {% if locale == 'ko' %}\uc81c\ud488 \uc0c1\uc138{% else %}Product Detail{% endif %}</div>
+        <div class="help-screenshot-card">
+          <img src="/img/help/product_info_screen_02_product_detail.png" alt="Product-Info 제품 상세" class="help-screenshot-img" onerror="this.style.display='none'">
+          <div class="help-screenshot-caption">✓ {% if locale == 'ko' %}\uc81c\ud488 \uc0c1\uc138{% else %}Product Detail{% endif %}</div>
         </div>
       </div>
     </div>

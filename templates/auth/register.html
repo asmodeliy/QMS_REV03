@@ -27,7 +27,7 @@
         {% endif %}
 
         
-        <form id="register-form" method="post" action="/auth/register" style="display:grid;gap:12px">
+        <form id="register-form" method="post" action="/auth/register" class="auth-form-grid">
           <div class="form-group">
             <label class="form-label">{{ t('register.email') }} (ID)</label>
             <input class="form-input" type="email" name="email" placeholder="{{ t('register.email_placeholder') }}" required>
@@ -40,7 +40,7 @@
 
           <div class="form-group">
             <label class="form-label">{{ t('common.department') }}</label>
-            <select class="form-input" name="department" required style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            <select class="form-input form-select" name="department" required>
               <option value="">-- Select Department --</option>
               <option value="AS">AS</option>
               <option value="DS">DS</option>
@@ -64,14 +64,14 @@
 
           <button class="btn-primary full-width" type="submit">{{ t('login.register') }}</button>
 
-          <div style="text-align:center; padding-top:10px; border-top:1px solid #eee">
+          <div class="auth-footer">
             {% if request.cookies.get('lang', 'ko') == 'ko' %}
-            <p style="margin:10px 0 0 0; color:#666; font-size:14px">
-              이미 계정이 있으신가요? <a href="/auth/login" style="color:#667eea; text-decoration:none; font-weight:bold">로그인</a>
+            <p class="auth-footer-text">
+              이미 계정이 있으신가요? <a href="/auth/login" class="auth-footer-link">로그인</a>
             </p>
             {% else %}
-            <p style="margin:10px 0 0 0; color:#666; font-size:14px">
-              Already have an account? <a href="/auth/login" style="color:#667eea; text-decoration:none; font-weight:bold">Log In</a>
+            <p class="auth-footer-text">
+              Already have an account? <a href="/auth/login" class="auth-footer-link">Log In</a>
             </p>
             {% endif %}
           </div>

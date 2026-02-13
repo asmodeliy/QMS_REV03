@@ -1,18 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
 <main class="container spec-center-root viewer">
-  <div class="dashboard-header-section">
-    <h1 class="dashboard-title">Spec Viewer</h1>
-    <p class="dashboard-subtitle">Preview (read-only)</p>
-  </div>
+  <header class="module-titlebar spec-titlebar" aria-label="Spec viewer header">
+    <div class="module-titleblock">
+      <p class="module-kicker">DOCUMENT PREVIEW</p>
+      <h1 class="module-title">Spec Viewer</h1>
+      <p class="module-subtitle">Preview (read-only)</p>
+    </div>
+    <div class="module-titleline" aria-hidden="true"></div>
+  </header>
   <h2>{{ filename }}</h2>
-  <div style="display:flex;gap:12px;align-items:flex-start">
-    <div style="flex:1">
-      <div id="pdf-viewer" style="height:80vh;border:1px solid #ddd;display:flex;align-items:center;justify-content:center"></div>
-      <div style="margin-top:8px;text-align:center">
-        <button id="prevBtn">◀ Prev</button>
+  <div class="spec-preview-row">
+    <div class="spec-preview-main">
+      <div id="pdf-viewer" class="spec-preview-viewer"></div>
+      <div class="spec-preview-controls">
+        <button id="prevBtn" class="btn btn-ghost btn-sm">◀ Prev</button>
         <span id="pageInfo"></span>
-        <button id="nextBtn">Next ▶</button>
+        <button id="nextBtn" class="btn btn-ghost btn-sm">Next ▶</button>
       </div>
     </div>
   </div>

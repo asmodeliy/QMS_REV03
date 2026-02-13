@@ -20,11 +20,11 @@
         {% endif %}
 
         <div class="form-tabs">
-          <h2 style="margin:0; padding:0; grid-column:1/-1; text-align:center; color:#333; font-size:20px">{{ t('login.login_button', locale) }}</h2>
+          <h2 class="auth-form-title">{{ t('login.login_button', locale) }}</h2>
         </div>
 
         
-        <form id="login-form" method="post" action="/auth/login" style="display:grid;gap:12px">
+        <form id="login-form" method="post" action="/auth/login" class="auth-form-grid">
           <div class="form-group">
             <label class="form-label">{{ t('login.email', locale) if t('login.email', locale) != 'login.email' else 'Email' }}</label>
             <input class="form-input" type="email" name="email" id="login-email" placeholder="Enter your email" required>
@@ -42,9 +42,9 @@
           <input type="hidden" name="next" value="{{ next }}">
           <button class="btn-primary full-width" type="submit">{{ t('login.login_button', locale) }}</button>
           
-          <div style="text-align:center; padding-top:10px; border-top:1px solid #eee">
-            <p style="margin:5px 0 0 0; color:#666; font-size:14px">
-              Don't have an account? <a href="/auth/register" style="color:#667eea; text-decoration:none; font-weight:bold">Sign Up</a>
+          <div class="auth-footer">
+            <p class="auth-footer-text-sm">
+              Don't have an account? <a href="/auth/register" class="auth-footer-link">Sign Up</a>
             </p>
           </div>
         </form>
@@ -109,9 +109,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<div id="save-debug" style="max-width:420px;margin:14px auto 36px;text-align:center;font-size:13px">
-  <div style="margin-bottom:6px;color:#334155">Saved Email: <strong id="savedEmailDisplay">—</strong></div>
-  <div style="display:flex;gap:8px;justify-content:center">
+<div id="save-debug" class="save-debug">
+  <div class="save-debug-row">Saved Email: <strong id="savedEmailDisplay">—</strong></div>
+  <div class="save-debug-actions">
     <button type="button" id="dbgSaveBtn" class="btn btn-primary">Save Now</button>
     <button type="button" id="dbgRemoveBtn" class="btn btn-secondary">Remove</button>
     <button type="button" id="dbgShowBtn" class="btn btn-ghost">Refresh</button>

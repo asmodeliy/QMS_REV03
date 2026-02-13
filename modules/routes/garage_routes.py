@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 from core.config import BASE_DIR
 import uuid
@@ -325,6 +325,10 @@ async def download_zip(request: Request):
     except Exception as e:
         garage_logger.log_error('download_zip_error', 'Failed to process download-zip', {'error': str(e)})
         raise HTTPException(status_code=500, detail='Failed to create zip')
+
+
+@router.get('/download/{safe_name}')
+async def download_file(request: Request, safe_name: str):
     """Download a previously uploaded garage file by its safe name."""
     _require_auth(request)
     garage_logger, _ = _get_loggers()

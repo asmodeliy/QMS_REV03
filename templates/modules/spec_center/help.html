@@ -50,7 +50,7 @@
       <div class="page-head">
         <h2>🚀 {% if locale == 'ko' %}빠른 시작{% else %}Quick Start{% endif %}</h2>
         <div class="head-actions">
-          <button id="btn-feedback" class="btn nav spec-center-help-head-actions" style="margin-left:auto">{% if locale == 'ko' %}피드백 보내기{% else %}Send Feedback{% endif %}</button>
+          <button id="btn-feedback" class="btn nav spec-center-help-head-actions">{% if locale == 'ko' %}피드백 보내기{% else %}Send Feedback{% endif %}</button>
         </div>
       </div>
 
@@ -116,17 +116,17 @@
       {% endif %}
     </div>
 
-    <div class="help-screenshot-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <div class="help-screenshot-section">
       <h3>📸 {% if locale == 'ko' %}사용 화면{% else %}Screenshots{% endif %}</h3>
-      <p style="color: #666; font-size: 14px; margin-bottom: 15px;">{% if locale == 'ko' %}Spec-Center를 사용한 기술 스펙 검색{% else %}Technical specification search using Spec-Center{% endif %}</p>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
-          <img src="/img/help/spec_center_screen_01_dashboard.png" alt="Spec-Center 대시보드" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
-          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ 대시보드</div>
+      <p class="help-screenshot-lead">{% if locale == 'ko' %}Spec-Center를 사용한 기술 스펙 검색{% else %}Technical specification search using Spec-Center{% endif %}</p>
+      <div class="help-screenshot-grid">
+        <div class="help-screenshot-card">
+          <img src="/img/help/spec_center_screen_01_dashboard.png" alt="Spec-Center 대시보드" class="help-screenshot-img" onerror="this.style.display='none'">
+          <div class="help-screenshot-caption">✓ 대시보드</div>
         </div>
-        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
-          <img src="/img/help/spec_center_screen_02_pdf_preview.png" alt="Spec-Center PDF 미리보기" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'">
-          <div style="padding: 12px; text-align: center; color: #999; font-size: 13px; background: #fafbfc;">✓ PDF 미리보기</div>
+        <div class="help-screenshot-card">
+          <img src="/img/help/spec_center_screen_02_pdf_preview.png" alt="Spec-Center PDF 미리보기" class="help-screenshot-img" onerror="this.style.display='none'">
+          <div class="help-screenshot-caption">✓ PDF 미리보기</div>
         </div>
       </div>
     </div>
