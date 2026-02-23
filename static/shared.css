@@ -944,6 +944,13 @@ input:focus, select:focus, textarea:focus {
   min-height:200px;
   animation:rb-rise .6s ease both, rb-float 9s ease-in-out infinite;
 }
+.card-content {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  height:100%;
+  padding-right:26px;
+}
 .module-card::after {
   content:"";
   position:absolute;
@@ -972,11 +979,29 @@ input:focus, select:focus, textarea:focus {
 }
 .module-card:hover .module-icon::after { opacity:1; }
 .module-icon { width:42px; height:42px; display:grid; place-items:center; border-radius:12px; background:rgba(46,91,255,0.18); }
+.module-icon { margin-bottom:6px; }
 .module-title { margin:0; font-size:18px; }
 .module-description { color:var(--muted); font-size:13px; }
-.module-status { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text); }
+.module-status {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  color:var(--text);
+  margin-top:auto;
+  padding-right:26px;
+  white-space:nowrap;
+}
 .status-dot { width:8px; height:8px; border-radius:999px; background:#34d399; }
-.card-arrow { margin-top:auto; font-weight:700; color:var(--text); }
+.card-arrow {
+  position:absolute;
+  right:18px;
+  bottom:16px;
+  font-weight:700;
+  font-size:18px;
+  line-height:1;
+  color:var(--text);
+}
 
 /* Login / Register */
 .login-page, .register-success-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 16px; }

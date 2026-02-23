@@ -20,10 +20,10 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QTabWidget, QScrollArea,
     QFrame, QSystemTrayIcon, QMenu, QMessageBox, QGridLayout, QSpacerItem, QSizePolicy,
-    QGraphicsDropShadowEffect
+    QGraphicsDropShadowEffect, QCheckBox
 )
 from PySide6.QtCore import Qt, QTimer, Signal, QObject, QThread, QSize
-from PySide6.QtGui import QIcon, QFont, QGuiApplication, QColor, QPalette, QAction, QPixmap
+from PySide6.QtGui import QIcon, QFont, QGuiApplication, QColor, QPalette, QAction, QPixmap, QKeySequence
 import os
 import requests
 import math
@@ -31,65 +31,191 @@ import hashlib
 
 
 class ToastNotification(QWidget):
-    def __init__(self, title, message, duration=3000):
+    def __init__(self, title, message, duration=4200, variant="info", action_label=None, action_callback=None):
         super().__init__()
         self.os_type = platform.system()
-        
+        self.duration = max(1500, int(duration))
+        self.variant = (variant or "info").lower()
+        self.action_callback = action_callback
+
+        color_map = {
+            "success": {"accent": "#16a34a", "icon_bg": "#dcfce7", "icon_fg": "#166534", "icon": "✓"},
+            "error": {"accent": "#dc2626", "icon_bg": "#fee2e2", "icon_fg": "#991b1b", "icon": "!"},
+            "warning": {"accent": "#d97706", "icon_bg": "#ffedd5", "icon_fg": "#9a3412", "icon": "!"},
+            "info": {"accent": "#2563eb", "icon_bg": "#dbeafe", "icon_fg": "#1e3a8a", "icon": "i"},
+        }
+        colors = color_map.get(self.variant, color_map["info"])
+        self.accent = colors["accent"]
+
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setObjectName("toastRoot")
         self.setStyleSheet("""
-            QWidget {
+            QWidget#toastRoot {{
                 background-color: #ffffff;
-                border-left: 4px solid #3b82f6;
+                border: 1px solid #dbe4f2;
+                border-left: 4px solid {accent};
+                border-radius: 14px;
+            }}
+            QLabel#toastTitle {{
+                color: #0f172a;
+                font-size: 12px;
+                font-weight: 700;
+            }}
+            QLabel#toastMessage {{
+                color: #475569;
+                font-size: 11px;
+            }}
+            QLabel#toastIcon {{
+                background: {icon_bg};
+                border: 1px solid #dbe4f2;
+                color: {icon_fg};
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 800;
+                padding: 1px;
+            }}
+            QPushButton#toastClose {{
+                background-color: #f8fafc;
+                color: #64748b;
+                border: 1px solid #e2e8f0;
+                border-radius: 9px;
+                font-size: 10px;
+                font-weight: 700;
+            }}
+            QPushButton#toastClose:hover {{
+                background-color: #eef2ff;
+                color: #334155;
+            }}
+            QPushButton#toastAction {{
+                background: #ffffff;
+                color: #1e3a8a;
+                border: 1px solid #bfdbfe;
                 border-radius: 8px;
-            }
-        """)
+                font-size: 10px;
+                font-weight: 700;
+                padding: 3px 8px;
+            }}
+            QPushButton#toastAction:hover {{
+                background: #eff6ff;
+            }}
+        """.format(
+            accent=self.accent,
+            icon_bg=colors["icon_bg"],
+            icon_fg=colors["icon_fg"],
+        ))
         try:
             effect = QGraphicsDropShadowEffect(self)
-            effect.setBlurRadius(18)
-            effect.setColor(QColor(0, 0, 0, 80))
-            effect.setOffset(0, 4)
+            effect.setBlurRadius(22)
+            effect.setColor(QColor(15, 23, 42, 70))
+            effect.setOffset(0, 8)
             self.setGraphicsEffect(effect)
         except Exception:
             logger.debug("Drop shadow not available for toast", exc_info=True)
-        
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(8, 4, 8, 4)
-        layout.setSpacing(2)
-        
+
+        root_layout = QVBoxLayout(self)
+        root_layout.setContentsMargins(10, 8, 10, 8)
+        root_layout.setSpacing(8)
+
+        content_row = QHBoxLayout()
+        content_row.setSpacing(10)
+
+        icon_label = QLabel(colors["icon"])
+        icon_label.setObjectName("toastIcon")
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        icon_label.setFixedSize(24, 24)
+        content_row.addWidget(icon_label, alignment=Qt.AlignmentFlag.AlignTop)
+
+        text_wrap = QWidget()
+        text_layout = QVBoxLayout(text_wrap)
+        text_layout.setContentsMargins(0, 0, 0, 0)
+        text_layout.setSpacing(3)
+
         title_label = QLabel(title)
         title_font = QFont("Segoe UI" if self.os_type == "Windows" else "San Francisco" if self.os_type == "Darwin" else "Ubuntu", 12, QFont.Weight.Bold)
         title_label.setFont(title_font)
-        title_label.setStyleSheet("color: #1e293b;")
-        layout.addWidget(title_label)
-        
+        title_label.setObjectName("toastTitle")
+        text_layout.addWidget(title_label)
+
         message_label = QLabel(message)
-        message_font = QFont("Segoe UI" if self.os_type == "Windows" else "San Francisco" if self.os_type == "Darwin" else "Ubuntu", 11)
+        message_font = QFont("Segoe UI" if self.os_type == "Windows" else "San Francisco" if self.os_type == "Darwin" else "Ubuntu", 10)
         message_label.setFont(message_font)
-        message_label.setStyleSheet("color: #64748b;")
+        message_label.setObjectName("toastMessage")
         message_label.setWordWrap(True)
-        message_label.setMaximumWidth(250)
-        layout.addWidget(message_label)
-        
-        self.setFixedWidth(400)
+        message_label.setMaximumWidth(290)
+        text_layout.addWidget(message_label)
+
+        if action_label and callable(action_callback):
+            action_btn = QPushButton(str(action_label))
+            action_btn.setObjectName("toastAction")
+            action_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            action_btn.clicked.connect(self._run_action)
+            text_layout.addWidget(action_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        content_row.addWidget(text_wrap, 1)
+
+        close_btn = QPushButton("×")
+        close_btn.setObjectName("toastClose")
+        close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        close_btn.setFixedSize(18, 18)
+        close_btn.clicked.connect(self.close)
+        content_row.addWidget(close_btn, alignment=Qt.AlignmentFlag.AlignTop)
+
+        root_layout.addLayout(content_row)
+
+        self.progress_track = QFrame()
+        self.progress_track.setFixedHeight(3)
+        self.progress_track.setStyleSheet("background:#eef2f7; border-radius:2px;")
+        self.progress_layout = QHBoxLayout(self.progress_track)
+        self.progress_layout.setContentsMargins(0, 0, 0, 0)
+        self.progress_layout.setSpacing(0)
+
+        self.progress_fill = QFrame()
+        self.progress_fill.setFixedHeight(3)
+        self.progress_fill.setStyleSheet(f"background:{self.accent}; border-radius:2px;")
+        self.progress_layout.addWidget(self.progress_fill)
+        root_layout.addWidget(self.progress_track)
+
+        self.setFixedWidth(376)
         self.adjustSize()
         self.move_to_bottom_right()
-        
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.close)
-        self.timer.start(duration)
+
+        self._elapsed = 0
+        self.close_timer = QTimer(self)
+        self.close_timer.timeout.connect(self.close)
+        self.close_timer.start(self.duration)
+
+        self.progress_timer = QTimer(self)
+        self.progress_timer.timeout.connect(self._tick_progress)
+        self.progress_timer.start(50)
     
     def move_to_bottom_right(self):
-        screen = QGuiApplication.primaryScreen().geometry()
+        screen = QGuiApplication.primaryScreen().availableGeometry()
         if self.os_type == "Darwin":
-            x = screen.right() - self.width() - 30
-            y = screen.bottom() - self.height() - 80
+            x = screen.right() - self.width() - 24
+            y = screen.bottom() - self.height() - 72
         else:
-            x = screen.right() - self.width() - 20
-            y = screen.bottom() - self.height() - 20
+            x = screen.right() - self.width() - 16
+            y = screen.bottom() - self.height() - 16
         self.move(x, y)
     
     def closeEvent(self, event):
-        self.timer.stop()
+        self.close_timer.stop()
+        self.progress_timer.stop()
+
+    def _tick_progress(self):
+        self._elapsed += 50
+        ratio = max(0.0, min(1.0, 1.0 - (self._elapsed / float(self.duration))))
+        width = max(0, int(self.progress_track.width() * ratio))
+        self.progress_fill.setFixedWidth(width)
+
+    def _run_action(self):
+        try:
+            if callable(self.action_callback):
+                self.action_callback()
+        except Exception:
+            logger.debug("Toast action callback failed", exc_info=True)
+        self.close()
 
 
 class NotificationSummaryWindow(QWidget):
@@ -106,7 +232,7 @@ class NotificationSummaryWindow(QWidget):
             QFrame#mainContainer {
                 background-color: #ffffff;
                 border-radius: 12px;
-                border: 1px solid #e2e8f0;
+                border: 1px solid #dbe4f2;
             }
         """)
         
@@ -118,35 +244,35 @@ class NotificationSummaryWindow(QWidget):
         header.setStyleSheet("""
             QFrame {
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
-                    stop:0 #3b82f6, stop:1 #2563eb);
+                    stop:0 #2e5bff, stop:1 #1f4df0);
                 border-radius: 10px 10px 0 0;
             }
         """)
         header_layout = QHBoxLayout(header)
-        header_layout.setContentsMargins(6, 2, 6, 2)
-        header_layout.setSpacing(2)
+        header_layout.setContentsMargins(8, 4, 8, 4)
+        header_layout.setSpacing(6)
         
         icon_label = QLabel("🔔")
-        icon_label.setStyleSheet("font-size: 16px; background: transparent;")
+        icon_label.setStyleSheet("font-size: 12px; background: transparent;")
         header_layout.addWidget(icon_label)
         
-        title = QLabel(f"New Issues · {len(notifications)}건")
+        title = QLabel(f"New Issues · {len(notifications)}")
         font_family = "Segoe UI" if self.os_type == "Windows" else "San Francisco" if self.os_type == "Darwin" else "Ubuntu"
-        title.setFont(QFont(font_family, 11, QFont.Weight.DemiBold))
+        title.setFont(QFont(font_family, 10, QFont.Weight.DemiBold))
         title.setStyleSheet("color: white; background: transparent;")
         header_layout.addWidget(title)
         header_layout.addStretch()
         
         close_btn = QPushButton("×")
-        close_btn.setFixedSize(20, 20)
+        close_btn.setFixedSize(18, 18)
         close_btn.setStyleSheet("""
             QPushButton {
                 background-color: rgba(255, 255, 255, 0.15);
                 color: white;
                 border: none;
-                font-size: 14px;
+                font-size: 12px;
                 font-weight: normal;
-                border-radius: 10px;
+                border-radius: 9px;
             }
             QPushButton:hover {
                 background-color: rgba(255, 255, 255, 0.22);
@@ -157,8 +283,7 @@ class NotificationSummaryWindow(QWidget):
         """)
         close_btn.clicked.connect(self.close)
         header_layout.addWidget(close_btn)
-        header.setFixedHeight(46)
-        header_layout.setContentsMargins(8, 4, 8, 4)
+        header.setFixedHeight(34)
         
         container_layout.addWidget(header)
         
@@ -166,106 +291,101 @@ class NotificationSummaryWindow(QWidget):
         import os
         total_frame = QFrame()
         total_frame.setStyleSheet("background: transparent;")
-        total_frame.setFixedHeight(72)
+        total_frame.setFixedHeight(48)
         total_layout = QHBoxLayout(total_frame)
-        total_layout.setContentsMargins(14, 10, 14, 10)
+        total_layout.setContentsMargins(12, 8, 12, 8)
         total_layout.setSpacing(8)
-        total_label = QLabel(f"Total notifications: {len(notifications)}")
-        total_label.setFont(QFont(font_family, 16, QFont.Weight.Bold))
-        total_label.setStyleSheet("color: #111827;")
+        total_label = QLabel("Total notifications")
+        total_label.setFont(QFont(font_family, 10, QFont.Weight.DemiBold))
+        total_label.setStyleSheet("color: #0f172a;")
         total_layout.addWidget(total_label, alignment=Qt.AlignmentFlag.AlignLeft)
         badge = QLabel(str(len(notifications)))
-        badge.setFont(QFont(font_family, 14, QFont.Weight.Bold))
-        badge.setStyleSheet("background: #eef2ff; color: #3730a3; padding: 8px 12px; border-radius: 14px;")
+        badge.setFont(QFont(font_family, 11, QFont.Weight.Bold))
+        badge.setStyleSheet("background: #eef2ff; color: #3730a3; padding: 4px 10px; border-radius: 12px;")
         total_layout.addStretch()
         total_layout.addWidget(badge, alignment=Qt.AlignmentFlag.AlignRight)
 
         summary_widget = QWidget()
         summary_layout = QVBoxLayout(summary_widget)
-        summary_layout.setContentsMargins(6, 2, 6, 2)
-        summary_layout.setSpacing(2)
+        summary_layout.setContentsMargins(8, 4, 8, 8)
+        summary_layout.setSpacing(6)
         summary_widget.setStyleSheet("background: transparent;")
 
-        module_info = {
-            'rpmt': {'color': '#3b82f6', 'name': 'RPMT', 'icon': 'rpmt.svg'},
-            'svit': {'color': '#8b5cf6', 'name': 'SVIT', 'icon': 'svit.svg'},
-            'cits': {'color': '#ec4899', 'name': 'CITS', 'icon': 'cits.svg'},
-            'spec': {'color': '#10b981', 'name': 'SPEC', 'icon': 'spec.svg'}
+        def classify_status(notif):
+            raw_status = str(notif.get('status') or '').strip().lower()
+            if raw_status in {'complete', 'completed'}:
+                return 'Complete'
+            if raw_status in {'in-progress', 'in progress'}:
+                return 'In-progress'
+            if raw_status in {'not started', 'not_started'}:
+                return 'Not Started'
+            if raw_status in {'n/a', 'na'}:
+                return 'N/A'
+
+            title_text = str(notif.get('title') or '').lower()
+            if 'complete' in title_text:
+                return 'Complete'
+            if 'in-progress' in title_text or 'in progress' in title_text:
+                return 'In-progress'
+            if 'not started' in title_text:
+                return 'Not Started'
+            if 'delay' in title_text or 'overdue' in title_text or '지연' in title_text:
+                return 'In-progress'
+            return 'New'
+
+        status_counts = {
+            'New': 0,
+            'Not Started': 0,
+            'In-progress': 0,
+            'Complete': 0,
+            'N/A': 0,
         }
-        module_counts = {}
         for notif in notifications:
-            mod = notif.get('module', 'Other')
-            module_counts[mod] = module_counts.get(mod, 0) + 1
-        self.module_row_widgets = {}
-        for mod, count in module_counts.items():
-            info = module_info.get(mod, {'color': '#d1d5db', 'name': mod, 'icon': None})
+            status_key = classify_status(notif)
+            status_counts[status_key] = status_counts.get(status_key, 0) + 1
+
+        status_meta = {
+            'New': {'bg': '#f1f5f9', 'border': '#cbd5e1', 'color': '#334155'},
+            'Not Started': {'bg': '#fff7ed', 'border': '#fdba74', 'color': '#9a3412'},
+            'In-progress': {'bg': '#eff6ff', 'border': '#93c5fd', 'color': '#1d4ed8'},
+            'Complete': {'bg': '#ecfdf5', 'border': '#86efac', 'color': '#166534'},
+            'N/A': {'bg': '#f8fafc', 'border': '#e2e8f0', 'color': '#64748b'},
+        }
+
+        for status_name in ['New', 'Not Started', 'In-progress', 'Complete', 'N/A']:
+            count = status_counts.get(status_name, 0)
+            if count <= 0:
+                continue
+
+            colors = status_meta[status_name]
             row_widget = QWidget()
+            row_widget.setStyleSheet(f"""
+                QWidget {{
+                    background: {colors['bg']};
+                    border: 1px solid {colors['border']};
+                    border-radius: 10px;
+                }}
+            """)
             row_layout = QHBoxLayout(row_widget)
-            row_layout.setContentsMargins(6, 4, 6, 4)
+            row_layout.setContentsMargins(9, 6, 9, 6)
             row_layout.setSpacing(8)
 
-            svg_size = 18
-            name_font_size = 11
-            count_font_size = 11
-            row_height = 36
-
-            icon_path = None
-            if info.get('icon'):
-                icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static', 'img', 'modules', info['icon']))
-
-            if icon_path and os.path.exists(icon_path):
-                try:
-                    svg = QSvgWidget(icon_path)
-                    svg.setFixedSize(svg_size, svg_size)
-                    row_layout.addWidget(svg, alignment=Qt.AlignmentFlag.AlignVCenter)
-                except Exception:
-                    logger.exception("Failed to render module SVG; falling back to avatar")
-                    avatar = QLabel(info.get('name', '?')[0])
-                    avatar.setFixedSize(svg_size, svg_size)
-                    avatar.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    avatar.setStyleSheet(f"background: {info.get('color', '#ececec')}; color: white; border-radius: {svg_size//2}px; font-weight: bold;")
-                    row_layout.addWidget(avatar, alignment=Qt.AlignmentFlag.AlignVCenter)
-            else:
-                initial = (info.get('name', mod)[:2]).upper()
-                avatar = QLabel(initial)
-                avatar.setFixedSize(svg_size, svg_size)
-                avatar.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                avatar.setStyleSheet(f"background: {info.get('color', '#d1d5db')}; color: white; border-radius: {svg_size//2}px; font-weight: bold; font-size: 10px;")
-                row_layout.addWidget(avatar, alignment=Qt.AlignmentFlag.AlignVCenter)
-
-            name_label = QLabel(f"{info.get('name', mod)}")
-            name_label.setFont(QFont(font_family, name_font_size, QFont.Weight.Medium))
-            name_label.setStyleSheet("color: #22223b; padding-left: 8px;")
-            row_layout.addWidget(name_label)
-
-            count_label = QLabel(f"{count}")
-            count_label.setFont(QFont(font_family, count_font_size, QFont.Weight.Bold))
-            count_label.setStyleSheet(f"color: {info.get('color', '#6b7280')}; margin-left: 10px;")
-            row_layout.addWidget(count_label)
-
+            status_label = QLabel(status_name)
+            status_label.setStyleSheet(f"color:{colors['color']}; font-size:10px; font-weight:700;")
+            row_layout.addWidget(status_label)
             row_layout.addStretch()
-            row_widget.setFixedHeight(row_height)
-            row_widget.setCursor(Qt.CursorShape.PointingHandCursor)
 
-            def make_click_handler(module_key, module_name, cnt):
-                def handler(event):
-                    try:
-                        if event.button() == Qt.MouseButton.LeftButton:
-                            self.filter_tasks_by_module(module_key)
-                        elif event.button() == Qt.MouseButton.RightButton:
-                            from PySide6.QtWidgets import QApplication
-                            for w in QApplication.topLevelWidgets():
-                                if w is self:
-                                    continue
-                                if getattr(w, '__class__', None) and getattr(w, '__class__').__name__ == 'QMSDesktopClient':
-                                    w.show_notification(f"{module_name}", f"{cnt} new notification(s)")
-                                    break
-                    except Exception:
-                        logger.exception("Error in module row click handler")
-                return handler
-
-            row_widget.mousePressEvent = make_click_handler(mod, info.get('name', mod), count)
-            self.module_row_widgets[mod] = row_widget
+            count_badge = QLabel(str(count))
+            count_badge.setStyleSheet(f"""
+                background:#ffffff;
+                color:{colors['color']};
+                border:1px solid {colors['border']};
+                border-radius:9px;
+                padding:2px 7px;
+                font-size:9px;
+                font-weight:800;
+            """)
+            row_layout.addWidget(count_badge)
             summary_layout.addWidget(row_widget)
 
         container_layout.addWidget(total_frame)
@@ -274,26 +394,44 @@ class NotificationSummaryWindow(QWidget):
         footer = QFrame()
         footer.setStyleSheet("""
             QFrame {
-                background-color: #f1f5f9;
-                border-radius: 0 0 10px 10px;
+                background-color: #f8fafc;
+                border-radius: 0 0 12px 12px;
             }
         """)
-        footer.setFixedHeight(28)
+        footer.setFixedHeight(34)
         footer_layout = QHBoxLayout(footer)
         footer_layout.setContentsMargins(10, 4, 10, 4)
         
-        footer_text = QLabel("QMS Desktop • Real-time updates")
+        footer_text = QLabel("Status summary only")
         footer_text.setFont(QFont(font_family, 8))
         footer_text.setStyleSheet("color: #64748b; background: transparent; padding-left: 4px;")
         footer_layout.addWidget(footer_text)
         footer_layout.addStretch()
+
+        open_btn = QPushButton("Open Dashboard")
+        open_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        open_btn.setStyleSheet("""
+            QPushButton {
+                background:#2e5bff;
+                color:#ffffff;
+                border:1px solid #1d4ed8;
+                border-radius:8px;
+                padding:3px 9px;
+                font-size:9px;
+                font-weight:700;
+            }
+            QPushButton:hover { background:#1f4df0; }
+        """)
+        open_btn.clicked.connect(self.open_main_workspace)
+        footer_layout.addWidget(open_btn)
         
         container_layout.addWidget(footer)
         
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(10, 8, 10, 8)
+        main_layout.setContentsMargins(6, 6, 6, 6)
         main_layout.addWidget(container)
-        self.setFixedSize(560, min(300, 110 + len(notifications[:10]) * 34))
+        visible_status_rows = sum(1 for value in status_counts.values() if value > 0)
+        self.setFixedSize(320, max(156, 96 + visible_status_rows * 28))
         self.move_to_bottom_right()
 
     def filter_tasks_by_module(self, module_key):
@@ -311,6 +449,16 @@ class NotificationSummaryWindow(QWidget):
                 continue
             if getattr(widget, '__class__', None) and getattr(widget, '__class__').__name__ == 'QMSDesktopClient' and hasattr(widget, 'filter_tasks_by_module'):
                 widget.filter_tasks_by_module(module_key)
+                break
+        self.close()
+
+    def open_main_workspace(self):
+        from PySide6.QtWidgets import QApplication
+        for widget in QApplication.topLevelWidgets():
+            if widget is self:
+                continue
+            if getattr(widget, '__class__', None) and getattr(widget, '__class__').__name__ == 'QMSDesktopClient' and hasattr(widget, 'open_module'):
+                widget.open_module('/main')
                 break
         self.close()
 
@@ -389,13 +537,13 @@ class NotificationSummaryWindow(QWidget):
         return item
     
     def move_to_bottom_right(self):
-        screen = QGuiApplication.primaryScreen().geometry()
+        screen = QGuiApplication.primaryScreen().availableGeometry()
         if self.os_type == "Darwin":
-            x = screen.right() - self.width() - 30
-            y = screen.bottom() - self.height() - 80
+            x = screen.right() - self.width() - 24
+            y = screen.bottom() - self.height() - 72
         else:
-            x = screen.right() - self.width() - 20
-            y = screen.bottom() - self.height() - 20
+            x = screen.right() - self.width() - 16
+            y = screen.bottom() - self.height() - 16
         self.move(x, y)
     
     def closeEvent(self, event):
@@ -474,7 +622,18 @@ class QMSDesktopClient(QMainWindow):
         self.current_user = None
         self.tray = None
         self.os_type = platform.system()
-        self.active_toasts = [] 
+        self.active_toasts = []
+        self.selected_module_filter = None
+        self.quick_search_text = ""
+        self.cached_tasks = []
+        self.cached_notifications = []
+        self.last_sync_text = "Never"
+        self.ui_settings_file = self.root_dir / ".qms_desktop_ui.json"
+        self.ui_settings = self.load_ui_settings()
+        self.auto_refresh_enabled = bool(self.ui_settings.get("auto_refresh_enabled", True))
+        self.auto_refresh_seconds = int(self.ui_settings.get("auto_refresh_seconds", 90))
+        if self.auto_refresh_seconds < 30:
+            self.auto_refresh_seconds = 30
         
         self.cookie_file = self.root_dir / ".qms_cookies"
         self.cookie_jar = LWPCookieJar(str(self.cookie_file))
@@ -483,8 +642,8 @@ class QMSDesktopClient(QMainWindow):
         
         self.setWindowTitle("RAMSCHIP QMS")
                                 
-        self.setMinimumSize(920, 680)
-        self.resize(1000, 750)
+        self.setMinimumSize(1180, 780)
+        self.resize(1280, 860)
         self.set_icon()
 
                                                   
@@ -552,6 +711,11 @@ class QMSDesktopClient(QMainWindow):
         
         self.start_notification_worker()
         self.setup_tray()
+        self.setup_shortcuts()
+
+        self.auto_refresh_timer = QTimer(self)
+        self.auto_refresh_timer.timeout.connect(self.refresh_main_ui)
+        self.apply_auto_refresh_settings()
 
     def show_about(self):
         try:
@@ -1009,6 +1173,25 @@ class QMSDesktopClient(QMainWindow):
                 self.cookie_jar.load(ignore_discard=True, ignore_expires=True)
         except Exception:
             logger.debug("Failed to load cookies", exc_info=True)
+
+    def load_ui_settings(self):
+        try:
+            if self.ui_settings_file.exists():
+                return json.loads(self.ui_settings_file.read_text(encoding='utf-8'))
+        except Exception:
+            logger.debug("Failed to load ui settings", exc_info=True)
+        return {
+            "remember_email": False,
+            "saved_email": "",
+            "auto_refresh_enabled": True,
+            "auto_refresh_seconds": 90,
+        }
+
+    def save_ui_settings(self):
+        try:
+            self.ui_settings_file.write_text(json.dumps(self.ui_settings, ensure_ascii=False, indent=2), encoding='utf-8')
+        except Exception:
+            logger.debug("Failed to save ui settings", exc_info=True)
     
     def save_cookies(self):
         try:
@@ -1092,6 +1275,10 @@ class QMSDesktopClient(QMainWindow):
                             logger.exception("API request HTTP error %s", he)
                         return None
                 except URLError as ue:
+                    if attempt < 1:
+                        attempt += 1
+                        time.sleep(0.4)
+                        continue
                     if not silent:
                         logger.exception("API request URL error")
                     return None
@@ -1191,177 +1378,272 @@ class QMSDesktopClient(QMainWindow):
     
     def show_login_ui(self):
         central_widget = QWidget()
-        central_widget.setStyleSheet("background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #fbf8ff, stop:1 #f6f4fb);")
+        central_widget.setStyleSheet("""
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #eef2ff,
+                stop:0.45 #f8fbff,
+                stop:1 #f8fafc);
+        """)
         self.setCentralWidget(central_widget)
-                                                                 
+
         self.setMinimumSize(1000, 760)
         layout = QVBoxLayout(central_widget)
-        layout.setSpacing(0)
-                                                                                 
-        layout.setContentsMargins(120, 0, 120, 0)
+        layout.setSpacing(14)
+        layout.setContentsMargins(120, 28, 120, 28)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        header = QFrame()
-        header.setStyleSheet("background: transparent;")
-        header.setFixedHeight(140)
-        header_layout = QHBoxLayout(header)
-        header_layout.setContentsMargins(0, 0, 0, 0)
-        header_layout.setSpacing(0)
-                                                                                                  
-        header_layout.addStretch()
-        group = QWidget()
-        group_layout = QHBoxLayout(group)
-        group_layout.setContentsMargins(0, 0, 0, 0)
-        group_layout.setSpacing(12)
+        brand_head = QFrame()
+        brand_head.setStyleSheet("background: transparent;")
+        brand_head.setFixedHeight(132)
+        brand_head_layout = QVBoxLayout(brand_head)
+        brand_head_layout.setContentsMargins(0, 0, 0, 0)
+        brand_head_layout.setSpacing(6)
 
         title = QLabel("RAMSCHIP QMS")
         font_family = "Segoe UI" if self.os_type == "Windows" else "San Francisco" if self.os_type == "Darwin" else "Ubuntu"
-        title.setFont(QFont(font_family, 46, QFont.Weight.Bold))
-        title.setStyleSheet("color: #6d28d9; background: transparent; letter-spacing: 1.5px;")
+        title.setFont(QFont(font_family, 44, QFont.Weight.Bold))
+        title.setStyleSheet("color: #2e5bff; background: transparent; letter-spacing: 1px;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        subtitle = QLabel("Quality Management System")
-        subtitle.setFont(QFont(font_family, 14))
-        subtitle.setStyleSheet("color: #6b7280; background: transparent;")
+
+        subtitle = QLabel("Enterprise Quality Management Workspace")
+        subtitle.setFont(QFont(font_family, 13, QFont.Weight.Medium))
+        subtitle.setStyleSheet("color: #64748b; background: transparent;")
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                                                                          
-        title_frame = QWidget()
-        tf_layout = QVBoxLayout(title_frame)
-        tf_layout.setContentsMargins(0, 0, 0, 0)
-        tf_layout.setSpacing(6)
-        tf_layout.addWidget(title)
-        tf_layout.addWidget(subtitle)
-        group_layout.addWidget(title_frame)
-        header_layout.addWidget(group)
-        header_layout.addStretch()
-        layout.addWidget(header) 
+
+        badge_line = QLabel("Secure Access  •  Real-time Notifications  •  Desktop Optimized")
+        badge_line.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        badge_line.setStyleSheet("""
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.65);
+            border: 1px solid #dbe4f2;
+            border-radius: 12px;
+            padding: 4px 10px;
+        """)
+
+        brand_head_layout.addWidget(title)
+        brand_head_layout.addWidget(subtitle)
+        brand_head_layout.addWidget(badge_line, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(brand_head)
         
         form_frame = QFrame()
-        form_frame.setStyleSheet("background-color: #ffffff; border-radius: 12px; border: 1px solid #e6e9ef;")
-                                                                                    
-        form_frame.setMaximumWidth(820)
+        form_frame.setStyleSheet("""
+            background-color: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #dbe4f2;
+        """)
+        form_frame.setMaximumWidth(760)
         try:
             shadow = QGraphicsDropShadowEffect(form_frame)
             shadow.setBlurRadius(32)
-            shadow.setColor(QColor(0,0,0,45))
-            shadow.setOffset(0,10)
+            shadow.setColor(QColor(15, 23, 42, 40))
+            shadow.setOffset(0, 12)
             form_frame.setGraphicsEffect(shadow)
         except Exception:
             logger.debug('Shadow not available for login frame', exc_info=True)
 
         form_layout = QVBoxLayout(form_frame)
-        form_layout.setSpacing(22)
-                                                            
-        form_layout.setContentsMargins(72, 56, 72, 56)
-        
+        form_layout.setSpacing(14)
+        form_layout.setContentsMargins(56, 42, 56, 42)
+
+        form_title = QLabel("Sign in")
+        form_title.setFont(QFont(font_family, 20, QFont.Weight.Bold))
+        form_title.setStyleSheet("color: #0f172a;")
+        form_layout.addWidget(form_title)
+
+        form_hint = QLabel("Use your company account to continue")
+        form_hint.setStyleSheet("color: #64748b; font-size: 12px;")
+        form_layout.addWidget(form_hint)
+
         self.error_label = QLabel()
-        self.error_label.setStyleSheet("color: #ef4444; font-size: 13px;")
+        self.error_label.setStyleSheet("""
+            color: #b91c1c;
+            font-size: 12px;
+            font-weight: 600;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 6px 10px;
+        """)
         self.error_label.setVisible(False)
         form_layout.addWidget(self.error_label)
-        
+
         email_label = QLabel("Email")
-        email_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #1e293b;")
+        email_label.setStyleSheet("font-size: 12px; font-weight: 700; color: #334155;")
         form_layout.addWidget(email_label)
-        
+
         self.email_input = QLineEdit()
-        self.email_input.setPlaceholderText("Enter your email")
-        self.email_input.setFixedHeight(64)
+        self.email_input.setPlaceholderText("you@company.com")
+        self.email_input.setFixedHeight(50)
         self.email_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.email_input.setMinimumWidth(520)
+        self.email_input.setMinimumWidth(500)
         self.email_input.setStyleSheet("""
             QLineEdit {
-                padding: 12px 14px;
-                border: 2px solid #e6eef8;
-                border-radius: 8px;
-                font-size: 16px;
+                padding: 10px 12px;
+                border: 1px solid #d0dcf0;
+                border-radius: 10px;
+                font-size: 14px;
                 font-family: Segoe UI;
-                background-color: #f8fafc;
+                background-color: #fbfdff;
                 color: #0f172a;
             }
             QLineEdit::placeholder {
                 color: #94a3b8;
             }
             QLineEdit:focus {
-                border: 2px solid #4f46e5;
+                border: 1px solid #2e5bff;
                 background-color: #ffffff;
             }
         """)
+        if self.ui_settings.get("remember_email") and self.ui_settings.get("saved_email"):
+            self.email_input.setText(self.ui_settings.get("saved_email", ""))
         form_layout.addWidget(self.email_input)
-        
+
         pwd_label = QLabel("Password")
-        pwd_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #1e293b;")
+        pwd_label.setStyleSheet("font-size: 12px; font-weight: 700; color: #334155;")
         form_layout.addWidget(pwd_label)
-        
+
+        password_row = QWidget()
+        password_row_layout = QHBoxLayout(password_row)
+        password_row_layout.setContentsMargins(0, 0, 0, 0)
+        password_row_layout.setSpacing(8)
+
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Enter your password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self.password_input.setFixedHeight(64)
+        self.password_input.setFixedHeight(50)
         self.password_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.password_input.setMinimumWidth(520)
+        self.password_input.setMinimumWidth(430)
         self.password_input.setStyleSheet("""
             QLineEdit {
-                padding: 12px 14px;
-                border: 2px solid #e6eef8;
-                border-radius: 8px;
-                font-size: 16px;
+                padding: 10px 12px;
+                border: 1px solid #d0dcf0;
+                border-radius: 10px;
+                font-size: 14px;
                 font-family: Segoe UI;
-                background-color: #f8fafc;
+                background-color: #fbfdff;
                 color: #0f172a;
             }
             QLineEdit::placeholder {
                 color: #94a3b8;
             }
             QLineEdit:focus {
-                border: 2px solid #4f46e5;
+                border: 1px solid #2e5bff;
                 background-color: #ffffff;
             }
         """)
-        form_layout.addWidget(self.password_input)
-        
+        password_row_layout.addWidget(self.password_input, 1)
+
+        self.toggle_password_btn = QPushButton("Show")
+        self.toggle_password_btn.setFixedHeight(50)
+        self.toggle_password_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.toggle_password_btn.setStyleSheet("""
+            QPushButton {
+                background: #f8fafc;
+                color: #334155;
+                border: 1px solid #d0dcf0;
+                border-radius: 10px;
+                font-size: 12px;
+                font-weight: 700;
+                padding: 0 14px;
+            }
+            QPushButton:hover {
+                background: #eef2ff;
+                border: 1px solid #a9c0ea;
+            }
+        """)
+        self.toggle_password_btn.clicked.connect(self.toggle_password_visibility)
+        password_row_layout.addWidget(self.toggle_password_btn)
+
+        form_layout.addWidget(password_row)
+
+        self.remember_email_checkbox = QCheckBox("Remember email")
+        self.remember_email_checkbox.setChecked(bool(self.ui_settings.get("remember_email", False)))
+        self.remember_email_checkbox.setStyleSheet("""
+            QCheckBox {
+                color: #475569;
+                font-size: 12px;
+                font-weight: 600;
+                spacing: 8px;
+            }
+            QCheckBox::indicator {
+                width: 15px;
+                height: 15px;
+                border: 1px solid #c7d2e4;
+                border-radius: 4px;
+                background: #ffffff;
+            }
+            QCheckBox::indicator:checked {
+                background: #2e5bff;
+                border: 1px solid #1d4ed8;
+            }
+        """)
+        form_layout.addWidget(self.remember_email_checkbox)
+
         login_btn = QPushButton("Login")
-        login_btn.setFixedHeight(64)
+        login_btn.setFixedHeight(52)
+        login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         login_btn.setStyleSheet("""
             QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6d28d9, stop:1 #4f46e5);
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2e5bff, stop:1 #1f4df0);
                 color: white;
                 border: none;
                 border-radius: 10px;
-                font-size: 17px;
+                font-size: 15px;
                 font-weight: 800;
-                padding: 12px 18px;
+                padding: 10px 16px;
             }
             QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #7d3be0, stop:1 #3b6cf0);
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3a6dff, stop:1 #2157f6);
             }
         """)
         login_btn.clicked.connect(self.handle_login)
         form_layout.addWidget(login_btn)
-        
+
+        self.email_input.returnPressed.connect(self.handle_login)
+        self.password_input.returnPressed.connect(self.handle_login)
+
         form_layout.addStretch()
-        
+
         footer = QLabel("Secure connection • Notifications enabled  • www.ramschip.com")
-        footer.setStyleSheet("color: #6b7280; font-size: 12px;")
+        footer.setStyleSheet("color: #64748b; font-size: 11px;")
         footer.setAlignment(Qt.AlignmentFlag.AlignCenter)
         form_layout.addWidget(footer)
-        
+
         layout.addWidget(form_frame, alignment=Qt.AlignmentFlag.AlignCenter)
+
+    def toggle_password_visibility(self):
+        if self.password_input.echoMode() == QLineEdit.EchoMode.Password:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.toggle_password_btn.setText("Hide")
+        else:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+            self.toggle_password_btn.setText("Show")
     
     def handle_login(self):
         email = self.email_input.text().strip()
         password = self.password_input.text().strip()
-        
+
         if not email or not password:
             self.show_error("Please enter email and password")
             return
-        
+
         try:
             result = self.api_request("/auth/api/login", method="POST", data={
                 "email": email,
                 "password": password
             })
-            
+
             if result and result.get("success"):
+                self.error_label.setVisible(False)
                 self.current_user = result.get("user", {})
                 self.save_cookies()
+
+                self.ui_settings["remember_email"] = bool(self.remember_email_checkbox.isChecked())
+                self.ui_settings["saved_email"] = email if self.ui_settings["remember_email"] else ""
+                self.save_ui_settings()
+
                 # Refresh admin UI elements (menu/tray) now that we're logged in
                 try:
                     self._maybe_add_garage_action()
@@ -1387,43 +1669,199 @@ class QMSDesktopClient(QMainWindow):
     def show_error(self, message):
         self.error_label.setText(message)
         self.error_label.setVisible(True)
+
+    def setup_shortcuts(self):
+        try:
+            refresh_action = QAction(self)
+            refresh_action.setShortcut(QKeySequence("Ctrl+R"))
+            refresh_action.triggered.connect(self.refresh_main_ui)
+            self.addAction(refresh_action)
+
+            focus_search_action = QAction(self)
+            focus_search_action.setShortcut(QKeySequence("Ctrl+F"))
+            focus_search_action.triggered.connect(self.focus_quick_search)
+            self.addAction(focus_search_action)
+
+            browser_action = QAction(self)
+            browser_action.setShortcut(QKeySequence("Ctrl+Shift+O"))
+            browser_action.triggered.connect(self.open_browser)
+            self.addAction(browser_action)
+        except Exception:
+            logger.debug("Failed to setup shortcuts", exc_info=True)
+
+    def focus_quick_search(self):
+        try:
+            if hasattr(self, 'quick_search_input') and self.quick_search_input:
+                self.quick_search_input.setFocus()
+                self.quick_search_input.selectAll()
+        except Exception:
+            logger.debug("Failed to focus quick search", exc_info=True)
+
+    def _matches_search(self, *values):
+        query = (self.quick_search_text or "").strip().lower()
+        if not query:
+            return True
+        merged = " ".join(str(value or "") for value in values).lower()
+        return query in merged
+
+    def refresh_dashboard_data(self):
+        tasks = None
+        notifications = None
+
+        task_result = self.api_request("/rpmt/api/my-tasks", silent=True)
+        if task_result and isinstance(task_result, dict):
+            tasks = task_result.get("tasks") or []
+
+        notif_result = self.api_request("/api/notifications", silent=True)
+        if notif_result and isinstance(notif_result, dict):
+            notifications = notif_result.get("notifications") or []
+
+        if tasks is not None:
+            self.cached_tasks = tasks
+        if notifications is not None:
+            self.cached_notifications = notifications
+        self.last_sync_text = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def set_quick_search(self, value):
+        self.quick_search_text = (value or "").strip()
+        self.show_main_ui()
+
+    def apply_auto_refresh_settings(self):
+        try:
+            self.auto_refresh_timer.stop()
+            if self.auto_refresh_enabled:
+                self.auto_refresh_timer.start(max(30, self.auto_refresh_seconds) * 1000)
+        except Exception:
+            logger.debug("Failed to apply auto refresh settings", exc_info=True)
+
+    def toggle_auto_refresh(self):
+        self.auto_refresh_enabled = not self.auto_refresh_enabled
+        self.ui_settings["auto_refresh_enabled"] = self.auto_refresh_enabled
+        self.save_ui_settings()
+        self.apply_auto_refresh_settings()
+        self.show_main_ui()
+
+    def cycle_auto_refresh_interval(self):
+        cycle = [30, 60, 90, 120, 180]
+        try:
+            current_index = cycle.index(self.auto_refresh_seconds)
+        except ValueError:
+            current_index = 2
+        self.auto_refresh_seconds = cycle[(current_index + 1) % len(cycle)]
+        self.ui_settings["auto_refresh_seconds"] = self.auto_refresh_seconds
+        self.save_ui_settings()
+        self.apply_auto_refresh_settings()
+        self.show_main_ui()
+
+    def refresh_main_ui(self):
+        self.show_main_ui(reload_data=True)
+
+    def clear_module_filter(self):
+        self.selected_module_filter = None
+        self.show_main_ui()
+
+    def _status_color(self, status_text):
+        normalized = (status_text or "").strip().lower()
+        if normalized in {"complete", "completed"}:
+            return "#10b981"
+        if normalized in {"in-progress", "in progress"}:
+            return "#3b82f6"
+        if normalized in {"not started", "not_started"}:
+            return "#f59e0b"
+        return "#64748b"
+
+    def _module_name(self, module_key):
+        module_map = {
+            "rpmt": "RPMT",
+            "svit": "SVIT",
+            "cits": "CITS",
+            "spec": "SPEC",
+            "spec-center": "SPEC",
+            "product-info": "PRODUCT-INFO",
+            "apqp": "APQP",
+        }
+        return module_map.get((module_key or "").lower(), (module_key or "QMS").upper())
+
+    def _module_route(self, module_key):
+        route_map = {
+            'rpmt': '/rpmt',
+            'svit': '/svit',
+            'cits': '/cits',
+            'spec': '/spec-center',
+            'spec-center': '/spec-center',
+            'product-info': '/product-info',
+            'apqp': '/apqp'
+        }
+        return route_map.get((module_key or '').lower(), '/main')
+
+    def open_notification_item(self, notif):
+        module_key = (notif.get('module') or '').lower()
+        self.open_module(self._module_route(module_key))
+
+    def open_task_item(self, task):
+        module_key = (task.get('module') or '').lower()
+        self.open_module(self._module_route(module_key))
     
-    def show_main_ui(self):
+    def show_main_ui(self, reload_data=False):
+        if reload_data or (self.current_user and not (self.cached_tasks or self.cached_notifications)):
+            self.refresh_dashboard_data()
+
         central_widget = QWidget()
+        central_widget.setObjectName("mainRoot")
         self.setCentralWidget(central_widget)
-                                            
+
         layout = QVBoxLayout(central_widget)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        central_widget.setStyleSheet("""
+            QWidget#mainRoot {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #f4f7ff,
+                    stop:0.4 #f8fbff,
+                    stop:1 #f1f5f9);
+            }
+        """)
         
         navbar = self.create_navbar()
         layout.addWidget(navbar)
         
         tabs = QTabWidget()
+        self.main_tabs = tabs
+        tabs.setDocumentMode(True)
+        tabs.setObjectName("mainTabs")
         tabs.setStyleSheet("""
+            QTabWidget#mainTabs::pane {
+                border: 1px solid #d6e1f0;
+                border-radius: 16px;
+                top: -1px;
+                background-color: rgba(255, 255, 255, 0.9);
+                margin: 0 16px 16px 16px;
+            }
             QTabBar {
                 background-color: transparent;
+                left: 16px;
             }
             QTabBar::tab {
-                background-color: transparent;
-                padding: 12px 28px;
-                border-bottom: 3px solid transparent;
+                background-color: rgba(255, 255, 255, 0.68);
+                padding: 12px 22px;
+                border: 1px solid #dbe4f2;
+                border-bottom: none;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
                 font-family: Segoe UI;
                 font-size: 13px;
-                font-weight: 500;
-                color: #94a3b8;
-                margin-right: 4px;
+                font-weight: 700;
+                color: #6b7280;
+                margin-right: 6px;
             }
             QTabBar::tab:selected {
-                border-bottom: 3px solid #3b82f6;
-                color: #1e293b;
-                background-color: rgba(59, 130, 246, 0.08);
+                background-color: #ffffff;
+                border-color: #c9d7ee;
+                color: #0f172a;
             }
             QTabBar::tab:hover {
-                background-color: rgba(59, 130, 246, 0.08);
-            }
-            QTabWidget::pane {
-                border: none;
-                background-color: #f8fafc;
+                background-color: rgba(231, 240, 255, 0.8);
             }
         """)
         
@@ -1435,94 +1873,253 @@ class QMSDesktopClient(QMainWindow):
     
     def create_navbar(self):
         navbar = QFrame()
-        navbar.setStyleSheet("background-color: #ffffff; border-bottom: 2px solid #e5e7eb;")
-        navbar.setFixedHeight(64)
-        layout = QHBoxLayout(navbar)
-        layout.setContentsMargins(24, 0, 24, 0)
-        layout.setSpacing(16)
-        
+        navbar.setObjectName("topNavbar")
+        navbar.setStyleSheet("""
+            QFrame#topNavbar {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #ffffff,
+                    stop:1 #f5f9ff);
+                border-bottom: 1px solid #d5e1f1;
+            }
+        """)
+        navbar.setFixedHeight(112)
+        root_layout = QVBoxLayout(navbar)
+        root_layout.setContentsMargins(16, 8, 16, 8)
+        root_layout.setSpacing(8)
+
+        top_row = QHBoxLayout()
+        top_row.setSpacing(10)
+
+        title_wrap = QWidget()
+        title_layout = QVBoxLayout(title_wrap)
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setSpacing(0)
+
         title = QLabel("RAMSCHIP QMS")
-        title_font = QFont("Segoe UI", 18, QFont.Weight.Bold)
-        title_font.setLetterSpacing(QFont.AbsoluteSpacing, 0.3)
+        title_font = QFont("Segoe UI", 30, QFont.Weight.Bold)
+        title_font.setLetterSpacing(QFont.AbsoluteSpacing, 0.4)
         title.setFont(title_font)
-        title.setStyleSheet("color: #3b82f6;")
-        layout.addWidget(title)
-        layout.addStretch()
-        
+        title.setStyleSheet("color:#3b82f6; line-height:1;")
+        title_layout.addWidget(title)
+
+        subtitle = QLabel("Enterprise Workspace")
+        subtitle.setStyleSheet("color:#64748b; font-size:11px; font-weight:600;")
+        title_layout.addWidget(subtitle)
+        top_row.addWidget(title_wrap)
+        top_row.addStretch()
+
         if self.current_user:
             user_name = self.current_user.get('english_name', 'User')
-            user_label = QLabel(user_name)
-            user_font = QFont("Segoe UI", 11, QFont.Weight.Normal)
-            user_label.setFont(user_font)
-            user_label.setStyleSheet("font-size: 12px; color: #64748b; padding: 0px 8px;")
-            layout.addWidget(user_label)
-        
-        browser_btn = QPushButton("Open in Browser")
+            user_label = QLabel(f"👤 {user_name}")
+            user_label.setStyleSheet("""
+                color:#334155;
+                padding:7px 12px;
+                border-radius:10px;
+                background:#eef2ff;
+                border:1px solid #c7d2fe;
+                font-size:11px;
+                font-weight:700;
+            """)
+            top_row.addWidget(user_label)
+
+        browser_btn = QPushButton("Open Browser")
+        browser_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        browser_btn.setMinimumWidth(124)
         browser_btn.setStyleSheet("""
             QPushButton {
-                background-color: #3b82f6;
-                color: white;
-                border: 1px solid #1f3a8a;
-                padding: 8px 20px;
-                border-radius: 8px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: 0.3px;
+                background:#2e5bff;
+                color:#ffffff;
+                border:1px solid #1e40af;
+                border-radius:10px;
+                padding:8px 14px;
+                font-size:11px;
+                font-weight:700;
             }
-            QPushButton:hover {
-                background-color: #2563eb;
-                border: 1px solid #1e40af;
-            }
-            QPushButton:pressed {
-                background-color: #1d4ed8;
-            }
+            QPushButton:hover { background:#1f4df0; }
         """)
         browser_btn.clicked.connect(self.open_browser)
-        layout.addWidget(browser_btn)
-        
+        top_row.addWidget(browser_btn)
+
         logout_btn = QPushButton("Logout")
+        logout_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        logout_btn.setMinimumWidth(96)
         logout_btn.setStyleSheet("""
             QPushButton {
-                background-color: #64748b;
-                color: white;
-                border: 1px solid #334155;
-                padding: 8px 20px;
-                border-radius: 8px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: 0.3px;
+                background:#64748b;
+                color:#ffffff;
+                border:1px solid #334155;
+                border-radius:10px;
+                padding:8px 14px;
+                font-size:11px;
+                font-weight:700;
             }
-            QPushButton:hover {
-                background-color: #475569;
-                border: 1px solid #1e293b;
-            }
-            QPushButton:pressed {
-                background-color: #334155;
-            }
+            QPushButton:hover { background:#475569; }
         """)
         logout_btn.clicked.connect(self.handle_logout)
-        layout.addWidget(logout_btn)
-        
+        top_row.addWidget(logout_btn)
+        root_layout.addLayout(top_row)
+
+        bottom_row = QHBoxLayout()
+        bottom_row.setSpacing(8)
+
+        task_count = len(self.cached_tasks)
+        notif_count = len(self.cached_notifications)
+        active_count = len([
+            task for task in self.cached_tasks
+            if str(task.get('status', '')).strip().lower() in {'in-progress', 'in progress'}
+        ])
+
+        summary_chip = QLabel(f"Tasks {task_count}  ·  Alerts {notif_count}  ·  Active {active_count}")
+        summary_chip.setStyleSheet("""
+            background:#eef2ff;
+            color:#3730a3;
+            border:1px solid #c7d2fe;
+            border-radius:10px;
+            padding:6px 10px;
+            font-size:10px;
+            font-weight:700;
+        """)
+        bottom_row.addWidget(summary_chip)
+
+        self.quick_search_input = QLineEdit()
+        self.quick_search_input.setPlaceholderText("Search tasks, notifications, modules (Ctrl+F)")
+        self.quick_search_input.setText(self.quick_search_text)
+        self.quick_search_input.setClearButtonEnabled(True)
+        self.quick_search_input.setMinimumWidth(320)
+        self.quick_search_input.setMaximumWidth(420)
+        self.quick_search_input.setStyleSheet("""
+            QLineEdit {
+                background:#ffffff;
+                color:#0f172a;
+                border:1px solid #cbd5e1;
+                border-radius:10px;
+                padding:7px 10px;
+                font-size:11px;
+            }
+            QLineEdit:focus {
+                border:1px solid #60a5fa;
+                background:#f8fbff;
+            }
+        """)
+        self.quick_search_input.textChanged.connect(self.set_quick_search)
+        bottom_row.addWidget(self.quick_search_input, 1)
+
+        sync_label = QLabel(f"Updated {self.last_sync_text}")
+        sync_label.setStyleSheet("color:#64748b; font-size:10px; font-weight:600;")
+        bottom_row.addWidget(sync_label)
+
+        notif_btn = QPushButton("Notifications")
+        notif_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        notif_btn.setStyleSheet("""
+            QPushButton {
+                background:#ffffff;
+                color:#334155;
+                border:1px solid #cbd5e1;
+                border-radius:10px;
+                padding:6px 10px;
+                font-size:11px;
+                font-weight:700;
+            }
+            QPushButton:hover { background:#f1f5ff; }
+        """)
+        notif_btn.clicked.connect(self.show_notification_popups)
+        bottom_row.addWidget(notif_btn)
+
+        refresh_btn = QPushButton("Refresh")
+        refresh_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                background:#ffffff;
+                color:#334155;
+                border:1px solid #cbd5e1;
+                border-radius:10px;
+                padding:6px 12px;
+                font-size:11px;
+                font-weight:700;
+            }
+            QPushButton:hover { background:#eef2ff; }
+        """)
+        refresh_btn.clicked.connect(self.refresh_main_ui)
+        bottom_row.addWidget(refresh_btn)
+
+        if hasattr(self, 'selected_module_filter') and self.selected_module_filter:
+            clear_filter_btn = QPushButton("Clear")
+            clear_filter_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            clear_filter_btn.setStyleSheet("""
+                QPushButton {
+                    background:#fff7ed;
+                    color:#9a3412;
+                    border:1px solid #fed7aa;
+                    border-radius:10px;
+                    padding:6px 10px;
+                    font-size:11px;
+                    font-weight:700;
+                }
+                QPushButton:hover { background:#ffedd5; }
+            """)
+            clear_filter_btn.clicked.connect(self.clear_module_filter)
+            bottom_row.addWidget(clear_filter_btn)
+
+        root_layout.addLayout(bottom_row)
+
         return navbar
     
     def create_tasks_tab(self):
         container = QWidget()
         layout = QVBoxLayout(container)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(14, 14, 14, 14)
+        layout.setSpacing(10)
 
-                                                      
+        container.setStyleSheet("background-color: transparent;")
+
+        header = QFrame()
+        header.setObjectName("quickAccessHeader")
+        header.setStyleSheet("""
+            QFrame#quickAccessHeader {
+                background:#ffffff;
+                border: 1px solid #d9e3f1;
+                border-radius: 14px;
+            }
+        """)
+        header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(12, 9, 12, 9)
+        header_layout.setSpacing(10)
+
+        title = QLabel("My Tasks")
+        title.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
+        title.setStyleSheet("color:#0f172a;")
+        header_layout.addWidget(title)
+
         if hasattr(self, 'selected_module_filter') and self.selected_module_filter:
-            filter_banner = QLabel(f"Filtering tasks by module: {self.selected_module_filter.upper()}")
-            filter_banner.setStyleSheet("background: #e0e7ff; color: #3730a3; padding: 6px 12px; border-radius: 8px; font-weight: bold;")
-            layout.addWidget(filter_banner)
-        container.setStyleSheet("background-color: #f8fafc;")
-        
+            filter_banner = QLabel(f"Filter: {self._module_name(self.selected_module_filter)}")
+            filter_banner.setStyleSheet("""
+                background: #e0e7ff;
+                color: #3730a3;
+                padding: 4px 10px;
+                border-radius: 10px;
+                font-weight: 700;
+            """)
+            header_layout.addWidget(filter_banner)
+
+        header_layout.addStretch()
+        layout.addWidget(header)
+
         try:
-            result = self.api_request("/rpmt/api/my-tasks")
-            if result and result.get("tasks"):
-                tasks = result.get("tasks", [])
-                
+            tasks = list(self.cached_tasks or [])
+
+            if tasks:
+                selected_filter = (getattr(self, 'selected_module_filter', None) or '').lower()
+                if selected_filter:
+                    tasks = [task for task in tasks if (task.get('module', '') or '').lower() == selected_filter]
+
+                if self.quick_search_text:
+                    tasks = [
+                        task for task in tasks
+                        if self._matches_search(task.get('title'), task.get('status'), task.get('due_date'), self._module_name(task.get('module')))
+                    ]
+
                 if tasks:
+
                     scroll = QScrollArea()
                     scroll.setWidgetResizable(True)
                     scroll.setStyleSheet("""
@@ -1551,96 +2148,177 @@ class QMSDesktopClient(QMainWindow):
                     scroll_widget.setStyleSheet("background-color: transparent;")
                     scroll_layout = QVBoxLayout(scroll_widget)
                     scroll_layout.setContentsMargins(0, 0, 0, 0)
+                    scroll_layout.setSpacing(8)
                     
                     for task in tasks[:30]:
                         card = self.create_task_card(task)
                         scroll_layout.addWidget(card)
-                    
+
                     scroll_layout.addStretch()
                     scroll.setWidget(scroll_widget)
                     layout.addWidget(scroll)
                 else:
-                    empty_label = QLabel("No tasks assigned")
-                    empty_label.setStyleSheet("color: #94a3b8;")
+                    empty_label = QLabel("No tasks assigned for current filter/search")
+                    empty_label.setStyleSheet("color: #64748b; font-size: 12px; padding: 10px;")
                     layout.addWidget(empty_label)
                     layout.addStretch()
             else:
-                fail_label = QLabel("Failed to load tasks")
-                fail_label.setStyleSheet("color: #94a3b8;")
+                fail_label = QLabel("No tasks available")
+                fail_label.setStyleSheet("color: #64748b; font-size: 12px; padding: 10px;")
                 layout.addWidget(fail_label)
                 layout.addStretch()
         except Exception as e:
-            layout.addWidget(QLabel(f"Error: {str(e)}"))
+            error_label = QLabel(f"Error: {str(e)}")
+            error_label.setStyleSheet("color:#b91c1c; padding: 10px;")
+            layout.addWidget(error_label)
             layout.addStretch()
-        
+
         return container
     
     def create_task_card(self, task):
         card = QFrame()
+        card.setObjectName("taskCard")
         card.setStyleSheet("""
-            QFrame {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ffffff, stop:1 #f9fafb);
-                border: 1px solid #e5e7eb;
-                border-radius: 14px;
-                margin: 4px 16px;
-                padding: 8px;
+            QFrame#taskCard {
+                background:#ffffff;
+                border: 1px solid #d8e3f2;
+                border-radius: 16px;
+                margin: 0 2px;
+                padding: 14px;
             }
-            QFrame:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #f9fafb, stop:1 #f3f4f6);
-                border: 1px solid #3b82f6;
+            QFrame#taskCard:hover {
+                background:#f8fbff;
+                border: 1px solid #9fb7e4;
             }
         """)
-        
+
         shadow = QGraphicsDropShadowEffect(card)
         shadow.setBlurRadius(20)
-        shadow.setOffset(0, 4)
-        shadow.setColor(QColor(0, 0, 0, 40))
+        shadow.setOffset(0, 6)
+        shadow.setColor(QColor(37, 99, 235, 28))
         card.setGraphicsEffect(shadow)
-        
+
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
-        
-        title = QLabel(task.get('title', 'Unknown'))
-        title_font = QFont("Segoe UI", 13, QFont.Weight.DemiBold)
-        title_font.setLetterSpacing(QFont.AbsoluteSpacing, 0.2)
-        title.setFont(title_font)
-        title.setStyleSheet("color: #1e293b; line-height: 1.4;")
-        title.setWordWrap(True)
-        layout.addWidget(title)
-        
-        meta_layout = QHBoxLayout()
-        meta_layout.setSpacing(12)
-        
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(9)
+
+        top_row = QHBoxLayout()
+        top_row.setSpacing(8)
+
+        module_name = self._module_name(task.get('module', 'qms'))
+        module_chip = QLabel(module_name)
+        module_chip.setStyleSheet("background:#e0ecff; color:#1e3a8a; border:1px solid #bfdbfe; border-radius:10px; padding:3px 9px; font-size:10px; font-weight:700;")
+        top_row.addWidget(module_chip)
+
         status = task.get('status', 'N/A')
         status_label = QLabel(f"● {status}")
-        status_color = "#10b981" if status == "Completed" else "#f59e0b" if status == "In Progress" else "#6b7280"
-        status_label.setStyleSheet(f"color: {status_color}; font-size: 12px; font-weight: 600;")
-        meta_layout.addWidget(status_label)
-        
-        if task.get('due_date'):
-            due_label = QLabel(f"📅 {task.get('due_date')}")
-            due_label.setStyleSheet("color: #64748b; font-size: 11px;")
-            meta_layout.addWidget(due_label)
-        
-        meta_layout.addStretch()
-        layout.addLayout(meta_layout)
-        
+        status_label.setStyleSheet(f"color: {self._status_color(status)}; font-size: 11px; font-weight: 700;")
+        top_row.addWidget(status_label)
+        top_row.addStretch()
+
+        due_text = task.get('due_date')
+        if due_text:
+            due_badge = QLabel(f"DUE {due_text}")
+            due_badge.setStyleSheet("color:#334155; background:#f8fafc; border:1px solid #dbe2ea; border-radius:9px; padding:3px 8px; font-size:10px; font-weight:700;")
+            top_row.addWidget(due_badge)
+
+        layout.addLayout(top_row)
+
+        title = QLabel(task.get('title', 'Unknown'))
+        title_font = QFont("Segoe UI", 14, QFont.Weight.DemiBold)
+        title_font.setLetterSpacing(QFont.AbsoluteSpacing, 0.2)
+        title.setFont(title_font)
+        title.setStyleSheet("color: #0f172a; line-height: 1.35;")
+        title.setWordWrap(True)
+        layout.addWidget(title)
+
+        bottom_row = QHBoxLayout()
+        bottom_row.setSpacing(8)
+        bottom_row.addStretch()
+
+        open_btn = QPushButton("Open")
+        open_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        open_btn.setStyleSheet("""
+            QPushButton {
+                background:#2e5bff;
+                color:#ffffff;
+                border:1px solid #1e40af;
+                border-radius:10px;
+                padding:7px 13px;
+                font-size:11px;
+                font-weight:700;
+            }
+            QPushButton:hover {
+                background:#1f4df0;
+            }
+        """)
+        open_btn.clicked.connect(lambda _=False, item=task: self.open_task_item(item))
+        bottom_row.addWidget(open_btn)
+
+        layout.addLayout(bottom_row)
+
         return card
     
     def create_notifications_tab(self):
         container = QWidget()
         layout = QVBoxLayout(container)
-        layout.setContentsMargins(0, 0, 0, 0)
-        container.setStyleSheet("background-color: #f8fafc;")
+        layout.setContentsMargins(14, 14, 14, 14)
+        layout.setSpacing(10)
+        container.setStyleSheet("background-color: transparent;")
+
+        header = QFrame()
+        header.setStyleSheet("""
+            QFrame {
+                background:#ffffff;
+                border: 1px solid #d9e3f1;
+                border-radius: 14px;
+            }
+        """)
+        header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(12, 9, 12, 9)
+        title = QLabel("Notifications")
+        title.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
+        title.setStyleSheet("color:#0f172a;")
+        header_layout.addWidget(title)
+        header_layout.addStretch()
+
+        refresh_btn = QPushButton("Refresh")
+        refresh_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                background:#ffffff;
+                color:#334155;
+                border:1px solid #c9d7ee;
+                border-radius:8px;
+                padding:5px 10px;
+                font-size:11px;
+                font-weight:700;
+            }
+            QPushButton:hover {
+                background:#eef2ff;
+                border:1px solid #aac2ea;
+            }
+        """)
+        refresh_btn.clicked.connect(self.refresh_main_ui)
+        header_layout.addWidget(refresh_btn)
+        layout.addWidget(header)
         
         try:
-            result = self.api_request("/api/notifications")
-            if result and result.get("notifications"):
-                notifications = result.get("notifications", [])
-                
+            notifications = list(self.cached_notifications or [])
+
+            if notifications:
+                if self.quick_search_text:
+                    notifications = [
+                        notif for notif in notifications
+                        if self._matches_search(
+                            notif.get('title'),
+                            notif.get('description'),
+                            notif.get('time'),
+                            self._module_name(notif.get('module')),
+                            notif.get('status')
+                        )
+                    ]
+
                 if notifications:
                     scroll = QScrollArea()
                     scroll.setWidgetResizable(True)
@@ -1670,168 +2348,311 @@ class QMSDesktopClient(QMainWindow):
                     scroll_widget.setStyleSheet("background-color: transparent;")
                     scroll_layout = QVBoxLayout(scroll_widget)
                     scroll_layout.setContentsMargins(0, 0, 0, 0)
+                    scroll_layout.setSpacing(8)
                     
                     for notif in notifications[:30]:
                         card = self.create_notification_card(notif)
                         scroll_layout.addWidget(card)
-                    
+
                     scroll_layout.addStretch()
                     scroll.setWidget(scroll_widget)
                     layout.addWidget(scroll)
                 else:
-                    layout.addWidget(QLabel("No notifications"))
+                    empty_label = QLabel("No notifications for current search")
+                    empty_label.setStyleSheet("color: #64748b; font-size: 12px; padding: 10px;")
+                    layout.addWidget(empty_label)
                     layout.addStretch()
             else:
-                layout.addWidget(QLabel("Failed to load notifications"))
+                fail_label = QLabel("No notifications")
+                fail_label.setStyleSheet("color: #64748b; font-size: 12px; padding: 10px;")
+                layout.addWidget(fail_label)
                 layout.addStretch()
         except Exception as e:
-            layout.addWidget(QLabel(f"Error: {str(e)}"))
+            error_label = QLabel(f"Error: {str(e)}")
+            error_label.setStyleSheet("color:#b91c1c; padding: 10px;")
+            layout.addWidget(error_label)
             layout.addStretch()
-        
+
         return container
     
     def create_notification_card(self, notif):
         card = QFrame()
+        card.setObjectName("notificationCard")
         card.setStyleSheet("""
-            QFrame {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ffffff, stop:1 #f9fafb);
-                border-left: 4px solid #3b82f6;
-                border: 1px solid #e5e7eb;
-                margin: 4px 16px;
-                padding: 8px 16px;
-                border-radius: 12px;
+            QFrame#notificationCard {
+                background:#ffffff;
+                border-left: 5px solid #3b82f6;
+                border: 1px solid #dbe4f2;
+                margin: 0 2px;
+                padding: 12px 14px;
+                border-radius: 14px;
             }
-            QFrame:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #f9fafb, stop:1 #f3f4f6);
-                border: 1px solid #3b82f6;
+            QFrame#notificationCard:hover {
+                background:#f8fbff;
+                border: 1px solid #9fb7e4;
             }
         """)
-        
+
         shadow = QGraphicsDropShadowEffect(card)
         shadow.setBlurRadius(18)
-        shadow.setOffset(0, 3)
-        shadow.setColor(QColor(0, 0, 0, 30))
+        shadow.setOffset(0, 5)
+        shadow.setColor(QColor(37, 99, 235, 24))
         card.setGraphicsEffect(shadow)
-        
+
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
-        
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(7)
+
+        top_row = QHBoxLayout()
+        top_row.setSpacing(8)
+        module_name = self._module_name(notif.get('module', 'qms'))
+        module_chip = QLabel(module_name)
+        module_chip.setStyleSheet("""
+            background:#eef2ff;
+            color:#3730a3;
+            border:1px solid #c7d2fe;
+            border-radius:10px;
+            padding:2px 8px;
+            font-size:10px;
+            font-weight:700;
+        """)
+        top_row.addWidget(module_chip)
+        top_row.addStretch()
+
+        if notif.get('time'):
+            time_label = QLabel(str(notif.get('time')))
+            time_label.setStyleSheet("color:#64748b; font-size:10px; font-weight:600;")
+            top_row.addWidget(time_label)
+
+        layout.addLayout(top_row)
+
         title = QLabel(notif.get('title', 'Unknown'))
-        title.setFont(QFont("Segoe UI", 12, QFont.Weight.Bold))
-        title.setStyleSheet("color: #1e293b;")
+        title.setFont(QFont("Segoe UI", 13, QFont.Weight.DemiBold))
+        title.setStyleSheet("color: #0f172a;")
         layout.addWidget(title)
-        
+
         if notif.get('description'):
             desc = QLabel(notif.get('description', ''))
-            desc.setStyleSheet("color: #64748b; font-size: 11px;")
+            desc.setStyleSheet("color: #475569; font-size: 11px; line-height: 1.35;")
             desc.setWordWrap(True)
             layout.addWidget(desc)
-        
-        time_label = QLabel(notif.get('time', ''))
-        time_label.setStyleSheet("color: #94a3b8; font-size: 10px;")
-        layout.addWidget(time_label)
-        
+
+        bottom_row = QHBoxLayout()
+        bottom_row.setSpacing(8)
+        bottom_row.addStretch()
+
+        open_btn = QPushButton("Open")
+        open_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        open_btn.setStyleSheet("""
+            QPushButton {
+                background:#2e5bff;
+                color:#ffffff;
+                border:1px solid #1e40af;
+                border-radius:8px;
+                padding:4px 10px;
+                font-size:10px;
+                font-weight:700;
+            }
+            QPushButton:hover {
+                background:#1f4df0;
+            }
+        """)
+        open_btn.clicked.connect(lambda _=False, item=notif: self.open_notification_item(item))
+        bottom_row.addWidget(open_btn)
+        layout.addLayout(bottom_row)
+
         return card
     
     def create_modules_tab(self):
         container = QWidget()
         container.setStyleSheet("background: transparent;")
         main_layout = QVBoxLayout(container)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(14, 14, 14, 14)
+        main_layout.setSpacing(10)
 
-                                                                 
-        gradient_bg = QFrame(container)
-        gradient_bg.setObjectName("gradientBg")
-        gradient_bg.setStyleSheet("""
-            QFrame#gradientBg {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 rgba(102,126,234,25),
-                    stop:0.25 rgba(118,75,162,25),
-                    stop:0.4 rgba(240,147,251,25),
-                    stop:0.5 #f8f9fc,
-                    stop:1 #f8f9fc);
+        header = QFrame()
+        header.setStyleSheet("""
+            QFrame {
+                background:#ffffff;
+                border: 1px solid #d9e3f1;
+                border-radius: 14px;
             }
         """)
-        gradient_bg.setGeometry(0, 0, 1, 1)                             
-        main_layout.addWidget(gradient_bg)
+        header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(12, 9, 12, 9)
+        header_layout.setSpacing(10)
 
-                                           
-        fg_widget = QWidget(container)
-        fg_layout = QVBoxLayout(fg_widget)
-        fg_layout.setContentsMargins(0, 0, 0, 0)
-        fg_layout.setSpacing(0)
+        title = QLabel("Quick Access")
+        title.setObjectName("quickAccessTitle")
+        title.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
+        title.setStyleSheet("color:#0f172a; border:none; background:transparent; padding:0;")
+        header_layout.addWidget(title)
 
-        title = QLabel("Quick Access to Modules")
-        title.setFont(QFont("Segoe UI", 16, QFont.Weight.Bold))
-        title.setStyleSheet("color: #1e293b; margin: 20px 20px 20px 20px;")
-        fg_layout.addWidget(title)
+        subtitle = QLabel("Open module dashboards quickly")
+        subtitle.setObjectName("quickAccessSubtitle")
+        subtitle.setStyleSheet("color:#64748b; font-size:11px; border:none; background:transparent; padding:0;")
+        header_layout.addWidget(subtitle)
+        header_layout.addStretch()
+
+        open_main_btn = QPushButton("Main")
+        open_main_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        open_main_btn.setStyleSheet("""
+            QPushButton {
+                background:#ffffff;
+                color:#334155;
+                border:1px solid #c9d7ee;
+                border-radius:8px;
+                padding:5px 10px;
+                font-size:11px;
+                font-weight:700;
+            }
+            QPushButton:hover {
+                background:#eef2ff;
+            }
+        """)
+        open_main_btn.clicked.connect(lambda: self.open_module('/main'))
+        header_layout.addWidget(open_main_btn)
+        main_layout.addWidget(header)
 
         modules = [
-            {"name": "RPMT", "url": "/rpmt", "color": "#667eea", "svg": '''<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z\"/><path d=\"M10 17l-3-3 1.41-1.41L10 14.17l4.59-4.58L16 11l-6 6z\"/></svg>'''},
-            {"name": "SVIT", "url": "/svit", "color": "#00d4ff", "svg": '''<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2\"/><line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/></svg>'''},
-            {"name": "CITS", "url": "/cits", "color": "#e63946", "svg": '''<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 2a7 7 0 100 14 7 7 0 000-14z\"/><path d=\"M4 20c1.5-3 5-5 8-5s6.5 2 8 5\"/></svg>'''},
-            {"name": "APQP", "url": "/apqp", "color": "#f59e0b", "svg": '''<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"4\"/><path d=\"M8 12h8\"/></svg>'''},
-            {"name": "SPEC Center", "url": "/spec-center", "color": "#10b981", "svg": '''<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"3\"/><path d=\"M5 20c2-3 6-4 7-4s5 1 7 4\"/></svg>'''},
-            {"name": "PRODUCT-INFO", "url": "/product-info", "color": "#2e5bff", "svg": '''<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"3\"/><path d=\"M8 9h8\"/><path d=\"M8 13h5\"/></svg>'''}
+            {"name": "RPMT", "url": "/rpmt", "help": "/rpmt/help", "desc": "Project roadmap and weekly execution", "color": "#2e5bff", "icon": "📦"},
+            {"name": "SVIT", "url": "/svit", "help": "/svit/help", "desc": "Shuttle and board validation management", "color": "#8b5cf6", "icon": "🧪"},
+            {"name": "CITS", "url": "/cits", "help": "/cits/help", "desc": "Inquiry and issue tracking workflow", "color": "#ec4899", "icon": "🎫"},
+            {"name": "APQP", "url": "/apqp", "help": None, "desc": "Advanced planning quality pipeline", "color": "#f59e0b", "icon": "📋"},
+            {"name": "SPEC Center", "url": "/spec-center", "help": "/spec-center/help", "desc": "Specification documents and approvals", "color": "#10b981", "icon": "📚"},
+            {"name": "PRODUCT-INFO", "url": "/product-info", "help": "/product-info/help", "desc": "Product matrix and version knowledge", "color": "#2563eb", "icon": "🧭"}
         ]
+
+        if self.quick_search_text:
+            modules = [
+                module for module in modules
+                if self._matches_search(module.get('name'), module.get('desc'))
+            ]
+
+        if not modules:
+            empty = QLabel("No modules for current search")
+            empty.setStyleSheet("color:#64748b; font-size:12px; padding:10px;")
+            main_layout.addWidget(empty)
+            main_layout.addStretch()
+            return container
+
         grid_widget = QWidget()
         grid_layout = QGridLayout(grid_widget)
-        grid_layout.setSpacing(40)
-        grid_layout.setContentsMargins(10, 10, 10, 10)
-        col_count = 2
+        grid_layout.setSpacing(14)
+        grid_layout.setContentsMargins(0, 0, 0, 0)
+        grid_layout.setColumnStretch(0, 1)
+        grid_layout.setColumnStretch(1, 1)
+        grid_layout.setColumnStretch(2, 1)
+
         for idx, module in enumerate(modules):
             card = self.create_module_card(module)
-            row = idx // col_count
-            col = idx % col_count
-            grid_layout.addWidget(card, row, col, alignment=Qt.AlignmentFlag.AlignTop)
-        fg_layout.addWidget(grid_widget)
-        fg_layout.addStretch()
-        main_layout.addWidget(fg_widget, 1)
+            row = idx // 3
+            col = idx % 3
+            grid_layout.addWidget(card, row, col)
+
+        main_layout.addWidget(grid_widget)
+        main_layout.addStretch()
         return container
     
     def create_module_card(self, module):
         module_color = module.get("color", "#667eea")
-        module_svg = module.get("svg", None)
+        module_icon = module.get("icon", "🧩")
         card = QFrame()
-        card.setFixedSize(300, 150)
+        card.setObjectName("moduleCard")
+        card.setMinimumSize(230, 164)
+        card.setMaximumHeight(194)
         card.setStyleSheet(f"""
-            QFrame {{
-                background: #fff;
+            QFrame#moduleCard {{
+                background: #ffffff;
                 border-radius: 16px;
-                border: none;
+                border: 1px solid #dbe4f2;
             }}
-            QFrame:hover {{
-                background: #f8fafc;
+            QFrame#moduleCard:hover {{
+                background: #f8fbff;
+                border: 1px solid {module_color};
+            }}
+            QFrame#moduleCard QLabel {{
+                border: none;
+                background: transparent;
             }}
         """)
         shadow = QGraphicsDropShadowEffect(card)
         shadow.setBlurRadius(18)
-        shadow.setOffset(0, 4)
-        shadow.setColor(QColor(0, 0, 0, 24))
+        shadow.setOffset(0, 6)
+        shadow.setColor(QColor(37, 99, 235, 24))
         card.setGraphicsEffect(shadow)
         vbox = QVBoxLayout(card)
-        vbox.setContentsMargins(16, 16, 16, 16)
-        vbox.setSpacing(4)
+        vbox.setContentsMargins(12, 10, 12, 11)
+        vbox.setSpacing(7)
         top_bar = QFrame()
-        top_bar.setFixedHeight(5)
-        top_bar.setStyleSheet(f"background: {module_color}; border-radius: 3px 3px 0 0;")
+        top_bar.setFixedHeight(4)
+        top_bar.setStyleSheet(f"background: {module_color}; border-radius: 3px;")
         vbox.addWidget(top_bar)
-                 
-        if module_svg:
-            svg_widget = QSvgWidget()
-            svg_widget.load(bytearray(module_svg, encoding='utf-8'))
-            svg_widget.setFixedSize(32, 32)
-            vbox.addWidget(svg_widget, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        icon_label = QLabel(module_icon)
+        icon_label.setStyleSheet("font-size: 18px; background:#ffffff; border:1px solid #dbe4f2; border-radius:14px; padding:3px 8px;")
+        vbox.addWidget(icon_label, alignment=Qt.AlignmentFlag.AlignLeft)
+        vbox.addSpacing(6)
+
         name = QLabel(module['name'])
         name.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
-        name.setStyleSheet("color: #1a1a2e; margin-bottom: 0px; background: transparent;")
+        name.setStyleSheet("color:#0f172a;")
         name.setAlignment(Qt.AlignmentFlag.AlignLeft)
         vbox.addWidget(name)
+
+        hint = QLabel(module.get("desc", "Open module workspace"))
+        hint.setWordWrap(True)
+        hint.setStyleSheet("color:#64748b; font-size:11px;")
+        vbox.addWidget(hint)
+
         vbox.addStretch()
+
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(6)
+        btn_row.addStretch()
+
+        open_btn = QPushButton("Open →")
+        open_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        open_btn.setStyleSheet(f"""
+            QPushButton {{
+                background:{module_color};
+                color:#ffffff;
+                border:1px solid {module_color};
+                border-radius:10px;
+                padding:6px 12px;
+                font-size:11px;
+                font-weight:700;
+            }}
+            QPushButton:hover {{
+                background:#1f4df0;
+            }}
+        """)
+        open_btn.clicked.connect(lambda _=False, url=module['url']: self.open_module(url))
+        btn_row.addWidget(open_btn)
+
+        help_url = module.get("help")
+        if help_url:
+            help_btn = QPushButton("Help")
+            help_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            help_btn.setStyleSheet("""
+                QPushButton {
+                    background:#ffffff;
+                    color:#334155;
+                    border:1px solid #c9d7ee;
+                    border-radius:10px;
+                    padding:6px 12px;
+                    font-size:11px;
+                    font-weight:700;
+                }
+                QPushButton:hover {
+                    background:#eef2ff;
+                }
+            """)
+            help_btn.clicked.connect(lambda _=False, url=help_url: self.open_module(url))
+            btn_row.addWidget(help_btn)
+
+        vbox.addLayout(btn_row)
+
         card.mousePressEvent = lambda e: self.open_module(module['url'])
         card.setCursor(Qt.CursorShape.PointingHandCursor)
         return card
@@ -1901,6 +2722,33 @@ class QMSDesktopClient(QMainWindow):
                     logger.info(f"Showing {len(notifications)} notifications in summary window")
         except Exception:
             logger.exception("Failed to fetch or show notification popups")
+
+    def _cleanup_toast_refs(self):
+        self.active_toasts = [widget for widget in self.active_toasts if widget is not None and widget.isVisible()]
+
+    def _reflow_toasts(self):
+        self._cleanup_toast_refs()
+        toasts = [widget for widget in self.active_toasts if isinstance(widget, ToastNotification)]
+        if not toasts:
+            return
+
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        x = screen.right() - 390
+        y = screen.bottom() - 16
+        for toast in reversed(toasts):
+            toast.adjustSize()
+            toast.move(x, y - toast.height())
+            y -= toast.height() + 10
+
+    def _infer_notification_variant(self, title, message):
+        text = f"{title or ''} {message or ''}".lower()
+        if any(keyword in text for keyword in ['error', 'failed', 'fail', 'denied', 'unauthorized']):
+            return 'error'
+        if any(keyword in text for keyword in ['warning', 'delay', 'overdue', 'late', '주의', '지연']):
+            return 'warning'
+        if any(keyword in text for keyword in ['success', 'complete', 'completed', 'done', 'saved']):
+            return 'success'
+        return 'info'
     
     def show_notification(self, title, message):
         if platform.system() == "Darwin":
@@ -1908,10 +2756,45 @@ class QMSDesktopClient(QMainWindow):
             script = f'display notification "{message}" with title "{title}"'
             subprocess.run(["osascript", "-e", script])
         else:
-            toast = ToastNotification(title, message)
+            variant = self._infer_notification_variant(title, message)
+            action_label = None
+            action_callback = None
+
+            if variant in {"error", "warning"}:
+                action_label = "Open"
+                action_callback = self.show_main_ui
+            elif "task" in f"{title} {message}".lower():
+                action_label = "Tasks"
+                action_callback = lambda: self.open_module('/rpmt')
+
+            toast = ToastNotification(
+                title,
+                message,
+                duration=4600,
+                variant=variant,
+                action_label=action_label,
+                action_callback=action_callback,
+            )
+
+            self._cleanup_toast_refs()
+            active_toasts = [widget for widget in self.active_toasts if isinstance(widget, ToastNotification)]
+            if len(active_toasts) >= 4:
+                oldest = active_toasts[0]
+                try:
+                    oldest.close()
+                except Exception:
+                    logger.debug("Failed to close oldest toast", exc_info=True)
+
             self.active_toasts.append(toast)
             toast.show()
-            QTimer.singleShot(5000, lambda: self.active_toasts.remove(toast) if toast in self.active_toasts else None)
+            self._reflow_toasts()
+
+            def remove_toast_reference():
+                if toast in self.active_toasts:
+                    self.active_toasts.remove(toast)
+                self._reflow_toasts()
+
+            QTimer.singleShot(5000, remove_toast_reference)
     
     def start_notification_worker(self):
         self.worker = NotificationWorker(self.server_url, cookie_jar=self.cookie_jar)
