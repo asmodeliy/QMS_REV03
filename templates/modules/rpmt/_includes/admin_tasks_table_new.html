@@ -1,25 +1,26 @@
 <div class="admin-panel">
   <div class="admin-card">
     <div class="admin-card-head">
-      <div class="admin-card-title-row">
-        <strong class="admin-title">{{ p.code }}</strong>
-        <form method="post" action="/admin/rpmt/projects/{{ p.id }}/archive?v={{ visit }}" class="form-inline">
-          <button class="btn small ghost" type="submit" title="Archive this project">📦</button>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <h2 class="admin-title" style="margin:0; font-size:1.2rem; font-weight:800; color:var(--text-strong);">{{ p.code
+          }}</h2>
+        <form method="post" action="/rpmt/admin/projects/{{ p.id }}/archive?v={{ visit }}"
+          style="display:inline; margin:0;">
+          <button class="btn small ghost" type="submit" title="Archive this project"
+            style="opacity:0.6; filter:grayscale(1);">📦</button>
         </form>
       </div>
-      <a class="btn ghost" href="/rpmt/projects/{{ p.id }}">상세보기</a>
+      <a class="btn primary small" href="/rpmt/projects/{{ p.id }}">상세보기</a>
     </div>
 
-    <button type="button" onclick="togglePDKDKModal()" class="rpmt-pdk-btn">📋 PDK/DK Information</button>
+    <button type="button" class="rpmt-pdk-btn" onclick="openPDKDKModal()">📋 PDK/DK Information</button>
 
-    <form method="post"
-      action="/admin/rpmt/projects/{{ p.id }}/update?v={{ visit }}"
-      class="table-form-grid cols-6">
-      <input class="inp" name="code"         value="{{ p.code or '' }}"         placeholder="PROJECT CODE">
-      <input class="inp" name="process"      value="{{ p.process or '' }}"      placeholder="PROCESS">
+    <form method="post" action="/rpmt/admin/projects/{{ p.id }}/update?v={{ visit }}" class="table-form-grid cols-6">
+      <input class="inp" name="code" value="{{ p.code or '' }}" placeholder="PROJECT CODE">
+      <input class="inp" name="process" value="{{ p.process or '' }}" placeholder="PROCESS">
       <input class="inp" name="metal_option" value="{{ p.metal_option or '' }}" placeholder="METAL OPTION">
-      <input class="inp" name="ip_code"      value="{{ p.ip_code or '' }}"      placeholder="IP/IC CODE">
-      <input class="inp" name="pdk_ver"      value="{{ p.pdk_ver or '' }}"      placeholder="PDK VER">
+      <input class="inp" name="ip_code" value="{{ p.ip_code or '' }}" placeholder="IP/IC CODE">
+      <input class="inp" name="pdk_ver" value="{{ p.pdk_ver or '' }}" placeholder="PDK VER">
       <button class="btn primary" type="submit">저장</button>
     </form>
   </div>
@@ -30,9 +31,9 @@
       <thead>
         <tr>
           <th colspan="8" class="category-header">
-            <div class="admin-category-row">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
               <span>{{ cat1 or '—' }}</span>
-              <form method="post" action="/admin/rpmt/tasks/create?v={{ visit }}" class="form-inline">
+              <form method="post" action="/rpmt/admin/tasks/create?v={{ visit }}" style="margin:0;">
                 <input type="hidden" name="project_id" value="{{ p.id }}">
                 <input type="hidden" name="cat1" value="{{ cat1 }}">
                 <button class="btn small" type="submit">행 추가</button>
@@ -54,33 +55,33 @@
       <tbody>
         {% for t in tasks %}
         <tr class="task-row">
-              <form id="task-{{ t.id }}-form"
-                method="post"
-                action="/admin/rpmt/tasks/{{ t.id }}/update?v={{ visit }}"
-                class="form-contents">
-            <td>
-              <input class="inp" name="cat1" value="{{ t.cat1 or '' }}">
-              <input type="hidden" name="reason" value="{{ t.reason or '' }}">
-            </td>
-            <td><input class="inp" name="cat2" value="{{ t.cat2 or '' }}"></td>
-            <td><input class="inp" name="dept_from" value="{{ t.dept_from or '' }}"></td>
-            <td><input class="inp" name="dept_to" value="{{ t.dept_to or '' }}"></td>
-            <td><input class="inp" type="date" name="due_date" value="{{ t.due_date.strftime('%Y-%m-%d') if t.due_date else '' }}"></td>
-            <td>
-              <select class="inp" name="status">
-                {% for s in StatusEnum %}
-                  <option value="{{ s.value }}" {% if t.status and t.status.value==s.value %}selected{% endif %}>{{ s.value }}</option>
-                {% endfor %}
-              </select>
-            </td>
-            <td><input class="inp input-sm-center" type="number" name="ord_val" value="{{ t.ord or '' }}"></td>
-          </form>
+          <td><input class="inp" form="task-{{ t.id }}-form" name="cat1" value="{{ t.cat1 or '' }}"></td>
+          <td><input class="inp" form="task-{{ t.id }}-form" name="cat2" value="{{ t.cat2 or '' }}"></td>
+          <td><input class="inp" form="task-{{ t.id }}-form" name="dept_from" value="{{ t.dept_from or '' }}"></td>
+          <td><input class="inp" form="task-{{ t.id }}-form" name="dept_to" value="{{ t.dept_to or '' }}"></td>
+          <td><input class="inp" form="task-{{ t.id }}-form" type="date" name="due_date"
+              value="{{ t.due_date.strftime('%Y-%m-%d') if t.due_date else '' }}"></td>
+          <td>
+            <select class="inp" form="task-{{ t.id }}-form" name="status">
+              {% for s in StatusEnum %}
+              <option value="{{ s.value }}" {% if t.status and t.status.value==s.value %}selected{% endif %}>{{
+                s.value }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><input class="inp" form="task-{{ t.id }}-form" type="number" name="ord_val" value="{{ t.ord or '' }}"
+              style="width:60px; text-align:center;"></td>
           <td class="actions-cell">
-            <button class="btn small primary" type="submit" form="task-{{ t.id }}-form">저장</button>
-            <form method="post" action="/admin/rpmt/tasks/{{ t.id }}/insert-below?v={{ visit }}" class="form-inline form-inline-gap">
+            <form id="task-{{ t.id }}-form" class="form-inline-gap" method="post" action="/rpmt/admin/tasks/{{ t.id }}/update?v={{ visit }}" style="margin:0;">
+              <input type="hidden" name="reason" value="{{ t.reason or '' }}">
+              <button class="btn small primary" type="submit">저장</button>
+            </form>
+            <form class="form-inline" method="post" action="/rpmt/admin/tasks/{{ t.id }}/insert-below?v={{ visit }}"
+              style="margin:0 2px;">
               <button class="btn small ghost" type="submit">아래삽입</button>
             </form>
-            <form method="post" action="/admin/rpmt/tasks/{{ t.id }}/delete?v={{ visit }}" onsubmit="return confirm('삭제하시겠습니까?');" class="form-inline form-inline-gap">
+            <form class="form-inline" method="post" action="/rpmt/admin/tasks/{{ t.id }}/delete?v={{ visit }}"
+              onsubmit="return confirm('삭제하시겠습니까?');" style="margin:0 2px;">
               <button class="btn small danger" type="submit">삭제</button>
             </form>
           </td>
@@ -89,7 +90,7 @@
 
         {% if tasks|length == 0 %}
         <tr>
-          <td colspan="8" class="table-empty">등록된 항목 없음</td>
+          <td colspan="8" style="text-align:center; padding:20px; color:var(--muted);">등록된 항목 없음</td>
         </tr>
         {% endif %}
       </tbody>
@@ -98,116 +99,10 @@
   {% endfor %}
 
   {% if groups|length == 0 %}
-  <div class="admin-card soft muted panel-empty">
+  <div class="admin-card soft muted" style="text-align:center; padding:20px; color:var(--muted);">
     아직 태스크가 없습니다. "행 추가"로 생성하세요.
   </div>
   {% endif %}
 </div>
 
-<div id="pdk-dk-modal" class="pdk-modal hidden">
-  <div class="pdk-modal-panel">
-    <div class="pdk-modal-head">
-      <h2 class="pdk-modal-title">PDK/DK Information - {{ p.code }}</h2>
-      <button type="button" onclick="closePDKDKModal()" class="pdk-modal-close">×</button>
-    </div>
-    
-    <div class="pdk-modal-body">
-      <table class="pdk-table">
-        <thead>
-          <tr class="pdk-head-row">
-            <th colspan="2" rowspan="3" class="pdk-th pdk-th-lg pdk-th-neutral">Required DK PDK List</th>
-            <th colspan="4" class="pdk-th pdk-th-lg pdk-th-blue">DK Version @ Kick-off</th>
-            <th colspan="4" class="pdk-th pdk-th-lg pdk-th-amber">DK Version @ 1week before tape out</th>
-            <th colspan="1" rowspan="3" class="pdk-th pdk-th-lg pdk-th-amber">DK Version @ 1week before tape out</th>
-          </tr>
-          <tr class="pdk-subhead-row">
-            <th class="pdk-th pdk-th-blue">Name / Version</th>
-            <th class="pdk-th pdk-th-blue">B2B Released Date</th>
-            <th class="pdk-th pdk-th-blue">Matching check</th>
-            <th class="pdk-th pdk-th-blue">check date</th>
-            <th class="pdk-th pdk-th-amber">Name / Version</th>
-            <th class="pdk-th pdk-th-amber">B2B Released Date</th>
-            <th class="pdk-th pdk-th-amber">Matching check</th>
-            <th class="pdk-th pdk-th-amber">check date</th>
-            <th class="pdk-th pdk-th-amber">Un-matched reason</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for entry in pdk_dk_entries %}
-          <tr class="pdk-row {% if loop.index0 % 2 == 0 %}is-even{% else %}is-odd{% endif %}" data-entry-id="{{ entry.id }}">
-            <td class="pdk-cell pdk-cell-click" onclick="toggleTypeEdit(this, {{ entry.id }})">
-              <span id="display-type-{{ entry.id }}" class="pdk-display pdk-type-badge {% if entry.type == 'PDK' %}pdk-type-pdk{% elif entry.type == 'DK' %}pdk-type-dk{% else %}pdk-type-none{% endif %}">
-                {% if entry.type == 'PDK' %}PDK{% elif entry.type == 'DK' %}DK{% else %}-{% endif %}
-              </span>
-              <select id="type-{{ entry.id }}" class="pdk-select hidden" onchange="saveTypeField({{ entry.id }}, this.value)">
-                <option value="">-</option>
-                <option value="PDK">PDK</option>
-                <option value="DK">DK</option>
-              </select>
-            </td>
-            <td class="pdk-cell pdk-cell-center pdk-cell-strong">{{ entry.category }}</td>
-            
-            <td class="pdk-cell pdk-cell-sm" onclick="toggleEdit(this, 'eng-ver-ko-{{ entry.id }}')">
-              <span id="display-eng-ver-ko-{{ entry.id }}" class="pdk-display pdk-display-md">{{ entry.engineer_version_kickoff or '-' }}</span>
-              <input type="text" id="eng-ver-ko-{{ entry.id }}" value="{{ entry.engineer_version_kickoff or '' }}" class="pdk-input hidden" onblur="saveField({{ entry.id }}, 'engineer_version_kickoff', this.value)"/>
-            </td>
-            <td class="pdk-cell pdk-cell-sm" onclick="toggleEdit(this, 'b2b-date-ko-{{ entry.id }}')">
-              <span id="display-b2b-date-ko-{{ entry.id }}" class="pdk-display pdk-display-sm">{{ entry.engineer_b2b_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_b2b_date_kickoff else '-' }}</span>
-              <input type="date" id="b2b-date-ko-{{ entry.id }}" value="{{ entry.engineer_b2b_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_b2b_date_kickoff else '' }}" class="pdk-input hidden" onblur="saveField({{ entry.id }}, 'engineer_b2b_date_kickoff', this.value)"/>
-            </td>
-            <td class="pdk-cell pdk-cell-sm" onclick="toggleEdit(this, 'match-ko-{{ entry.id }}')">
-              <span id="display-match-ko-{{ entry.id }}" class="pdk-display pdk-display-sm">{{ entry.engineer_matching_kickoff or '-' }}</span>
-              <select id="match-ko-{{ entry.id }}" class="pdk-select hidden" onblur="saveField({{ entry.id }}, 'engineer_matching_kickoff', this.value)">
-                <option value="">-</option>
-                <option value="Matched">Matched</option>
-                <option value="Unmatched">Unmatched</option>
-              </select>
-            </td>
-            <td class="pdk-cell pdk-cell-sm" onclick="toggleEdit(this, 'check-date-ko-{{ entry.id }}')">
-              <span id="display-check-date-ko-{{ entry.id }}" class="pdk-display pdk-display-sm">{{ entry.engineer_check_date_kickoff.strftime('%Y.%m.%d') if entry.engineer_check_date_kickoff else '-' }}</span>
-              <input type="date" id="check-date-ko-{{ entry.id }}" value="{{ entry.engineer_check_date_kickoff.strftime('%Y-%m-%d') if entry.engineer_check_date_kickoff else '' }}" class="pdk-input hidden" onblur="saveField({{ entry.id }}, 'engineer_check_date_kickoff', this.value)"/>
-            </td>
-            <td class="pdk-cell pdk-cell-sm" onclick="toggleEdit(this, 'qa-check-ko-{{ entry.id }}')">
-              <span id="display-qa-check-ko-{{ entry.id }}" class="pdk-display pdk-display-sm">{{ entry.qa_matching_kickoff or '-' }}</span>
-              <select id="qa-check-ko-{{ entry.id }}" class="pdk-select hidden" onblur="saveField({{ entry.id }}, 'qa_matching_kickoff', this.value)">
-                <option value="">-</option>
-                <option value="Matched">Matched</option>
-                <option value="Unmatched">Unmatched</option>
-              </select>
-            </td>
-            
-            <td class="pdk-cell pdk-cell-sm pdk-cell-amber" onclick="toggleEdit(this, 'eng-ver-tweek-{{ entry.id }}')">
-              <span id="display-eng-ver-tweek-{{ entry.id }}" class="pdk-display pdk-display-md">{{ entry.engineer_version_tweek or '-' }}</span>
-              <input type="text" id="eng-ver-tweek-{{ entry.id }}" value="{{ entry.engineer_version_tweek or '' }}" class="pdk-input hidden" onblur="saveField({{ entry.id }}, 'engineer_version_tweek', this.value)"/>
-            </td>
-            <td class="pdk-cell pdk-cell-sm pdk-cell-amber" onclick="toggleEdit(this, 'b2b-date-tweek-{{ entry.id }}')">
-              <span id="display-b2b-date-tweek-{{ entry.id }}" class="pdk-display pdk-display-sm">{{ entry.engineer_b2b_date_tweek.strftime('%Y.%m.%d') if entry.engineer_b2b_date_tweek else '-' }}</span>
-              <input type="date" id="b2b-date-tweek-{{ entry.id }}" value="{{ entry.engineer_b2b_date_tweek.strftime('%Y-%m-%d') if entry.engineer_b2b_date_tweek else '' }}" class="pdk-input hidden" onblur="saveField({{ entry.id }}, 'engineer_b2b_date_tweek', this.value)"/>
-            </td>
-            <td class="pdk-cell pdk-cell-sm pdk-cell-amber" onclick="toggleEdit(this, 'match-tweek-{{ entry.id }}')">
-              <span id="display-match-tweek-{{ entry.id }}" class="pdk-display pdk-display-sm">{{ entry.engineer_matching_tweek or '-' }}</span>
-              <select id="match-tweek-{{ entry.id }}" class="pdk-select hidden" onblur="saveField({{ entry.id }}, 'engineer_matching_tweek', this.value)">
-                <option value="">-</option>
-                <option value="Matched">Matched</option>
-                <option value="Unmatched">Unmatched</option>
-              </select>
-            </td>
-            <td class="pdk-cell pdk-cell-sm pdk-cell-amber" onclick="toggleEdit(this, 'check-date-tweek-{{ entry.id }}')">
-              <span id="display-check-date-tweek-{{ entry.id }}" class="pdk-display pdk-display-sm">{{ entry.engineer_check_date_tweek.strftime('%Y.%m.%d') if entry.engineer_check_date_tweek else '-' }}</span>
-              <input type="date" id="check-date-tweek-{{ entry.id }}" value="{{ entry.engineer_check_date_tweek.strftime('%Y-%m-%d') if entry.engineer_check_date_tweek else '' }}" class="pdk-input hidden" onblur="saveField({{ entry.id }}, 'engineer_check_date_tweek', this.value)"/>
-            </td>
-            <td class="pdk-cell pdk-cell-sm pdk-cell-amber" onclick="toggleEdit(this, 'reason-{{ entry.id }}')">
-              <span id="display-reason-{{ entry.id }}" class="pdk-display pdk-display-lg">{{ entry.unmatched_reason_tweek or '-' }}</span>
-              <textarea id="reason-{{ entry.id }}" class="pdk-textarea hidden" onblur="saveField({{ entry.id }}, 'unmatched_reason_tweek', this.value)"></textarea>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    
-    <div class="pdk-modal-foot">
-      <button type="button" onclick="closePDKDKModal()" class="pdk-btn pdk-btn-close">Close</button>
-    </div>
-  </div>
-</div>
+{% include 'modules/rpmt/_includes/pdkdk_modal.html' %}
