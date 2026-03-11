@@ -100,7 +100,22 @@
       const sel = [...document.querySelectorAll('.side-item')]
         .find(n => n.getAttribute('onclick')?.includes(`(${pid})`));
       if(sel) sel.classList.add('active');
+
+      // 스크롤 및 포커스 유지 (폼 제출 후 리로드 시)
+      const scrollY = sessionStorage.getItem('rpmt_admin_scrollY');
+      if(scrollY !== null) {
+        // 약간의 딜레이를 주어 완전히 렌더링된 후 스크롤을 이동하도록 함
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(scrollY, 10));
+          sessionStorage.removeItem('rpmt_admin_scrollY');
+        }, 10);
+      }
     }
+
+    // 폼 제출, 페이지 리로드 시 현재 스크롤 위치 저장
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('rpmt_admin_scrollY', window.scrollY);
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
       if(FOCUS) openProjectInAdmin(FOCUS);

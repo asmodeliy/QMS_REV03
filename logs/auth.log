@@ -1038,3 +1038,6 @@ WHERE users.email = ?]
 {"timestamp": "2026-02-11 20:04:49", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "swlee@ramschip.com"}"}
 {"timestamp": "2026-02-11 20:04:49", "level": "DEBUG", "module": "auth", "message": "Login attempt for swlee@ramschip.com | {"ip": "127.0.0.1"}"}
 {"timestamp": "2026-02-11 20:04:49", "level": "INFO", "module": "auth", "message": "User swlee@ramschip.com logged in successfully | {"user_id": 8, "ip": "127.0.0.1"}"}
+{"timestamp": "2026-03-11 12:09:06", "level": "DEBUG", "module": "auth", "message": "Request received | {"type": "request", "method": "POST", "path": "/login", "user": "admin@localhost"}"}
+{"timestamp": "2026-03-11 12:09:06", "level": "DEBUG", "module": "auth", "message": "Login attempt for admin@localhost | {"ip": "127.0.0.1"}"}
+{"timestamp": "2026-03-11 12:09:06", "level": "INFO", "module": "auth", "message": "User admin@localhost logged in successfully | {"user_id": 6, "ip": "127.0.0.1"}"}

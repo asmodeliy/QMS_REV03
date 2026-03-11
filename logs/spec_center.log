@@ -1986,3 +1986,5 @@ ved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
 {"timestamp": "2026-02-13 13:46:04", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
 {"timestamp": "2026-02-13 15:38:17", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_SERVER\uploads\spec_center"}
 {"timestamp": "2026-02-13 15:38:17", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
+{"timestamp": "2026-03-11 12:08:55", "level": "INFO", "module": "spec_center", "message": "Spec center upload folder resolved to: C:\Users\이상원\Downloads\QMS_Merge\QMS_REV0.3\QMS_REV0.2\uploads\spec_center"}
+{"timestamp": "2026-03-11 12:08:55", "level": "INFO", "module": "spec_center", "message": "soffice=False mammoth=False"}
